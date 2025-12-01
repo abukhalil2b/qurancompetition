@@ -15,7 +15,7 @@ return new class extends Migration
         Schema::create('questionsets', function (Blueprint $table) {
             $table->id();
             $table->string('title');
-            $table->string('branch');
+            $table->enum('level', ['حفظ','حفظ وتفسير'])->default('حفظ');
             $table->boolean('selected')->default(false);
         });
     }

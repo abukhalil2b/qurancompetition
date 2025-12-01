@@ -19,11 +19,10 @@ return new class extends Migration
             $table->string('national_id', 11)->nullable()->unique();// max digit = 11
             $table->string('nationality');
             $table->date('dob');
-            $table->string('age')->nullable();
             $table->string('state');
             $table->string('wilaya');
             $table->string('qarya')->nullable();
-            $table->string('branch')->nullable();
+            $table->enum('level', ['حفظ','حفظ وتفسير'])->default('حفظ');
             $table->date('registration_date')->nullable();
             $table->timestamps();
         });

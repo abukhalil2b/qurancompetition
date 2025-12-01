@@ -1,7 +1,7 @@
 <x-app-layout>
     <div class="p-6 max-w-4xl mx-auto bg-white rounded-xl shadow">
         <div class="flex justify-between items-center mb-4">
-            <h2 class="text-xl font-bold">الأسئلة لمجموعة: {{ $questionset->title }}</h2>
+            <h2 class="text-xl font-bold">الأسئلة لباقة: {{ $questionset->title }}</h2>
             <a href="{{ route('question.create', $questionset) }}"
                 class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
                 إضافة سؤال جديد

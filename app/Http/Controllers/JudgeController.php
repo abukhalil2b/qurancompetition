@@ -30,26 +30,26 @@ class JudgeController extends Controller
     {
         return view('judge.create');
     }
- 
+
     public function store(Request $request)
-{
-    $validated = $request->validate([
-        'name'        => 'required|string|max:255',
-        'gender'      => 'required|in:male,female',
-        'national_id' => 'nullable|string|max:10|unique:users,national_id',
-    ]);
+    {
+        $validated = $request->validate([
+            'name'        => 'required|string|max:255',
+            'gender'      => 'required|in:male,female',
+            'national_id' => 'nullable|string|max:10|unique:users,national_id',
+        ]);
 
-    User::create([
-        'name'        => $validated['name'],
-        'gender'      => $validated['gender'],
-        'national_id' => $validated['national_id'] ?? null,
-        'user_type'   => 'judge',
-        'password'    => bcrypt('123456'), // default
-    ]);
+        User::create([
+            'name'        => $validated['name'],
+            'gender'      => $validated['gender'],
+            'national_id' => $validated['national_id'] ?? null,
+            'user_type'   => 'judge',
+            'password'    => bcrypt('123456'), // default
+        ]);
 
-    return redirect()->route('judge.index')
-                     ->with('success', 'تم إضافة المحكم بنجاح');
-}
+        return redirect()->route('judge.index')
+            ->with('success', 'تم إضافة المحكم بنجاح');
+    }
 
 
     public function assignCommittee(Request $request)

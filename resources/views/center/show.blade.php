@@ -1,16 +1,12 @@
 <x-app-layout>
 
-<div class="p-6 space-y-6">
+<div class="p-3 space-y-3">
 
-    {{-- Center Info --}}
-    <h1 class="text-xl font-bold">بيانات المركز</h1>
 
-    <div class="bg-white shadow rounded-lg p-4">
-        <h2 class="text-lg font-semibold">{{ $center->title }}</h2>
+        <h2 class="text-3xl font-semibold">{{ $center->title }}</h2>
         <p class="text-gray-700 mt-2 leading-relaxed">
             {{ $center->description }}
         </p>
-    </div>
 
 
     {{-- Committees List --}}

@@ -9,7 +9,8 @@ class QuestionsetController extends Controller
 {
     public function index()
     {
-        $questionsets = Questionset::all();
+        $questionsets = Questionset::withCount('questions')->get();
+
         return view('questionset.index', compact('questionsets'));
     }
 
@@ -23,19 +24,24 @@ class QuestionsetController extends Controller
         $request->validate([
             'title' => 'required|string|max:255',
             'branch' => 'required|string|max:255',
-            'selected' => 'boolean',
         ]);
 
-        Questionset::create($request->all());
+        Questionset::create([
+            'title' => $request->title,
+            'branch' => $request->branch,
+        ]);
 
-        return redirect()->route('questionset.index')->with('success', 'تم إنشاء مجموعة الأسئلة بنجاح');
+        return redirect()->route('questionset.index')->with('success', 'تم إنشاء باقة الأسئلة بنجاح');
     }
 
     public function show(Questionset $questionset)
-    {
-        $questions = $questionset->questions;
-        return view('questionset.show', compact('questionset', 'questions'));
-    }
+{
+    $questionsByLevel = $questionset->questions
+        ->groupBy('difficulties');
+
+    return view('questionset.show', compact('questionset', 'questionsByLevel'));
+}
+
 
     public function edit(Questionset $questionset)
     {
@@ -52,12 +58,12 @@ class QuestionsetController extends Controller
 
         $questionset->update($request->all());
 
-        return redirect()->route('questionset.index')->with('success', 'تم تحديث مجموعة الأسئلة بنجاح');
+        return redirect()->route('questionset.index')->with('success', 'تم تحديث باقة الأسئلة بنجاح');
     }
 
     public function destroy(Questionset $questionset)
     {
         $questionset->delete();
-        return back()->with('success', 'تم حذف مجموعة الأسئلة');
+        return back()->with('success', 'تم حذف باقة الأسئلة');
     }
 }

@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('centers', function (Blueprint $table) {
             $table->id();
             $table->string('title');// name of place
-            $table->text('description');// center info: a place where competition begin, write date and other info.
+            $table->text('description')->nullable();// center info: a place where competition begin, write date and other info.
             $table->timestamps();
         });
     }

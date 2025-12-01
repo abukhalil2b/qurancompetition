@@ -26,11 +26,13 @@ class QuestionController extends Controller
     {
         $request->validate([
             'content' => 'required|string',
-            'level' => 'required|in:easy,medium,hard',
-            'branch' => 'required|string|max:255',
+            'difficulties' => 'required',
         ]);
 
-        $questionset->questions()->create($request->all());
+        $questionset->questions()->create([
+            'content'=>$request->content,
+            'difficulties'=>$request->difficulties,
+        ]);
 
         return redirect()->route('questionset.show', $questionset)->with('success', 'تم إضافة السؤال بنجاح');
     }

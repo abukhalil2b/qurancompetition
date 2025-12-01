@@ -114,7 +114,7 @@
                             </svg>
                             <span
                                 class="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">
-                                مجموعات الأسئلة
+                                باقات الأسئلة
                             </span>
                         </div>
                     </a>

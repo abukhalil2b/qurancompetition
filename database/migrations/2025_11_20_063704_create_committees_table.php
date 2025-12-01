@@ -15,8 +15,8 @@ return new class extends Migration
         Schema::create('committees', function (Blueprint $table) {
             $table->id();
             $table->string('title');
-            $table->enum('gender', ['male','female'])->default('male');
-            $table->string('branch')->nullable();
+            $table->enum('branch', ['male','female'])->default('male');
+            $table->enum('level', ['حفظ','حفظ وتفسير'])->default('حفظ');
             $table->foreignId('center_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
         });

@@ -13,10 +13,9 @@ return new class extends Migration
     {
         Schema::create('questions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('questionset_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('questionset_id')->nullable();
             $table->text('content');
-            $table->string('level');// question level (easy - hard)
-            $table->string('branch');// (تفسير وحفظ، فقط حفظ) 
+            $table->enum('difficulties', ['الصعبة','المتوسطة','السهلة'])->default('السهلة');
         });
     }
 
