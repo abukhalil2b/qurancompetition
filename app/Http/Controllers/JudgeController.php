@@ -4,36 +4,40 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Committee;
+use App\Models\Stage;
 use Illuminate\Http\Request;
 
 class JudgeController extends Controller
 {
     public function index()
     {
-        $judges = User::where('user_type', 'judge')->get();
+        $users = User::all();
 
-        return view('judge.index', compact('judges'));
+        return view('user.index', compact('users'));
     }
 
-    public function show(User $judge)
+    public function show(User $user)
     {
-        // load committees linked to the judge
-        $judge->load('committees');
+        // load committees linked to the user
+        $user->load('committees');
 
         // all committees from all centers
         $committees = Committee::with('center')->get();
 
-        return view('judge.show', compact('judge', 'committees'));
+        return view('user.show', compact('user', 'committees'));
     }
 
     public function create()
     {
-        return view('judge.create');
+        $userTypes = ['judge', 'admin', 'organizer', 'student'];
+
+        return view('user.create', compact('userTypes'));
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
+            'user_type'        => 'required|string|max:9',
             'name'        => 'required|string|max:255',
             'gender'      => 'required|in:male,female',
             'national_id' => 'nullable|string|max:10|unique:users,national_id',
@@ -43,29 +47,39 @@ class JudgeController extends Controller
             'name'        => $validated['name'],
             'gender'      => $validated['gender'],
             'national_id' => $validated['national_id'] ?? null,
-            'user_type'   => 'judge',
+            'user_type'   => $validated['user_type'],
             'password'    => bcrypt('123456'), // default
         ]);
 
-        return redirect()->route('judge.index')
+        return redirect()->route('user.index')
             ->with('success', 'تم إضافة المحكم بنجاح');
     }
 
 
-    public function assignCommittee(Request $request)
+    public function assignCommittees(Request $request)
     {
-        $validated = $request->validate([
-            'judge_id' => 'required|exists:users,id',
-            'committee_id' => 'required|exists:committees,id'
+        $request->validate([
+            'judge_id'       => 'required|exists:users,id',
+            'committee_ids'  => 'required|array',
+            'committee_ids.*' => 'exists:committees,id',
         ]);
 
-        $judge = User::findOrFail($validated['judge_id']);
+        $user = User::findOrFail($request->judge_id);
 
-        // Prevent duplicates
-        if (!$judge->committees()->where('committee_id', $validated['committee_id'])->exists()) {
-            $judge->committees()->attach($validated['committee_id']);
+        $stage = Stage::where('active', 1)->firstOrFail();
+
+        // Remove previous committee assignments for this stage only
+        $user->committees()
+            ->wherePivot('stage_id', $stage->id)
+            ->detach();
+
+        // Reassign committees for this stage
+        foreach ($request->committee_ids as $committee_id) {
+            $user->committees()->attach($committee_id, [
+                'stage_id' => $stage->id,
+            ]);
         }
 
-        return back()->with('success', 'تم ربط المحكم باللجنة بنجاح');
+        return back()->with('success', 'تم ربط المحكّم باللجان بنجاح');
     }
 }

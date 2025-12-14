@@ -15,7 +15,7 @@
                 </div>
             @endif
 
-            <form action="{{ route('judge.store') }}" method="POST" class="space-y-4">
+            <form action="{{ route('user.store') }}" method="POST" class="space-y-4">
                 @csrf
 
                 {{-- name --}}
@@ -34,9 +34,18 @@
                     </select>
                 </div>
 
+                <div>
+                    <label class="font-semibold mb-1 block">نوع المستخدم</label>
+                    <select name="gender" class="form-select w-full" required>
+                        @foreach($userTypes as $userType)
+                        <option value="{{ $userType }}">{{ __($userType) }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
                 {{-- national id --}}
                 <div>
-                    <label class="font-semibold mb-1 block">الرقم المدني (إن وجد)</label>
+                    <label class="font-semibold mb-1 block">الرقم المدني</label>
                     <input type="text" name="national_id" maxlength="10"
                            class="form-input w-full" value="{{ old('national_id') }}">
                 </div>
@@ -46,7 +55,7 @@
                 </p>
 
                 <div class="flex justify-between pt-4">
-                    <a href="{{ route('judge.index') }}"
+                    <a href="{{ route('user.index') }}"
                        class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">
                         رجوع
                     </a>
@@ -57,6 +66,7 @@
                 </div>
 
             </form>
+            
         </div>
     </div>
 </x-app-layout>

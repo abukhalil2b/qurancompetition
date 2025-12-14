@@ -2,13 +2,14 @@
 
 use App\Http\Controllers\CenterController;
 use App\Http\Controllers\CommitteeController;
+use App\Http\Controllers\CompetitionController;
 use App\Http\Controllers\EvaluationElementController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\JudgeController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\QuestionsetController;
 use App\Http\Controllers\QuestionController;
-
+use App\Http\Controllers\StageController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -24,6 +25,11 @@ Route::middleware(['auth'])->group(function () {
 
     // Students
     Route::get('student/index', [StudentController::class, 'index'])->name('student.index');
+    Route::get('student/present_index', [StudentController::class, 'presentIndex'])->name('student.present_index');
+    Route::get('student/choose_questionset/{competition}', [StudentController::class, 'chooseQuestionset'])->name('student.choose_questionset');
+    Route::get('student/save_questionset/{competition}/{questionset}', [StudentController::class, 'saveQuestionset'])->name('student.save_questionset');
+    Route::get('student/start_evaluation/{student_question_selection_id}', [StudentController::class, 'startEvaluation'])->name('student.start_evaluation');
+    Route::post('student/save_evaluation', [StudentController::class, 'saveEvaluation'])->name('student.save_evaluation');
     Route::get('student/create', [StudentController::class, 'create'])->name('student.create');
     Route::post('student/store', [StudentController::class, 'store'])->name('student.store');
     Route::get('student/show/{student}', [StudentController::class, 'show'])->name('student.show');
@@ -34,17 +40,22 @@ Route::middleware(['auth'])->group(function () {
 
 
 Route::middleware(['auth'])->group(function () {
-    Route::get('judge/index', [JudgeController::class, 'index'])
-        ->name('judge.index');
+    Route::post('competition/student/present', [CompetitionController::class, 'present'])
+        ->name('competition.student.present');
+});
 
-    Route::get('judge/show/{judge}', [JudgeController::class, 'show'])
-        ->name('judge.show');
+Route::middleware(['auth'])->group(function () {
+    Route::get('user/index', [JudgeController::class, 'index'])
+        ->name('user.index');
 
-    Route::get('judge/create', [JudgeController::class, 'create'])->name('judge.create');
-    Route::post('judge/store', [JudgeController::class, 'store'])->name('judge.store');
+    Route::get('user/show/{user}', [JudgeController::class, 'show'])
+        ->name('user.show');
 
-    Route::post('judge/assign-committee', [JudgeController::class, 'assignCommittee'])
-        ->name('judge.assignCommittee');
+    Route::get('user/create', [JudgeController::class, 'create'])->name('user.create');
+    Route::post('user/store', [JudgeController::class, 'store'])->name('user.store');
+
+    Route::post('judge/assign_committee', [JudgeController::class, 'assignCommittees'])
+        ->name('judge.assign_committee');
 });
 
 
@@ -69,48 +80,51 @@ Route::middleware(['auth'])->group(function () {
 Route::middleware(['auth'])->group(function () {
 
     // Questionsets CRUD
-    Route::get('questionsets', [QuestionsetController::class, 'index'])->name('questionset.index');
-    Route::get('questionsets/create', [QuestionsetController::class, 'create'])->name('questionset.create');
-    Route::post('questionsets', [QuestionsetController::class, 'store'])->name('questionset.store');
-    Route::get('questionsets/{questionset}', [QuestionsetController::class, 'show'])->name('questionset.show');
-    Route::get('questionsets/{questionset}/edit', [QuestionsetController::class, 'edit'])->name('questionset.edit');
-    Route::put('questionsets/{questionset}', [QuestionsetController::class, 'update'])->name('questionset.update');
-    Route::delete('questionsets/{questionset}', [QuestionsetController::class, 'destroy'])->name('questionset.destroy');
+    Route::get('questionset/index/{id?}', [QuestionsetController::class, 'index'])->name('questionset.index');
+    Route::get('questionset/create', [QuestionsetController::class, 'create'])->name('questionset.create');
+    Route::post('questionset', [QuestionsetController::class, 'store'])->name('questionset.store');
+    Route::get('questionset/show/{questionset}', [QuestionsetController::class, 'show'])->name('questionset.show');
+    Route::get('questionset/edit/{questionset}', [QuestionsetController::class, 'edit'])->name('questionset.edit');
+    Route::put('questionset/{questionset}', [QuestionsetController::class, 'update'])->name('questionset.update');
+    Route::delete('questionset/{questionset}', [QuestionsetController::class, 'destroy'])->name('questionset.destroy');
 
     // Questions CRUD
-    Route::get('questions/{questionset}/index', [QuestionController::class, 'index'])->name('question.index');
-    Route::get('questions/{questionset}/create', [QuestionController::class, 'create'])->name('question.create');
-    Route::post('questions/{questionset}', [QuestionController::class, 'store'])->name('question.store');
-    Route::get('questions/{question}/edit', [QuestionController::class, 'edit'])->name('question.edit');
-    Route::put('questions/{question}', [QuestionController::class, 'update'])->name('question.update');
-    Route::delete('questions/{question}', [QuestionController::class, 'destroy'])->name('question.destroy');
+    Route::get('question/index', [QuestionController::class, 'index'])->name('question.index');
+    Route::get('question/create/{questionset}', [QuestionController::class, 'create'])->name('question.create');
+    Route::post('question/{questionset}', [QuestionController::class, 'store'])->name('question.store');
+    Route::get('question/edit/{question}', [QuestionController::class, 'edit'])->name('question.edit');
+    Route::put('question/{question}', [QuestionController::class, 'update'])->name('question.update');
+    Route::delete('question/{question}', [QuestionController::class, 'destroy'])->name('question.destroy');
 });
 
 
 Route::middleware(['auth'])->group(function () {
-    Route::get('evaluation_element/index', [EvaluationElementController::class, 'index'])
+    Route::get('evaluation_element/index/{id}', [EvaluationElementController::class, 'index'])
         ->name('evaluation_element.index');
-        Route::get('evaluation_element/edit/{evaluationElement}', [EvaluationElementController::class, 'edit'])
+    Route::get('evaluation_element/edit/{evaluationElement}', [EvaluationElementController::class, 'edit'])
         ->name('evaluation_element.edit');
-        // PUT/PATCH: Update the specified resource in storage
     Route::put('evaluation_element/update/{evaluationElement}', [EvaluationElementController::class, 'update'])
         ->name('evaluation_element.update');
-        
-    // DELETE: Remove the specified resource from storage (The requested method)
-    Route::delete('evaluation_element/destroy/{evaluationElement}', [EvaluationElementController::class, 'destroy'])
-        ->name('evaluation_element.destroy');
-    Route::get('evaluation_element/create', [EvaluationElementController::class, 'create'])
-        ->name('evaluation_element.create');
     Route::post('evaluation_element/store', [EvaluationElementController::class, 'store'])
         ->name('evaluation_element.store');
-
 });
 
 
 Route::middleware(['auth'])->group(function () {
     Route::get('evaluation', [EvaluationElementController::class, 'evaluation'])
         ->name('evaluation');
-
 });
+
+
+
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('stage/index', [StageController::class, 'index'])
+        ->name('stage.index');
+
+    Route::post('stage/{stage}/toggle-active', [StageController::class, 'toggleActive'])
+        ->name('stage.toggle');
+});
+
 
 require __DIR__ . '/auth.php';

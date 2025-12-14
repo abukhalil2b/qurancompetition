@@ -11,10 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('committee_judges', function (Blueprint $table) {
+        Schema::create('committee_users', function (Blueprint $table) {
             $table->id();
+            $table->bigInteger('stage_id');
             $table->foreignId('committee_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('judge_id')->constrained('users')->cascadeOnDelete();
+            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->timestamps();
         });
     }
@@ -24,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('committee_judges');
+        Schema::dropIfExists('committee_users');
     }
 };

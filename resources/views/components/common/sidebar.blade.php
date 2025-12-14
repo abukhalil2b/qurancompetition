@@ -45,6 +45,27 @@
                     </a>
                 </li>
 
+                <li class="nav-item">
+                    <a href="{{ route('stage.index') }}" class="group">
+                        <div class="flex items-center">
+                            <svg class="shrink-0 group-hover:!text-primary" width="20" height="20"
+                                viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"
+                                focusable="false">
+                                <!-- Layers / Steps icon -->
+                                <path d="M12 2L2 7l10 5 10-5-10-5z" fill="currentColor" opacity="0.9" />
+                                <path d="M2 12l10 5 10-5" fill="currentColor" opacity="0.6" />
+                                <path d="M2 17l10 5 10-5" fill="currentColor" opacity="0.4" />
+                            </svg>
+
+                            <span
+                                class="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">
+                                التصفيات
+                            </span>
+                        </div>
+                    </a>
+                </li>
+
+
                 <!-- Committees -->
                 <li class="nav-item">
                     <a href="{{ route('committee.index') }}" class="group">
@@ -64,7 +85,7 @@
 
                 <!-- Judges -->
                 <li class="nav-item">
-                    <a href="{{ route('judge.index') }}" class="group">
+                    <a href="{{ route('user.index') }}" class="group">
                         <div class="flex items-center">
                             <svg class="shrink-0 group-hover:!text-primary" width="20" height="20"
                                 viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -75,7 +96,7 @@
                             </svg>
                             <span
                                 class="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">
-                                المحكمين
+                               مستخدم النظام
                             </span>
                         </div>
                     </a>
@@ -94,7 +115,24 @@
                             </svg>
                             <span
                                 class="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">
-                                الطلاب
+                                المتسابقون - تسجيل الحضور
+                            </span>
+                        </div>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ route('student.present_index') }}" class="group">
+                        <div class="flex items-center">
+                            <svg class="shrink-0 group-hover:!text-primary" width="20" height="20"
+                                viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path opacity="0.5"
+                                    d="M12 12c2.2091 0 4-1.7909 4-4s-1.7909-4-4-4-4 1.7909-4 4 1.7909 4 4 4z"
+                                    fill="currentColor" />
+                                <path d="M4 20c0-3.3137 3.5817-6 8-6s8 2.6863 8 6v1H4v-1z" fill="currentColor" />
+                            </svg>
+                            <span
+                                class="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">
+                                المتسابقون الحاضرون
                             </span>
                         </div>
                     </a>
@@ -102,7 +140,7 @@
 
                 <!-- Questionsets -->
                 <li class="nav-item">
-                    <a href="{{ route('questionset.index') }}" class="group">
+                    <a href="{{ route('questionset.index', 1) }}" class="group">
                         <div class="flex items-center">
                             <svg class="shrink-0 group-hover:!text-primary" width="20" height="20"
                                 viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -114,14 +152,33 @@
                             </svg>
                             <span
                                 class="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">
-                                باقات الأسئلة
+                                باقات الأسئلة - حفظ وتفسير
                             </span>
                         </div>
                     </a>
                 </li>
 
                 <li class="nav-item">
-                    <a href="{{ route('evaluation_element.index') }}" class="group">
+                    <a href="{{ route('questionset.index', 2) }}" class="group">
+                        <div class="flex items-center">
+                            <svg class="shrink-0 group-hover:!text-primary" width="20" height="20"
+                                viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path opacity="0.5"
+                                    d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"
+                                    fill="currentColor" />
+                                <path d="M12 6h.01M12 12h.01M12 18h.01" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                            <span
+                                class="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">
+                                باقات الأسئلة - حفظ
+                            </span>
+                        </div>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="{{ route('evaluation_element.index', 1) }}" class="group">
                         <div class="flex items-center">
                             <svg class="shrink-0 group-hover:!text-primary" width="20" height="20"
                                 viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -134,7 +191,27 @@
                             </svg>
                             <span
                                 class="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">
-                                عناصر التقييم
+                                عناصر التقييم - مستوى الحفظ
+                            </span>
+                        </div>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="{{ route('evaluation_element.index', 2) }}" class="group">
+                        <div class="flex items-center">
+                            <svg class="shrink-0 group-hover:!text-primary" width="20" height="20"
+                                viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <!-- Checklist/Document Icon -->
+                                <path opacity="0.5"
+                                    d="M14 2H6C4.89543 2 4 2.89543 4 4V20C4 21.1046 4.89543 22 6 22H18C19.1046 22 20 21.1046 20 20V8L14 2Z"
+                                    fill="currentColor" />
+                                <path d="M14 2V8H20M8 13L12 17L16 11" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                            <span
+                                class="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">
+                                عناصر التقييم -الحفظ والتفسير
                             </span>
                         </div>
                     </a>
@@ -154,7 +231,30 @@
                             </svg>
                             <span
                                 class="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">
-                                 التقييم
+                                التقييم
+                            </span>
+                        </div>
+                    </a>
+                </li>
+
+
+
+
+                <li class="nav-item">
+                    <a href="{{ route('evaluation') }}" class="group">
+                        <div class="flex items-center">
+                            <svg class="shrink-0 group-hover:!text-primary" width="20" height="20"
+                                viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <!-- Checklist/Document Icon -->
+                                <path opacity="0.5"
+                                    d="M14 2H6C4.89543 2 4 2.89543 4 4V20C4 21.1046 4.89543 22 6 22H18C19.1046 22 20 21.1046 20 20V8L14 2Z"
+                                    fill="currentColor" />
+                                <path d="M14 2V8H20M8 13L12 17L16 11" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                            <span
+                                class="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">
+                                تسجيل الحضور
                             </span>
                         </div>
                     </a>

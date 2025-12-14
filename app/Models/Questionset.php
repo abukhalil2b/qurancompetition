@@ -6,8 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Questionset extends Model
 {
-     public $timestamps = false;
-     protected $guarded = [];
+    public $timestamps = false;
+    protected $guarded = [];
 
     public function questions()
     {

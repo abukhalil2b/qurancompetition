@@ -1,68 +1,36 @@
 <x-app-layout>
 
     <div class="p-6 space-y-6">
-
         <h1 class="text-2xl font-bold">اللجان</h1>
-اللجنة لفرع الحفظ + الحفظ والتفسير
-        {{-- Create Form --}}
-        <div class="bg-white shadow rounded-lg p-4">
-            <h2 class="text-lg font-semibold mb-3">إضافة لجنة جديدة</h2>
-
-            <form action="{{ route('committee.store') }}" method="POST" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                @csrf
-
-                <div>
-                    <label class="font-semibold">اسم اللجنة</label>
-                    <input type="text" name="title" class="w-full border rounded p-2" required>
-                </div>
-
-                <div>
-                    <label class="font-semibold">الجنس</label>
-                    <select name="gender" class="w-full border rounded p-2">
-                        <option value="male">ذكور</option>
-                        <option value="female">إناث</option>
-                    </select>
-                </div>
-
-                <div>
-                    <label class="font-semibold">المركز</label>
-                    <select name="center_id" class="w-full border rounded p-2" required>
-                        @foreach($centers as $center)
-                            <option value="{{ $center->id }}">{{ $center->title }}</option>
-                        @endforeach
-                    </select>
-                </div>
-
-                <div class="col-span-2 text-left">
-                    <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">حفظ</button>
-                </div>
-
-            </form>
-        </div>
 
         {{-- Committees List --}}
         <div class="bg-white shadow rounded-lg p-4">
-            <h2 class="text-lg font-semibold mb-3">قائمة اللجان</h2>
 
             <table class="w-full text-right">
                 <thead>
                     <tr class="border-b">
-                        <th class="py-2">#</th>
                         <th>اللجنة</th>
-                        <th>الجنس</th>
-                        <th>المستوى</th>
-                        <th>المركز</th>
+                        <th>الأعضاء</th>
                     </tr>
                 </thead>
 
                 <tbody>
                     @forelse($committees as $committee)
                         <tr class="border-b">
-                            <td class="py-2">{{ $loop->iteration }}</td>
-                            <td>{{ $committee->title }}</td>
-                            <td>{{ $committee->gender == 'male' ? 'ذكور' : 'إناث' }}</td>
-                            <td>{{ $committee->level ?? '-' }}</td>
-                            <td>{{ $committee->center->title }}</td>
+                            <td>
+                               <p class="text-xl text-blue-800"> {{ $committee->title }}</p>
+                               <p class="text-xs text-blue-800"> {{ __($committee->gender) }}</p>
+                                <p class="text-xs">
+                                    {{ $committee->center->title }}
+                                </p>
+                            </td>
+                            <td>
+                                @foreach($committee->judges as $judge)
+                                <div class="text-xs">
+                                    {{ $judge->name }}
+                                </div>
+                                @endforeach
+                            </td>
                         </tr>
                     @empty
                         <tr>
@@ -74,6 +42,43 @@
             </table>
         </div>
 
+        {{-- Create Form --}}
+        <div class="bg-white shadow rounded-lg p-4">
+            <h2 class="text-lg font-semibold mb-3">إضافة لجنة جديدة</h2>
+
+            <form action="{{ route('committee.store') }}" method="POST" >
+                @csrf
+
+                <div class="mb-4">
+                    <label class="font-semibold">اسم اللجنة</label>
+                    <input type="text" name="title" class="w-full border rounded p-2" required>
+                </div>
+
+              <div class="flex gap-2">
+                  <div>
+                    <label class="font-semibold">الجنس/نوع اللجنة</label>
+                    <select name="gender" class="w-44 border rounded p-2" required>
+                         <option value="males">{{ __('males') }}</option>
+                         <option value="females">{{ __('females') }}</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="font-semibold">المركز</label>
+                    <select name="center_id" class="w-44 border rounded p-2" required>
+                        @foreach ($centers as $center)
+                            <option value="{{ $center->id }}">{{ $center->title }}</option>
+                        @endforeach
+                    </select>
+                </div>
+              </div>
+
+                <div class="col-span-2 text-left">
+                    <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">حفظ</button>
+                </div>
+
+            </form>
+        </div>
     </div>
 
 </x-app-layout>

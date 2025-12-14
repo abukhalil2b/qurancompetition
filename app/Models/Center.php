@@ -6,8 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class Center extends Model
 {
-   protected $guarded = [];
+    protected $guarded = [];
 
+    public $timestamps = false;
+    
     public function committees()
     {
         return $this->hasMany(Committee::class);

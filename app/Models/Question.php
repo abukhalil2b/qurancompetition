@@ -14,8 +14,8 @@ class Question extends Model
         return $this->belongsTo(Questionset::class);
     }
 
-    public function attempts()
+    public function selections()
     {
-        return $this->hasMany(StudentQuestionAttempt::class);
+        return $this->hasMany(StudentQuestionSelection::class);
     }
 }

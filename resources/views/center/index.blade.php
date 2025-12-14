@@ -9,7 +9,6 @@
                     <tr class="border-b">
                         <th class="py-2">#</th>
                         <th>اسم المركز</th>
-                        <th>الوصف</th>
                         <th>عرض</th>
                     </tr>
                 </thead>
@@ -17,11 +16,14 @@
                     @forelse($centers as $center)
                         <tr class="border-b">
                             <td class="py-2">{{ $loop->iteration }}</td>
-                            <td>{{ $center->title }}</td>
-                            <td>{{ Str::limit($center->description, 50) }}</td>
                             <td>
+                                <div> {{ $center->title }}</div>
+                            </td>
+
+                            <td>
+                                <div>عدد اللجان {{ $center->committees_count }}</div>
                                 <a href="{{ route('center.show', $center->id) }}"
-                                   class="text-blue-600 hover:underline">عرض</a>
+                                    class="text-blue-600 hover:underline">عرض</a>
                             </td>
                         </tr>
                     @empty

@@ -32,7 +32,8 @@ class User extends Authenticatable
 
 	public function committees()
 	{
-		return $this->belongsToMany(Committee::class, 'committee_judges', 'judge_id', 'committee_id')
+		return $this->belongsToMany(Committee::class, 'committee_users', 'user_id', 'committee_id')
+			->withPivot('stage_id')
 			->withTimestamps();
 	}
 }

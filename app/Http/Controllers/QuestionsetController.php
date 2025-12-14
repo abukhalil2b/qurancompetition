@@ -7,11 +7,20 @@ use Illuminate\Http\Request;
 
 class QuestionsetController extends Controller
 {
-    public function index()
+    public function index($id = 1)
     {
-        $questionsets = Questionset::withCount('questions')->get();
+        $ids = [
+            1 => 'حفظ وتفسير',
+            2 => 'حفظ',
+        ];
 
-        return view('questionset.index', compact('questionsets'));
+        $level = $ids[$id];
+
+        $questionsets = Questionset::withCount('questions')
+            ->where('level', $level)
+            ->get();
+
+        return view('questionset.index', compact('questionsets', 'level'));
     }
 
     public function create()
@@ -35,12 +44,12 @@ class QuestionsetController extends Controller
     }
 
     public function show(Questionset $questionset)
-{
-    $questionsByLevel = $questionset->questions
-        ->groupBy('difficulties');
+    {
+        $questionsByLevel = $questionset->questions
+            ->groupBy('difficulties');
 
-    return view('questionset.show', compact('questionset', 'questionsByLevel'));
-}
+        return view('questionset.show', compact('questionset', 'questionsByLevel'));
+    }
 
 
     public function edit(Questionset $questionset)
@@ -52,14 +61,18 @@ class QuestionsetController extends Controller
     {
         $request->validate([
             'title' => 'required|string|max:255',
-            'branch' => 'required|string|max:255',
-            'selected' => 'boolean',
+            'level' => 'required|string',
         ]);
 
-        $questionset->update($request->all());
+        $questionset->update([
+            'title' => $request->title,
+            'level' => $request->level,
+        ]);
 
-        return redirect()->route('questionset.index')->with('success', 'تم تحديث باقة الأسئلة بنجاح');
+        return redirect()->route('questionset.index')
+            ->with('success', 'تم تحديث باقة الأسئلة بنجاح');
     }
+
 
     public function destroy(Questionset $questionset)
     {

@@ -8,9 +8,9 @@ class JudgeEvaluation extends Model
 {
     protected $guarded = [];
 
-    public function attempt()
+    public function selected()
     {
-        return $this->belongsTo(StudentQuestionAttempt::class, 'student_question_attempt_id');
+        return $this->belongsTo(StudentQuestionSelection::class, 'student_question_selection_id');
     }
 
     public function element()

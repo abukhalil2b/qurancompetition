@@ -11,11 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // let this table be as attendnace records.
-        Schema::create('committee_students', function (Blueprint $table) {
+        Schema::create('question_judge_evaluations', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('committee_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('student_id')->constrained()->cascadeOnDelete();
+             $table->foreignId('student_question_selection_id')->constrained()->cascadeOnDelete();
+             $table->foreignId('judge_id')->constrained('users')->cascadeOnDelete();
+            $table->decimal('total_question', 4, 1)->default(0);
             $table->timestamps();
         });
     }
@@ -25,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('committee_students');
+        Schema::dropIfExists('student_question_selection_judges');
     }
 };

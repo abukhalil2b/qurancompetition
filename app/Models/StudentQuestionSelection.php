@@ -4,13 +4,34 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class StudentQuestionAttempt extends Model
+class StudentQuestionSelection extends Model
 {
     protected $guarded = [];
+
+    public function center()
+    {
+        return $this->belongsTo(Center::class);
+    }
+
+    public function stage()
+    {
+        return $this->belongsTo(Stage::class);
+    }
+
+    public function committee()
+    {
+        return $this->belongsTo(Committee::class);
+    }
+
 
     public function question()
     {
         return $this->belongsTo(Question::class);
+    }
+
+    public function competition()
+    {
+        return $this->belongsTo(Competition::class);
     }
 
     public function student()
@@ -27,4 +48,7 @@ class StudentQuestionAttempt extends Model
     {
         return $this->hasMany(JudgeEvaluation::class);
     }
+
+ 
+   
 }

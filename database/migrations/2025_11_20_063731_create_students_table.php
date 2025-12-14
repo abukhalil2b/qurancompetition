@@ -24,6 +24,8 @@ return new class extends Migration
             $table->string('qarya')->nullable();
             $table->enum('level', ['حفظ','حفظ وتفسير'])->default('حفظ');
             $table->date('registration_date')->nullable();
+            $table->boolean('active')->default(1);
+            $table->string('note')->nullable();
             $table->timestamps();
         });
     }

@@ -3,7 +3,7 @@
 
         <div class="bg-white p-6 rounded-xl shadow w-full md:w-2/3 mx-auto">
 
-            <h2 class="text-xl font-bold mb-4 text-center">إضافة طالب جديد</h2>
+            <h2 class="text-xl font-bold mb-4 text-center">إضافة متسابق جديد</h2>
 
             @if ($errors->any())
                 <div class="bg-red-100 text-red-700 p-3 rounded mb-4">
@@ -60,11 +60,6 @@
                         <input type="date" name="dob" class="form-input w-full" required value="{{ old('dob') }}">
                     </div>
 
-                    {{-- Age --}}
-                    <div>
-                        <label class="font-semibold mb-1 block">العمر</label>
-                        <input type="text" name="age" class="form-input w-full" value="{{ old('age') }}">
-                    </div>
 
                     {{-- State --}}
                     <div>
@@ -86,8 +81,12 @@
 
                     {{-- Branch --}}
                     <div>
-                        <label class="font-semibold mb-1 block">الفرع</label>
-                        <input type="text" name="branch" class="form-input w-full" value="{{ old('branch') }}">
+                        <label class="font-semibold mb-1 block">المستوى</label>
+                        <select name="level" class="form-input w-full">
+                            @foreach($levels as $level)
+                            <option value="{{ $level }}">{{ $level }}</option>
+                            @endforeach
+                        </select>
                     </div>
 
                     {{-- Registration Date --}}
@@ -104,7 +103,7 @@
                     </a>
 
                     <button class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
-                        حفظ الطالب
+                        حفظ المتسابق
                     </button>
                 </div>
 

@@ -12,7 +12,7 @@ class CenterController extends Controller
      */
     public function index()
     {
-        $centers = Center::latest()->get();
+        $centers = Center::withCount('committees')->latest('id')->get();
 
         return view('center.index', compact('centers'));
     }

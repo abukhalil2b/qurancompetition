@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('questions', function (Blueprint $table) {
             $table->id();
             $table->foreignId('questionset_id')->nullable();
-            $table->text('content');
-            $table->enum('difficulties', ['الصعبة','المتوسطة','السهلة'])->default('السهلة');
+            $table->longText('content');
+            $table->enum('difficulties', ['القوية','المتوسطة','السهلة'])->default('السهلة');
         });
     }
 

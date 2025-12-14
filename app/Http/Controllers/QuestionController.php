@@ -9,12 +9,12 @@ use Illuminate\Http\Request;
 class QuestionController extends Controller
 {
 
-    public function index(Questionset $questionset)
+    public function index()
     {
         // Get all questions belonging to this questionset
-        $questions = $questionset->questions()->get();
+        $questions = Question::all();
 
-        return view('question.index', compact('questionset', 'questions'));
+        return view('question.index', compact('questions'));
     }
 
     public function create(Questionset $questionset)
@@ -30,8 +30,8 @@ class QuestionController extends Controller
         ]);
 
         $questionset->questions()->create([
-            'content'=>$request->content,
-            'difficulties'=>$request->difficulties,
+            'content' => $request->content,
+            'difficulties' => $request->difficulties,
         ]);
 
         return redirect()->route('questionset.show', $questionset)->with('success', 'تم إضافة السؤال بنجاح');
@@ -39,24 +39,32 @@ class QuestionController extends Controller
 
     public function edit(Question $question)
     {
-        return view('questions.edit', compact('question'));
+        $questionset = $question->questionset;
+
+        return view('question.edit', compact('question', 'questionset'));
     }
 
     public function update(Request $request, Question $question)
     {
         $request->validate([
             'content' => 'required|string',
-            'level' => 'required|in:easy,medium,hard',
-            'branch' => 'required|string|max:255',
+            'difficulties' => 'required|in:السهلة,المتوسطة,الصعبة',
         ]);
 
-        $question->update($request->all());
+        $question->update([
+            'content' => $request->content,
+            'difficulties' => $request->difficulties,
+        ]);
 
-        return redirect()->route('questionset.show', $question->questionset_id)->with('success', 'تم تحديث السؤال بنجاح');
+        return redirect()
+            ->route('questionset.show', $question->questionset_id)
+            ->with('success', 'تم تحديث السؤال بنجاح');
     }
+
 
     public function destroy(Question $question)
     {
+        return 'معطل حاليا';
         $question->delete();
         return back()->with('success', 'تم حذف السؤال');
     }

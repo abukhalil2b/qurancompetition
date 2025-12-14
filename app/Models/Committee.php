@@ -8,19 +8,17 @@ class Committee extends Model
 {
     protected $guarded = [];
 
+    public $timestamps = false;
+
     public function center()
     {
         return $this->belongsTo(Center::class);
     }
 
-    public function students()
-    {
-        return $this->belongsToMany(Student::class, 'committee_students');
-    }
 
     public function judges()
     {
-        return $this->belongsToMany(User::class, 'committee_judges', 'committee_id', 'judge_id')
+        return $this->belongsToMany(User::class, 'committee_users', 'committee_id', 'user_id')
             ->withTimestamps();
     }
 }

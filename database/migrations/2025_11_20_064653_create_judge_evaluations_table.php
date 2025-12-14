@@ -14,19 +14,18 @@ return new class extends Migration
         Schema::create('judge_evaluations', function (Blueprint $table) {
             $table->id();
 
-            // Original relation - remains cascade (deleting an attempt deletes the evaluations)
-            $table->foreignId('student_question_attempt_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('student_question_selection_id')->constrained()->cascadeOnDelete();
 
-            // MODIFIED: Use restrictOnDelete() to prevent deleting the EvaluationElement
-            // if it has associated JudgeEvaluations.
             $table->foreignId('evaluation_element_id')
                 ->constrained()
                 ->restrictOnDelete();
 
             $table->foreignId('judge_id')->constrained('users')->cascadeOnDelete();
-            $table->integer('achieved_point')->default(0);
+            $table->decimal('achieved_point', 4, 1)->default(0);
             $table->timestamps();
         });
+
+
     }
 
     /**

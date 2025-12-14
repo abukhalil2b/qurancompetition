@@ -6,7 +6,7 @@
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
             <div>
                 <h1 class="text-2xl md:text-3xl font-bold text-gray-800">باقات الأسئلة</h1>
-                <p class="text-gray-600 mt-2">إدارة باقات الأسئلة والاختبارات</p>
+                <p class="text-xl text-gray-600 mt-2">{{ $level }}</p>
             </div>
             <a href="{{ route('questionset.create') }}" 
                class="mt-4 md:mt-0 px-5 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition flex items-center shadow-md">
@@ -18,11 +18,11 @@
         <!-- Cards Grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             @foreach ($questionsets as $set)
-            <div class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-200 card-hover">
+            <div class="{{$set->questions_count == 5 ? 'bg-green-100 text-green-700' : 'bg-white'}} rounded-xl shadow-md overflow-hidden border border-gray-200">
                 <!-- Card Header -->
                 <div class="p-5 border-b border-gray-100">
                     <div class="flex justify-between items-start">
-                        <h3 class="text-xl font-bold text-gray-800 truncate">{{ $set->title }}</h3>
+                        <h3 class="text-xl font-bold">{{ $set->title }}</h3>
                         @if($set->selected)
                         <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full flex items-center">
                             <i class="fas fa-check ml-1 text-xs"></i>
@@ -44,6 +44,9 @@
                            class="px-3 py-2 bg-blue-500 text-white text-sm rounded-lg hover:bg-blue-600 transition flex items-center">
                             <i class="fas fa-eye ml-1"></i>
                             عرض
+                                         الأسئلة
+
+                            ({{ $set->questions_count }})
                         </a>
                         <a href="{{ route('questionset.edit', $set) }}" 
                            class="px-3 py-2 bg-yellow-500 text-white text-sm rounded-lg hover:bg-yellow-600 transition flex items-center">
@@ -53,13 +56,7 @@
                     </div>
                     
                     <div class="flex space-x-2 rtl:space-x-reverse">
-                        <a href="{{ route('question.index', $set->id) }}" 
-                           class="px-3 py-2 bg-indigo-100 text-indigo-700 text-sm rounded-lg hover:bg-indigo-200 transition flex items-center">
-                            <i class="fas fa-list-ol ml-1"></i>
-                            الأسئلة
-
-                            ({{ $set->questions_count }})
-                        </a>
+                
                         
                         <form action="{{ route('questionset.destroy', $set) }}" method="POST" 
                               onsubmit="return confirm('هل أنت متأكد من حذف هذه الباقة؟');">

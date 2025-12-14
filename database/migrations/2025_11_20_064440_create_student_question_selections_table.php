@@ -11,13 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('student_question_attempts', function (Blueprint $table) {
+        Schema::create('student_question_selections', function (Blueprint $table) {
             $table->id();
+             $table->bigInteger('center_id');
+            $table->bigInteger('stage_id');
+            $table->bigInteger('committee_id');
+            $table->foreignId('competition_id')->constrained()->cascadeOnDelete();
             $table->foreignId('questionset_id')->constrained()->cascadeOnDelete();
             $table->foreignId('question_id')->constrained()->cascadeOnDelete();
+            $table->enum('level', ['حفظ','حفظ وتفسير'])->default('حفظ');
             $table->foreignId('student_id')->constrained()->cascadeOnDelete();
-            $table->timestamp('done_at')->nullable();
-            $table->string('total_achieved_point')->nullable(); //later will be total calculating both judges
+            $table->decimal('total_element_evaluation', 4, 1)->default(0);
             $table->timestamps();
         });
     }
@@ -27,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('student_question_attempts');
+        Schema::dropIfExists('student_question_selections');
     }
 };

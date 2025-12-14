@@ -12,7 +12,7 @@
 
         @foreach ($questionsByLevel as $difficult => $questions)
             <!-- Category Header -->
-            <h3 class="text-2xl font-semibold bg-gray-100 p-3 rounded mt-6 mb-3">
+            <h3 class="text-2xl font-semibold bg-black text-white p-3 rounded mt-6 mb-3">
                  {{ $difficult }}
             </h3>
 

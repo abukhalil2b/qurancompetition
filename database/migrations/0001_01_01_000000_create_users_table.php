@@ -15,7 +15,7 @@ return new class extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('user_type', 12)->default('judge');// admin - judge - student (in futute)
+            $table->enum('user_type', ['judge','admin','organizer','student'])->default('judge');
             $table->enum('gender', ['male','female'])->default('male');
             $table->string('national_id', 10)->nullable()->unique();
             $table->string('password');
