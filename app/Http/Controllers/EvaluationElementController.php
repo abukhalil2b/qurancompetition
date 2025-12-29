@@ -60,9 +60,4 @@ class EvaluationElementController extends Controller
     }
 
 
-    public function evaluation(Student $student)
-    {
-
-        return view('evaluation');
-    }
 }

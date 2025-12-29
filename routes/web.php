@@ -110,11 +110,6 @@ Route::middleware(['auth'])->group(function () {
 });
 
 
-Route::middleware(['auth'])->group(function () {
-    Route::get('evaluation', [EvaluationElementController::class, 'evaluation'])
-        ->name('evaluation');
-});
-
 
 
 

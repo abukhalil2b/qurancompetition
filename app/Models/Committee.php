@@ -21,4 +21,13 @@ class Committee extends Model
         return $this->belongsToMany(User::class, 'committee_users', 'committee_id', 'user_id')
             ->withTimestamps();
     }
+
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'committee_users')
+            ->withPivot('stage_id')
+            ->withTimestamps();
+    }
+
+   
 }

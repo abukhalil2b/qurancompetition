@@ -55,7 +55,6 @@
             <header class="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-6">
                 <div>
                     <h1 class="text-2xl font-bold flex items-center gap-2 text-indigo-700">
-
                         تقييم المتسابق
                     </h1>
 
@@ -72,11 +71,18 @@
                         <span class="text-gray-600">التاريخ:</span>
                         <span>{{ date('Y-m-d') }}</span>
                     </div>
+                   <button 
+    @click="showStudentInfo = !showStudentInfo"
+    class="text-sm font-semibold text-blue-600 hover:text-blue-800 transition-colors"
+>
+    <span x-show="!showStudentInfo">عرض بيانات الطالب</span>
+    <span x-show="showStudentInfo">إخفاء بيانات الطالب</span>
+</button>
                 </div>
             </header>
 
             <!-- Student Info -->
-            <section class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 p-6 border rounded-lg bg-indigo-50">
+            <section x-show="showStudentInfo" class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 p-6 border rounded-lg bg-indigo-50">
 
                 <!-- العمود الأول -->
                 <!-- الاسم والرقم المدني -->
@@ -201,6 +207,7 @@
     <script>
         function evaluationPage(elements) {
             return {
+            showStudentInfo: false,
                 scores: {},
 
                 init() {

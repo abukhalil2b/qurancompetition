@@ -43,7 +43,9 @@ class StudentController extends Controller
             return back()->with('error', 'لا توجد مرحلة نشطة حالياً');
         }
 
-        $committeeUser = CommitteeUser::where('user_id', $loggedUser->id)->where('stage_id', $stage->id)->first();
+        $committeeUser = CommitteeUser::where('user_id', $loggedUser->id)
+            ->where('stage_id', $stage->id)
+            ->first();
 
         if (!$committeeUser) {
             return back()->with('error', 'المستخدم غير مرتبط باللجنة');

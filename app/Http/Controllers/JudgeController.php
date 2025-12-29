@@ -11,10 +11,14 @@ class JudgeController extends Controller
 {
     public function index()
     {
-        $users = User::all();
+        $users = User::with([
+            'committees',
+            'committees.users', // optional
+        ])->get();
 
         return view('user.index', compact('users'));
     }
+
 
     public function show(User $user)
     {
