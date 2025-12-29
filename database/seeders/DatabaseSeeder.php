@@ -6,7 +6,7 @@ namespace Database\Seeders;
 
 use App\Models\Center;
 use App\Models\Committee;
-use App\Models\Profile;
+use App\Models\CommitteeUser;
 use App\Models\Question;
 use App\Models\Questionset;
 use App\Models\Stage;
@@ -26,74 +26,121 @@ class DatabaseSeeder extends Seeder
 			'user_type' => 'admin',
 			'gender' => 'male',
 			'national_id' => '91171747',
-			'password' => Hash::make('91171747'),
+			'password' => Hash::make('alBim@n!'),
 		]);
 
 		User::create([
-			'name' => 'أحمد البكاري',
+			'name' => 'عبدالله الهنائي',
 			'user_type' => 'judge',
 			'gender' => 'male',
-			'national_id' => '96702426',
-			'password' => Hash::make('96702426'),
+			'national_id' => '200200200',
+			'password' => Hash::make('B@w200200'),
+		]);
+
+		User::create([
+			'name' => 'طالب القنوبي',
+			'user_type' => 'judge',
+			'gender' => 'male',
+			'national_id' => '300300300',
+			'password' => Hash::make('B@w300300'),
+		]);
+
+		User::create([
+			'name' => 'يوسف البلوشي',
+			'user_type' => 'judge',
+			'gender' => 'male',
+			'national_id' => '400400400',
+			'password' => Hash::make('B@w400400'),
 		]);
 
 		User::create([
 			'name' => 'طاهر العزواني',
 			'user_type' => 'judge',
 			'gender' => 'male',
-			'national_id' => '98184264',
-			'password' => Hash::make('98184264'),
+			'national_id' => '500500500',
+			'password' => Hash::make('B@w500500'),
 		]);
 
 		User::create([
-			'name' => 'سالم القصابي',
+			'name' => 'المنظم ذكور ',
 			'user_type' => 'organizer',
 			'gender' => 'male',
-			'national_id' => '92156779',
-			'password' => Hash::make('92156779'),
+			'national_id' => '600600600',
+			'password' => Hash::make('600600600'),
+		]);
+
+		User::create([
+			'name' => 'المنظم إناث ',
+			'user_type' => 'organizer',
+			'gender' => 'female',
+			'national_id' => '700700700',
+			'password' => Hash::make('700700700'),
 		]);
 
 		Stage::create([
 			'title' => 'التصفيات الأولية',
-			'active' => 1,
+			'active' => 0,
 		]);
+
 		Stage::create([
 			'title' => 'التصفيات النهائية',
+			'active' => 1,
 		]);
 
 		Center::create([
 			'title' => 'مسقط',
 		]);
-		Center::create([
-			'title' => 'البريمي',
+
+		Committee::create([
+			'title' => 'اللجنة الأولى (مركز مسقط)',
+			'center_id' => 1,
+			'gender' => 'males',
 		]);
-		Center::create([
-			'title' => 'ظفار',
-		]);
-		Center::create([
-			'title' => 'الداخلية',
+		
+		CommitteeUser::create([
+			'stage_id' => 2,
+			'committee_id' => 1,
+			'user_id' => 2,
 		]);
 
-		Questionset::create([
-			'title' => 'الباقة 1',
-			'level' => 'حفظ',
-			'selected' => 0,
+		CommitteeUser::create([
+			'stage_id' => 2,
+			'committee_id' => 1,
+			'user_id' => 3,
 		]);
-		Questionset::create([
-			'title' => 'الباقة 2',
-			'level' => 'حفظ',
-			'selected' => 0,
+		CommitteeUser::create([
+			'stage_id' => 2,
+			'committee_id' => 1,
+			'user_id' => 4,
 		]);
-		Questionset::create([
-			'title' => 'الباقة 3',
-			'level' => 'حفظ',
-			'selected' => 0,
+		CommitteeUser::create([
+			'stage_id' => 2,
+			'committee_id' => 1,
+			'user_id' => 5,
 		]);
-		Questionset::create([
-			'title' => 'الباقة 1',
-			'level' => 'حفظ وتفسير',
-			'selected' => 0,
-		]);
+
+		$data = [];
+
+		foreach (range(1, 100) as $i) {
+			$title = 'الباقة ' . $i;
+
+			$data[] = [
+				'title' => $title,
+				'level' => 'حفظ',
+				'selected' => 0,
+			];
+
+			$data[] = [
+				'title' => $title,
+				'level' => 'حفظ وتفسير',
+				'selected' => 0,
+			];
+		}
+
+		Questionset::insert($data);
+
+
+
 
 		Question::create([
 			'questionset_id' => 1,
@@ -106,15 +153,6 @@ class DatabaseSeeder extends Seeder
 			'difficulties' => 'المتوسطة',
 		]);
 
-		Committee::create([
-			'title' => 'اللجنة الأولى (الذكور - مركز مسقط)',
-			'center_id' => 1,
-			'gender' => 'males',
-		]);
-		Committee::create([
-			'title' => 'اللجنة الثانية (للإناث - مركز مسقط)',
-			'center_id' => 1,
-			'gender' => 'males',
-		]);
+		
 	}
 }

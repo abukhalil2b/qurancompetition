@@ -29,6 +29,6 @@ class Competition extends Model
 
    public function questionset()
    {
-      return $this->belongsTo(QuestionSet::class, 'questionset_id');
+      return $this->belongsTo(Questionset::class, 'questionset_id');
    }
 }

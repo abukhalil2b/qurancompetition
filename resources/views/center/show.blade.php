@@ -15,7 +15,7 @@
                     @forelse($center->committees as $committee)
                         <tr class="border-b">
                             <td>{{ $committee->title }}</td>
-                            <td>{{ $committee->branch == 'male' ? 'ذكور' : 'إناث' }}</td>
+                            <td>{{ __($committee->gender) }}</td>
                         </tr>
                     @empty
                         <tr>

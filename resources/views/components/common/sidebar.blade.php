@@ -1,6 +1,5 @@
 <div :class="{ 'dark text-white-dark': $store.app.semidark }">
-    <nav
-        x-data="sidebar"class="sidebar fixed min-h-screen h-full top-0 bottom-0 w-[260px] shadow-[5px_0_25px_0_rgba(94,92,154,0.1)] z-50 transition-all duration-300">
+    <nav x-data="sidebar"class="sidebar fixed min-h-screen h-full top-0 bottom-0 w-[260px] shadow-[5px_0_25px_0_rgba(94,92,154,0.1)] z-50 transition-all duration-300">
         <div class="bg-white dark:bg-[#0e1726] h-full">
             <div class="flex justify-between items-center px-4 py-3">
                 <a href="{{ route('dashboard') }}" class="main-logo flex items-center shrink-0">
@@ -122,7 +121,11 @@
                                 </span>
                             </div>
                         </a>
-                    </li> <!-- Questionsets -->
+                    </li>
+                @endif
+
+                @if (auth()->user()->user_type == 'admin')
+                    <!-- Questionsets -->
                     <li class="nav-item">
                         <a href="{{ route('questionset.index', 1) }}" class="group">
                             <div class="flex items-center">
@@ -203,27 +206,24 @@
                 @endif
 
                 @if (auth()->user()->user_type == 'judge' || auth()->user()->user_type == 'admin')
-                <li class="nav-item">
-                    <a href="{{ route('student.present_index') }}" class="group">
-                        <div class="flex items-center">
-                            <svg class="shrink-0 group-hover:!text-primary" width="20" height="20"
-                                viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path opacity="0.5"
-                                    d="M12 12c2.2091 0 4-1.7909 4-4s-1.7909-4-4-4-4 1.7909-4 4 1.7909 4 4 4z"
-                                    fill="currentColor" />
-                                <path d="M4 20c0-3.3137 3.5817-6 8-6s8 2.6863 8 6v1H4v-1z" fill="currentColor" />
-                            </svg>
-                            <span
-                                class="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">
-                                المتسابقون الحاضرون
-                            </span>
-                        </div>
-                    </a>
-                </li>
+                    <li class="nav-item">
+                        <a href="{{ route('student.present_index') }}" class="group">
+                            <div class="flex items-center">
+                                <svg class="shrink-0 group-hover:!text-primary" width="20" height="20"
+                                    viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path opacity="0.5"
+                                        d="M12 12c2.2091 0 4-1.7909 4-4s-1.7909-4-4-4-4 1.7909-4 4 1.7909 4 4 4z"
+                                        fill="currentColor" />
+                                    <path d="M4 20c0-3.3137 3.5817-6 8-6s8 2.6863 8 6v1H4v-1z" fill="currentColor" />
+                                </svg>
+                                <span
+                                    class="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">
+                                    المتسابقون الحاضرون
+                                </span>
+                            </div>
+                        </a>
+                    </li>
                 @endif
-
-
-
             </ul>
 
         </div>
