@@ -16,6 +16,7 @@ return new class extends Migration
             $table->bigInteger('stage_id');
             $table->foreignId('committee_id')->constrained()->cascadeOnDelete();
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
+            $table->boolean('is_leader')->default(false);
             $table->timestamps();
         });
     }

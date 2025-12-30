@@ -7,6 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 class Competition extends Model
 {
    protected $guarded = [];
+
+   public function studentQuestionSelections()
+   {
+      return $this->hasMany(StudentQuestionSelection::class);
+   }
+   
    public function student()
    {
       return $this->belongsTo(Student::class);

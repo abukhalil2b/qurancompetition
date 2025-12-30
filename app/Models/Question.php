@@ -18,4 +18,14 @@ class Question extends Model
     {
         return $this->hasMany(StudentQuestionSelection::class);
     }
+
+    public function getLevelClassAttribute()
+    {
+        return match ($this->difficulties) {
+            'القوية' => 'hard',
+            'المتوسطة' => 'medium',
+            'السهلة' => 'easy',
+            default => 'easy',
+        };
+    }
 }

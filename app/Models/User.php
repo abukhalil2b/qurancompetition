@@ -33,7 +33,21 @@ class User extends Authenticatable
 	public function committees()
 	{
 		return $this->belongsToMany(Committee::class, 'committee_users', 'user_id', 'committee_id')
-			->withPivot('stage_id')
+			->withPivot('stage_id', 'is_leader')
 			->withTimestamps();
 	}
+
+	public function isCommitteeLeader($stageId)
+    {
+        // If the user is a global admin, they should have leader powers
+        if ($this->user_type === 'admin') {
+            return true;
+        }
+
+        return $this->committees()
+            ->wherePivot('stage_id', $stageId)
+            ->wherePivot('is_leader', true)
+            ->exists();
+    }
+	
 }

@@ -14,9 +14,13 @@ use Illuminate\Support\Facades\Route;
 
 
 Route::middleware(['auth'])->group(function () {
-    Route::get('/', [HomeController::class, 'welcome'])
-        ->name('welcome');
 
+    Route::get('/', [HomeController::class, 'welcome'])->name('welcome');
+    Route::get('final_report/{competitionId}', [HomeController::class, 'finalReport'])->name('final_report');
+    Route::get('finish_student/{competitionId}', [HomeController::class, 'finishStudent'])->name('finish_student');
+    Route::get('unfinish_student/{competitionId}', [HomeController::class, 'unFinishStudent'])->name('unfinish_student');
+    Route::get('final_result', [HomeController::class, 'finalResult'])->name('final_result');
+    Route::post('selection/{id}/reset', [HomeController::class, 'resetQuestionScore'])->name('selection.reset');
     Route::get('dashboard', [HomeController::class, 'dashboard'])
         ->name('dashboard');
 });

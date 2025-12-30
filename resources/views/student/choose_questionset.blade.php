@@ -1,16 +1,12 @@
 <x-app-layout>
     <div class="p-6">
         <div class="bg-white rounded-2xl shadow-lg p-6">
-
             <h2 class="text-xl font-semibold mb-4">
                 اختيار الباقة: {{ $student->name }}
             </h2>
-
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-
                 @foreach ($questionsets as $questionset)
                     <div class="border rounded-xl p-4 shadow-sm">
-
                         <div class="text-lg font-semibold">
                             {{ $questionset->title }}
                         </div>
@@ -29,10 +25,8 @@
                                 اختيار
                             </a>
                         </div>
-
                     </div>
                 @endforeach
-
             </div>
         </div>
     </div>

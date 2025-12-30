@@ -63,12 +63,12 @@ class StudentController extends Controller
             'students.national_id',
             'students.level',
             'competitions.created_at as present_at'
-        )
-            ->leftJoin('students', 'competitions.student_id', '=', 'students.id')
+        )->leftJoin('students', 'competitions.student_id', '=', 'students.id')
             ->with('questionset.questions')
             ->where('competitions.center_id', $center->id)
             ->where('competitions.committee_id', $committee->id)
             ->where('competitions.stage_id', $stage->id)
+            ->whereIn('competitions.student_status', ['with_committee', 'present'])
             ->get();
 
 
@@ -118,7 +118,7 @@ class StudentController extends Controller
 
             $judgeEvaluation =  JudgeEvaluation::whereIn('student_question_selection_id', $studentQuestionSelectionIds)->get();
 
-            return view('student.questionset_selected', compact('student', 'studentQuestionSelections', 'questionset', 'evaluationElementCount'));
+            return view('student.questionset_selected', compact('student', 'studentQuestionSelections', 'questionset', 'evaluationElementCount', 'competition', 'stage'));
         }
 
         $questionsetIds = Competition::where('committee_id', $committeeUser->committee_id)
@@ -179,13 +179,14 @@ class StudentController extends Controller
         }
 
         $evaluationElements = EvaluationElement::where('level', $studentQuestionSelection->level)->get();
-        //  return$studentQuestionSelection;
+        //  return$evaluationElements;
 
         return view('student.start_evaluation', compact('studentQuestionSelection', 'evaluationElements'));
     }
-
     public function saveEvaluation(Request $request)
     {
+        // return $request->all();
+
         $request->validate([
             'student_question_selection_id' => 'required|exists:student_question_selections,id',
             'elements' => 'required|array',
@@ -193,71 +194,79 @@ class StudentController extends Controller
         ]);
 
         $selectionId = $request->student_question_selection_id;
-
         $judgeId = auth()->id();
+        try {
+            return DB::transaction(function () use ($request, $selectionId, $judgeId) {
 
-        // 1. Remove old data (only from this judge)
-        JudgeEvaluation::where('student_question_selection_id', $selectionId)
-            ->where('judge_id', $judgeId)
-            ->delete();
+                // 1. Clear existing judge data
+                JudgeEvaluation::where('student_question_selection_id', $selectionId)
+                    ->where('judge_id', $judgeId)
+                    ->delete();
 
+                // 2. Insert new evaluations
+                $data = [];
+                foreach ($request->elements as $elementId => $score) {
+                    $data[] = [
+                        'student_question_selection_id' => $selectionId,
+                        'evaluation_element_id' => $elementId,
+                        'judge_id' => $judgeId,
+                        'achieved_point' => $score,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ];
+                }
+                JudgeEvaluation::insert($data);
 
-        // 2. Insert new evaluations
-        foreach ($request->elements as $elementId => $score) {
-            JudgeEvaluation::create([
-                'student_question_selection_id' => $selectionId,
-                'evaluation_element_id' => $elementId,
-                'judge_id' => $judgeId,
-                'achieved_point' => $score,
-            ]);
+                // 3. Update QuestionJudgeEvaluation (Using updateOrCreate to avoid duplicates)
+                $judgeEvaluationSum = JudgeEvaluation::where('student_question_selection_id', $selectionId)
+                    ->where('judge_id', $judgeId)
+                    ->sum('achieved_point');
+
+                QuestionJudgeEvaluation::updateOrCreate(
+                    ['student_question_selection_id' => $selectionId, 'judge_id' => $judgeId],
+                    ['total_question' => $judgeEvaluationSum, 'note' => $request->note]
+                );
+
+                // 4. Update Student Selection Totals
+                $studentQuestionSelection = StudentQuestionSelection::findOrFail($selectionId);
+
+                $allJudgesSum = QuestionJudgeEvaluation::where('student_question_selection_id', $selectionId)
+                    ->sum('total_question');
+
+                $studentQuestionSelection->update(['total_element_evaluation' => $allJudgesSum]);
+
+                // 5. Update Competition Grand Totals
+                $totalQuestionEvaluations = StudentQuestionSelection::where('questionset_id', $studentQuestionSelection->questionset_id)
+                    ->sum('total_element_evaluation');
+
+                $judgeCount = JudgeEvaluation::where('student_question_selection_id', $selectionId)
+                    ->distinct('judge_id')
+                    ->count('judge_id');
+
+                $competition = Competition::where('questionset_id', $studentQuestionSelection->questionset_id)->firstOrFail();
+
+                $competition->update([
+                    'grand_total' => $totalQuestionEvaluations,
+                    'judge_count' => $judgeCount,
+                    'student_status' => 'with_committee',
+                    'notes' => $request->notes
+                ]);
+
+                return redirect()
+                    ->route('student.choose_questionset', $studentQuestionSelection->competition_id)
+                    ->with('success', 'تم حفظ التقييم بنجاح');
+            });
+        } catch (\Exception $e) {
+            // This will prevent the logout and show you the actual error
+            return back()->withErrors(['error' => 'حدث خطأ: ' . $e->getMessage()])->withInput();
         }
-
-        $judgeEvaluationTotals = JudgeEvaluation::where('student_question_selection_id', $selectionId)
-            ->where('judge_id', $judgeId)
-            ->sum('achieved_point');
-
-        QuestionJudgeEvaluation::create([
-            'student_question_selection_id' => $selectionId,
-            'judge_id' => $judgeId,
-            'total_question' => $judgeEvaluationTotals,
-        ]);
-
-        // 3. Update total for this student (sum from all judges)
-        $totalElementEvaluations = QuestionJudgeEvaluation::where([
-            'student_question_selection_id' => $selectionId,
-            'total_question' => $judgeEvaluationTotals,
-        ])->sum('total_question');
-
-        $judgeCount = JudgeEvaluation::where('student_question_selection_id', $selectionId)
-            ->groupBy('judge_id')
-            ->pluck('judge_id')
-            ->count();
-
-        $studentQuestionSelection = StudentQuestionSelection::find($selectionId);
-
-        $studentQuestionSelection->update(['total_element_evaluation' => $totalElementEvaluations]);
-
-        $totalQuestionEvaluations = StudentQuestionSelection::where('questionset_id', $studentQuestionSelection->questionset_id)
-            ->sum('total_element_evaluation');
-
-        $competition = Competition::where('questionset_id', $studentQuestionSelection->questionset_id)->first();
-
-        if (!$competition) {
-            abort(404);
-        }
-
-        $competition->update(['grand_total' => $totalQuestionEvaluations, 'judge_count' => $judgeCount]);
-
-
-        return redirect()
-            ->route('student.choose_questionset', $studentQuestionSelection->competition_id)
-            ->with('success', 'تم حفظ التقييم بنجاح');
     }
 
 
     // create form
     public function create()
     {
+        return 'حاليا معطل';
         $levels = ['حفظ', 'حفظ وتفسير'];
 
         return view('student.create', compact('levels'));

@@ -35,14 +35,14 @@
 
             @if (Route::has('login'))
             @auth
-            <a href="{{ url('/dashboard') }}" class="btn bg-green-200 text-green-600 border-green-600">الرئيسية</a>
+            <a href="{{ url('/dashboard') }}" class="btn bg-green-200 text-green-600 border-green-600 w-44 p-3 flex items-center justify-center">الرئيسية</a>
             <form action="{{ route('logout') }}" method="POST">
                 @csrf
-                <button class="btn bg-red-200 text-red-600 border-red-600">تسجيل الخروج</button>
+                <button class="btn bg-red-200 text-red-600 border-red-600 w-44 p-3 flex items-center justify-center">تسجيل الخروج</button>
             </form>
 
             @else
-            <a href="{{ route('login') }}" class="btn bg-green-200 text-green-600 border-green-600">
+            <a href="{{ route('login') }}" class="btn bg-green-200 text-green-600 border-green-600 w-44 p-3 flex items-center justify-center">
                 تسجيل الدخول
             </a>
 

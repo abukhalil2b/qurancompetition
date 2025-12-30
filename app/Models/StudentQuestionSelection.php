@@ -8,6 +8,11 @@ class StudentQuestionSelection extends Model
 {
     protected $guarded = [];
 
+    public function questionJudgeEvaluations()
+    {
+        return $this->hasMany(QuestionJudgeEvaluation::class);
+    }
+
     public function center()
     {
         return $this->belongsTo(Center::class);
@@ -48,7 +53,4 @@ class StudentQuestionSelection extends Model
     {
         return $this->hasMany(JudgeEvaluation::class);
     }
-
- 
-   
 }

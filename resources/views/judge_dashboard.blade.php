@@ -1,4 +1,8 @@
 <x-app-layout>
 {{$activeStage->title}}
-Judge dashboard
+
+<h1 class="text-3xl">
+    لوحة المحكم
+</h1>
+
 </x-app-layout>

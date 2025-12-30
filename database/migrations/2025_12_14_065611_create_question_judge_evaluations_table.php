@@ -13,9 +13,10 @@ return new class extends Migration
     {
         Schema::create('question_judge_evaluations', function (Blueprint $table) {
             $table->id();
-             $table->foreignId('student_question_selection_id')->constrained()->cascadeOnDelete();
-             $table->foreignId('judge_id')->constrained('users')->cascadeOnDelete();
-            $table->decimal('total_question', 4, 1)->default(0);
+            $table->foreignId('student_question_selection_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('judge_id')->constrained('users')->cascadeOnDelete();
+            $table->decimal('total_question', 6, 2)->default(0);
+            $table->string('note')->nullable();
             $table->timestamps();
         });
     }
@@ -28,3 +29,5 @@ return new class extends Migration
         Schema::dropIfExists('student_question_selection_judges');
     }
 };
+
+

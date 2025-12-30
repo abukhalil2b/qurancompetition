@@ -7,6 +7,7 @@ namespace Database\Seeders;
 use App\Models\Center;
 use App\Models\Committee;
 use App\Models\CommitteeUser;
+use App\Models\EvaluationElement;
 use App\Models\Question;
 use App\Models\Questionset;
 use App\Models\Stage;
@@ -22,7 +23,7 @@ class DatabaseSeeder extends Seeder
 	{
 
 		User::create([
-			'name' => 'إبراهيم البيماني',
+			'name' => 'الدعم الفني',
 			'user_type' => 'admin',
 			'gender' => 'male',
 			'national_id' => '91171747',
@@ -96,27 +97,31 @@ class DatabaseSeeder extends Seeder
 			'center_id' => 1,
 			'gender' => 'males',
 		]);
-		
+
 		CommitteeUser::create([
 			'stage_id' => 2,
 			'committee_id' => 1,
 			'user_id' => 2,
+			'is_leader' => 1,
 		]);
 
 		CommitteeUser::create([
 			'stage_id' => 2,
 			'committee_id' => 1,
 			'user_id' => 3,
+			'is_leader' => 0,
 		]);
 		CommitteeUser::create([
 			'stage_id' => 2,
 			'committee_id' => 1,
 			'user_id' => 4,
+			'is_leader' => 0,
 		]);
 		CommitteeUser::create([
 			'stage_id' => 2,
 			'committee_id' => 1,
 			'user_id' => 5,
+			'is_leader' => 0,
 		]);
 
 		$data = [];
@@ -139,20 +144,81 @@ class DatabaseSeeder extends Seeder
 
 		Questionset::insert($data);
 
+		$evaluationElements = [
+			[
+				'title' => 'الحفظ',
+				'level' => 'حفظ',
+				'max_score' => '70',
+			],
+			[
+				'title' => 'المخارج والصفات',
+				'level' => 'حفظ',
+				'max_score' => '15',
+			],
+			[
+				'title' => 'الوقف والابتداء',
+				'level' => 'حفظ',
+				'max_score' => '10',
+			],
+			[
+				'title' => 'تناسق الأداء وحسن الصوت',
+				'level' => 'حفظ',
+				'max_score' => '5',
+			]
+		];
+
+		EvaluationElement::insert($evaluationElements);
 
 
+		$evaluationElements = [
+			[
+				'title' => 'الحفظ',
+				'level' => 'حفظ وتفسير',
+				'max_score' => '70',
+			],
+			[
+				'title' => 'المخارج والصفات',
+				'level' => 'حفظ وتفسير',
+				'max_score' => '15',
+			],
+			[
+				'title' => 'الوقف والابتداء',
+				'level' => 'حفظ وتفسير',
+				'max_score' => '10',
+			],
+			[
+				'title' => 'تناسق الأداء وحسن الصوت',
+				'level' => 'حفظ وتفسير',
+				'max_score' => '5',
+			]
+		];
 
-		Question::create([
-			'questionset_id' => 1,
-			'content' => ' إقرا من قوله تعالى ( وإذ قال ربك للملائكة إني جاعل في الأرض خليفة ) إلى قوله تعالى ( أتجعل فيها من يفسد فيها ويسفك الدماء ) ',
-			'difficulties' => 'السهلة',
-		]);
-		Question::create([
-			'questionset_id' => 1,
-			'content' => ' إقرا من قوله تعالى ( وإذ قال ربك للملائكة إني جاعل في الأرض خليفة ) إلى قوله تعالى ( أتجعل فيها من يفسد فيها ويسفك الدماء ) ',
-			'difficulties' => 'المتوسطة',
-		]);
+		EvaluationElement::insert($evaluationElements);
 
+		$tafseer = [
+			[
+				'title' => 'معاني الكلمات',
+				'level' => 'حفظ وتفسير',
+				'max_score' => '10',
+			],
+			[
+				'title' => 'المعنى الإجمالي',
+				'level' => 'حفظ وتفسير',
+				'max_score' => '10',
+			],
+			[
+				'title' => 'النكات والمعاني البلاغية',
+				'level' => 'حفظ وتفسير',
+				'max_score' => '10',
+			],
+			[
+				'title' => 'ما يستفاد من حكم وأحكام',
+				'level' => 'حفظ وتفسير',
+				'max_score' => '10',
+			]
+		];
+
+		EvaluationElement::insert($tafseer);
 		
 	}
 }

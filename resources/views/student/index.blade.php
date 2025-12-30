@@ -19,7 +19,7 @@
             >
         </div>
         
-        <div class="overflow-x-auto bg-white rounded-2xl shadow-lg p-6">
+        <div class="overflow-x-auto bg-white rounded-2xl shadow-lg">
             <table class="min-w-full divide-y divide-gray-200 table-auto">
                 <thead class="bg-gray-100 rounded-t-xl">
                     <tr class="text-right text-gray-700 uppercase text-sm tracking-wider">

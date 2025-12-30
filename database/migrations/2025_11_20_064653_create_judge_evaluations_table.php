@@ -21,7 +21,7 @@ return new class extends Migration
                 ->restrictOnDelete();
 
             $table->foreignId('judge_id')->constrained('users')->cascadeOnDelete();
-            $table->decimal('achieved_point', 4, 1)->default(0);
+            $table->decimal('achieved_point', 6, 2)->default(0);
             $table->timestamps();
         });
 
