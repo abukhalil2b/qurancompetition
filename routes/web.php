@@ -3,6 +3,7 @@
 use App\Http\Controllers\CenterController;
 use App\Http\Controllers\CommitteeController;
 use App\Http\Controllers\CompetitionController;
+use App\Http\Controllers\EvaluationController;
 use App\Http\Controllers\EvaluationElementController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\JudgeController;
@@ -20,20 +21,25 @@ Route::middleware(['auth'])->group(function () {
     Route::get('finish_student/{competitionId}', [HomeController::class, 'finishStudent'])->name('finish_student');
     Route::get('unfinish_student/{competitionId}', [HomeController::class, 'unFinishStudent'])->name('unfinish_student');
     Route::get('final_result', [HomeController::class, 'finalResult'])->name('final_result');
-    Route::post('selection/{id}/reset', [HomeController::class, 'resetQuestionScore'])->name('selection.reset');
     Route::get('dashboard', [HomeController::class, 'dashboard'])
         ->name('dashboard');
 });
 
 Route::middleware(['auth'])->group(function () {
+    Route::get('student/start_evaluation/{student_question_selection_id}', [EvaluationController::class, 'startEvaluation'])->name('student.start_evaluation');
+    Route::post('student/save_evaluation', [EvaluationController::class, 'saveEvaluation'])->name('student.save_evaluation');
+    Route::get('student/show_evaluation/{student_question_selection_id}', [EvaluationController::class, 'showEvaluation'])->name('student.show_evaluation');
+    Route::get('student/show_final_result/{competition}', [EvaluationController::class, 'showFinalResult'])->name('student.show_final_result');
+   
+    Route::get('student/evaluation-status/{id}',[EvaluationController::class, 'evaluationStatus']);
+});
 
+Route::middleware(['auth'])->group(function () {
     // Students
     Route::get('student/index', [StudentController::class, 'index'])->name('student.index');
     Route::get('student/present_index', [StudentController::class, 'presentIndex'])->name('student.present_index');
     Route::get('student/choose_questionset/{competition}', [StudentController::class, 'chooseQuestionset'])->name('student.choose_questionset');
     Route::get('student/save_questionset/{competition}/{questionset}', [StudentController::class, 'saveQuestionset'])->name('student.save_questionset');
-    Route::get('student/start_evaluation/{student_question_selection_id}', [StudentController::class, 'startEvaluation'])->name('student.start_evaluation');
-    Route::post('student/save_evaluation', [StudentController::class, 'saveEvaluation'])->name('student.save_evaluation');
     Route::get('student/create', [StudentController::class, 'create'])->name('student.create');
     Route::post('student/store', [StudentController::class, 'store'])->name('student.store');
     Route::get('student/show/{student}', [StudentController::class, 'show'])->name('student.show');

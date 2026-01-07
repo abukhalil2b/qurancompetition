@@ -37,6 +37,7 @@
 
             </div>
 
+            @if(auth()->id() == 1)
             {{-- Actions --}}
             <div class="flex flex-wrap gap-3">
                 <a href="{{ route('student.edit', $student) }}"
@@ -64,6 +65,8 @@
                     </button>
                 </form>
             </div>
+
+            @endif
 
         </div>
 

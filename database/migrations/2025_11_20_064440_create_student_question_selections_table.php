@@ -13,15 +13,11 @@ return new class extends Migration
     {
         Schema::create('student_question_selections', function (Blueprint $table) {
             $table->id();
-             $table->bigInteger('center_id');
-            $table->bigInteger('stage_id');
-            $table->bigInteger('committee_id');
             $table->foreignId('competition_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('questionset_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('question_id')->constrained()->cascadeOnDelete();
-            $table->enum('level', ['حفظ','حفظ وتفسير'])->default('حفظ');
-            $table->foreignId('student_id')->constrained()->cascadeOnDelete();
-            $table->decimal('total_element_evaluation', 6,2)->default(0)->comment('Total score from all judges for this question selection');
+            $table->foreignId('question_id')->constrained();
+            $table->enum('level', ['حفظ', 'حفظ وتفسير']);
+            $table->boolean('done')->default(false);
+            $table->text('note')->nullable();
             $table->timestamps();
         });
     }

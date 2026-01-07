@@ -19,10 +19,10 @@ return new class extends Migration
             $table->foreignId('committee_id')->constrained()->cascadeOnDelete();
             $table->foreignId('student_id')->constrained()->cascadeOnDelete();
             $table->bigInteger('questionset_id')->unsigned()->nullable();
-            $table->enum('student_status', ['present', 'with_committee', 'withdraw', 'finish_competition'])->default('present');
-            $table->decimal('grand_total',6,2)->default(0);
-            $table->integer('judge_count')->default(0);
-            $table->text('notes')->nullable();
+            $table->enum('student_status', ['present', 'with_committee', 'withdraw', 'waiting_finalization','finish_competition'])->default('present');
+            // Final computed result (after finalization)
+            $table->decimal('final_score', 6, 2)->nullable();
+            $table->string('final_grade')->nullable();
             $table->timestamps();
         });
     }

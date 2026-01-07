@@ -4,7 +4,7 @@
 <head>
     <meta charset='utf-8' />
     <meta http-equiv='X-UA-Compatible' content='IE=edge' />
-    <title>{{ $title ?? 'الجمعية العمانية للعناية بالقرآن الكريم' }}</title>
+    <title>{{ $title ?? 'مسابقة فاستمسك' }}</title>
 
     <meta name='viewport' content='width=device-width, initial-scale=1' />
     <link rel="icon" type="image/svg" href="{{ asset('assets/images/favicon.svg') }}" />
@@ -215,7 +215,7 @@
                     @endif
 
                     <!-- Present Students (Visible to judge and admin) -->
-                    @if (auth()->user()->user_type == 'judge' || auth()->user()->user_type == 'admin')
+                    @if (in_array(auth()->user()->user_type, ['judge', 'admin', 'organizer']))
                         <li class="menu-header text-xs uppercase text-gray-500 font-semibold px-2 py-2 mt-4">
                             التقييم
                         </li>
@@ -233,18 +233,19 @@
                             </a>
                         </li>
                     @endif
-
-                    <li class="menu-item">
-                        <a href="{{ route('final_result') }}"
-                            class="flex items-center px-3 py-3 rounded-lg hover:bg-gray-100 text-gray-700 hover:text-blue-600 transition-colors">
-                            <svg class="w-5 h-5 ml-3" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M5 19h14V5H5v14zm10-12h2v10h-2V7zm-4 4h2v6h-2v-6zm-4 3h2v3H7v-3z"
-                                    fill="currentColor" />
-                                <path opacity="0.5" d="M3 21h18v2H3v-2z" fill="currentColor" />
-                            </svg>
-                            <span>النتائج النهائية</span>
-                        </a>
-                    </li>
+                    @if (in_array(auth()->user()->user_type, ['judge']))
+                        <li class="menu-item">
+                            <a href="{{ route('final_result') }}"
+                                class="flex items-center px-3 py-3 rounded-lg hover:bg-gray-100 text-gray-700 hover:text-blue-600 transition-colors">
+                                <svg class="w-5 h-5 ml-3" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M5 19h14V5H5v14zm10-12h2v10h-2V7zm-4 4h2v6h-2v-6zm-4 3h2v3H7v-3z"
+                                        fill="currentColor" />
+                                    <path opacity="0.5" d="M3 21h18v2H3v-2z" fill="currentColor" />
+                                </svg>
+                                <span>النتائج النهائية</span>
+                            </a>
+                        </li>
+                    @endif
                 </ul>
 
             </div>

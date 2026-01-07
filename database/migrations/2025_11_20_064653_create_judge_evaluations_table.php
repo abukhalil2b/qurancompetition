@@ -13,19 +13,16 @@ return new class extends Migration
     {
         Schema::create('judge_evaluations', function (Blueprint $table) {
             $table->id();
-
             $table->foreignId('student_question_selection_id')->constrained()->cascadeOnDelete();
-
             $table->foreignId('evaluation_element_id')
                 ->constrained()
                 ->restrictOnDelete();
-
+            $table->decimal('reduct_point', 6, 2)->default(0);
             $table->foreignId('judge_id')->constrained('users')->cascadeOnDelete();
-            $table->decimal('achieved_point', 6, 2)->default(0);
+            $table->text('note')->nullable();
             $table->timestamps();
         });
-
-
+        
     }
 
     /**

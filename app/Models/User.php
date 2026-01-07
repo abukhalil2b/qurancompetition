@@ -33,7 +33,7 @@ class User extends Authenticatable
 	public function committees()
 	{
 		return $this->belongsToMany(Committee::class, 'committee_users', 'user_id', 'committee_id')
-			->withPivot('stage_id', 'is_leader')
+			->withPivot('stage_id', 'is_judge_leader')
 			->withTimestamps();
 	}
 
@@ -46,7 +46,7 @@ class User extends Authenticatable
 
         return $this->committees()
             ->wherePivot('stage_id', $stageId)
-            ->wherePivot('is_leader', true)
+            ->wherePivot('is_judge_leader', true)
             ->exists();
     }
 	

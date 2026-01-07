@@ -28,6 +28,4 @@ class Committee extends Model
             ->withPivot('stage_id')
             ->withTimestamps();
     }
-
-   
 }

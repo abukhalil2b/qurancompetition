@@ -8,26 +8,14 @@ class StudentQuestionSelection extends Model
 {
     protected $guarded = [];
 
-    public function questionJudgeEvaluations()
-    {
-        return $this->hasMany(QuestionJudgeEvaluation::class);
-    }
+    protected $casts = [
+        'done' => 'boolean',
+    ];
 
-    public function center()
+    public function isFinished()
     {
-        return $this->belongsTo(Center::class);
+        return $this->done === true;
     }
-
-    public function stage()
-    {
-        return $this->belongsTo(Stage::class);
-    }
-
-    public function committee()
-    {
-        return $this->belongsTo(Committee::class);
-    }
-
 
     public function question()
     {
@@ -39,18 +27,18 @@ class StudentQuestionSelection extends Model
         return $this->belongsTo(Competition::class);
     }
 
-    public function student()
-    {
-        return $this->belongsTo(Student::class);
-    }
-
-    public function questionset()
-    {
-        return $this->belongsTo(Questionset::class);
-    }
-
     public function judgeEvaluations()
     {
         return $this->hasMany(JudgeEvaluation::class);
+    }
+
+    public function totalDeduction(): float
+    {
+        return $this->judgeEvaluations()->sum('reduct_point');
+    }
+
+    public function judgeNotes()
+    {
+        return $this->hasMany(JudgeNote::class);
     }
 }

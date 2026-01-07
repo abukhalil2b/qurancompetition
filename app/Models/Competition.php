@@ -12,7 +12,7 @@ class Competition extends Model
    {
       return $this->hasMany(StudentQuestionSelection::class);
    }
-   
+
    public function student()
    {
       return $this->belongsTo(Student::class);
@@ -36,5 +36,10 @@ class Competition extends Model
    public function questionset()
    {
       return $this->belongsTo(Questionset::class, 'questionset_id');
+   }
+
+   public function judges()
+   {
+      return $this->belongsToMany(User::class, 'competition_judges');
    }
 }

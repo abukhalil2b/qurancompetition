@@ -35,7 +35,7 @@ class DatabaseSeeder extends Seeder
 			'user_type' => 'judge',
 			'gender' => 'male',
 			'national_id' => '200200200',
-			'password' => Hash::make('B@w200200'),
+			'password' => Hash::make('200200200'),
 		]);
 
 		User::create([
@@ -43,7 +43,7 @@ class DatabaseSeeder extends Seeder
 			'user_type' => 'judge',
 			'gender' => 'male',
 			'national_id' => '300300300',
-			'password' => Hash::make('B@w300300'),
+			'password' => Hash::make('300300300'),
 		]);
 
 		User::create([
@@ -51,7 +51,7 @@ class DatabaseSeeder extends Seeder
 			'user_type' => 'judge',
 			'gender' => 'male',
 			'national_id' => '400400400',
-			'password' => Hash::make('B@w400400'),
+			'password' => Hash::make('400400400'),
 		]);
 
 		User::create([
@@ -59,7 +59,7 @@ class DatabaseSeeder extends Seeder
 			'user_type' => 'judge',
 			'gender' => 'male',
 			'national_id' => '500500500',
-			'password' => Hash::make('B@w500500'),
+			'password' => Hash::make('500500500'),
 		]);
 
 		User::create([
@@ -102,31 +102,49 @@ class DatabaseSeeder extends Seeder
 			'stage_id' => 2,
 			'committee_id' => 1,
 			'user_id' => 2,
-			'is_leader' => 1,
+			'is_judge_leader' => 1,
+			'role' => 'judge',
 		]);
 
 		CommitteeUser::create([
 			'stage_id' => 2,
 			'committee_id' => 1,
 			'user_id' => 3,
-			'is_leader' => 0,
+			'is_judge_leader' => 0,
+			'role' => 'judge',
 		]);
 		CommitteeUser::create([
 			'stage_id' => 2,
 			'committee_id' => 1,
 			'user_id' => 4,
-			'is_leader' => 0,
+			'is_judge_leader' => 0,
+			'role' => 'judge',
 		]);
 		CommitteeUser::create([
 			'stage_id' => 2,
 			'committee_id' => 1,
 			'user_id' => 5,
-			'is_leader' => 0,
+			'is_judge_leader' => 0,
+			'role' => 'judge',
+		]);
+		CommitteeUser::create([
+			'stage_id' => 2,
+			'committee_id' => 1,
+			'user_id' => 6,
+			'is_judge_leader' => 0,
+			'role' => 'organizer',
+		]);
+		CommitteeUser::create([
+			'stage_id' => 2,
+			'committee_id' => 1,
+			'user_id' => 7,
+			'is_judge_leader' => 0,
+			'role' => 'organizer',
 		]);
 
 		$data = [];
 
-		foreach (range(1, 100) as $i) {
+		foreach (range(1, 14) as $i) {
 			$title = 'الباقة ' . $i;
 
 			$data[] = [
@@ -134,7 +152,11 @@ class DatabaseSeeder extends Seeder
 				'level' => 'حفظ',
 				'selected' => 0,
 			];
+		}
+		Questionset::insert($data);
 
+		foreach (range(1, 26) as $i) {
+			$title = 'الباقة ' . $i;
 			$data[] = [
 				'title' => $title,
 				'level' => 'حفظ وتفسير',
@@ -148,22 +170,26 @@ class DatabaseSeeder extends Seeder
 			[
 				'title' => 'الحفظ',
 				'level' => 'حفظ',
-				'max_score' => '70',
+				'max_score' => 14,
+				'scope' => 'question',
 			],
 			[
 				'title' => 'المخارج والصفات',
 				'level' => 'حفظ',
-				'max_score' => '15',
+				'max_score' => 3,
+				'scope' => 'competition',
 			],
 			[
 				'title' => 'الوقف والابتداء',
 				'level' => 'حفظ',
-				'max_score' => '10',
+				'max_score' => 2,
+				'scope' => 'competition',
 			],
 			[
 				'title' => 'تناسق الأداء وحسن الصوت',
 				'level' => 'حفظ',
-				'max_score' => '5',
+				'max_score' => 1,
+				'scope' => 'competition',
 			]
 		];
 
@@ -174,22 +200,26 @@ class DatabaseSeeder extends Seeder
 			[
 				'title' => 'الحفظ',
 				'level' => 'حفظ وتفسير',
-				'max_score' => '70',
+				'max_score' => 14,
+				'scope' => 'question',
 			],
 			[
 				'title' => 'المخارج والصفات',
 				'level' => 'حفظ وتفسير',
-				'max_score' => '15',
+				'max_score' => 3,
+				'scope' => 'competition',
 			],
 			[
 				'title' => 'الوقف والابتداء',
 				'level' => 'حفظ وتفسير',
-				'max_score' => '10',
+				'max_score' => 2,
+				'scope' => 'competition',
 			],
 			[
 				'title' => 'تناسق الأداء وحسن الصوت',
 				'level' => 'حفظ وتفسير',
-				'max_score' => '5',
+				'max_score' => 1,
+				'scope' => 'competition',
 			]
 		];
 
@@ -199,26 +229,29 @@ class DatabaseSeeder extends Seeder
 			[
 				'title' => 'معاني الكلمات',
 				'level' => 'حفظ وتفسير',
-				'max_score' => '10',
+				'max_score' => 10,
+				'scope' => 'competition',
 			],
 			[
 				'title' => 'المعنى الإجمالي',
 				'level' => 'حفظ وتفسير',
-				'max_score' => '10',
+				'max_score' => 10,
+				'scope' => 'competition',
 			],
 			[
 				'title' => 'النكات والمعاني البلاغية',
 				'level' => 'حفظ وتفسير',
-				'max_score' => '10',
+				'max_score' => 10,
+				'scope' => 'competition',
 			],
 			[
 				'title' => 'ما يستفاد من حكم وأحكام',
 				'level' => 'حفظ وتفسير',
-				'max_score' => '10',
+				'max_score' => 10,
+				'scope' => 'competition',
 			]
 		];
 
 		EvaluationElement::insert($tafseer);
-		
 	}
 }

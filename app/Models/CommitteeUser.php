@@ -12,5 +12,15 @@ class CommitteeUser extends Model
     {
         return $this->belongsTo(Stage::class);
     }
-}
 
+    public function committee()
+    {
+        return $this->belongsTo(Committee::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+}

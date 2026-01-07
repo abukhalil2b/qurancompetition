@@ -12,7 +12,6 @@ use App\Models\Center;
 use App\Models\EvaluationElement;
 use App\Models\JudgeEvaluation;
 use App\Models\Question;
-use App\Models\QuestionJudgeEvaluation;
 use App\Models\StudentQuestionSelection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -32,105 +31,106 @@ class StudentController extends Controller
         return view('student.index', compact('students'));
     }
 
-
     public function presentIndex()
     {
-        $loggedUser = auth()->user();
+        $user = auth()->user();
 
         $stage = Stage::where('active', 1)->first();
-
         if (!$stage) {
             return back()->with('error', 'لا توجد مرحلة نشطة حالياً');
         }
 
-        $committeeUser = CommitteeUser::where('user_id', $loggedUser->id)
+        $committeeUser = CommitteeUser::with('committee.center')
+            ->where('user_id', $user->id)
             ->where('stage_id', $stage->id)
             ->first();
 
-        if (!$committeeUser) {
-            return back()->with('error', 'المستخدم غير مرتبط باللجنة');
+        if (!$committeeUser || !$committeeUser->committee || !$committeeUser->committee->center) {
+            return back()->with('error', 'المستخدم غير مرتبط بلجنة صالحة');
         }
 
-        $committee = Committee::findOrFail($committeeUser->committee_id);
+        $committee = $committeeUser->committee;
+        $center    = $committee->center;
 
-        $center = Center::findOrFail($committee->center_id);
-
-        $competitions = Competition::select(
-            'competitions.*',
-            'students.name as student_name',
-            'students.gender',
-            'students.nationality',
-            'students.national_id',
-            'students.level',
-            'competitions.created_at as present_at'
-        )->leftJoin('students', 'competitions.student_id', '=', 'students.id')
-            ->with('questionset.questions')
-            ->where('competitions.center_id', $center->id)
-            ->where('competitions.committee_id', $committee->id)
-            ->where('competitions.stage_id', $stage->id)
-            ->whereIn('competitions.student_status', ['with_committee', 'present'])
+        $competitions = Competition::with([
+            'student',
+            'questionset.questions'
+        ])
+            ->where([
+                'center_id'    => $center->id,
+                'committee_id' => $committee->id,
+                'stage_id'     => $stage->id,
+            ])
+            ->whereIn('student_status', [
+                'with_committee',
+                'present',
+                'finish_competition'
+            ])
+            ->latest()
             ->get();
 
-
-        return view('student.present_index', compact('competitions', 'center', 'stage', 'committee'));
+        return view(
+            'student.present_index',
+            compact('competitions', 'center', 'stage', 'committee', 'committeeUser')
+        );
     }
 
-    // create form
     public function chooseQuestionset(Competition $competition)
     {
         $judge = auth()->user();
 
-        $stage = Stage::where('active', 1)->first();
+        $stage = Stage::where('active', true)->firstOrFail();
 
-        if (!$stage) {
-            return back()->with('error', 'لا توجد مرحلة نشطة حالياً');
-        }
-
-        $committeeUser = CommitteeUser::where('user_id', $judge->id)->where('stage_id', $stage->id)->first();
-
-        if (!$committeeUser) {
-            return back()->with('error', 'المستخدم غير مرتبط باللجنة');
-        }
+        $committeeUser = CommitteeUser::where([
+            'user_id'  => $judge->id,
+            'stage_id' => $stage->id,
+        ])->firstOrFail();
 
         $committee = Committee::findOrFail($committeeUser->committee_id);
+        $student   = Student::findOrFail($competition->student_id);
 
-        $center = Center::findOrFail($committee->center_id);
-
-
-        $student = Student::findOrFail($competition->student_id);
-
+        /**
+         * CASE 1: Question set already selected
+         */
         if ($competition->questionset_id) {
-
-            $evaluationElementCount = EvaluationElement::where('level', $student->level)->count();
 
             $questionset = Questionset::findOrFail($competition->questionset_id);
 
-            $studentQuestionSelections = StudentQuestionSelection::with(['question'])
-                ->withCount([
-                    'judgeEvaluations as unique_judge_count' => function ($query) use ($judge) {
-                        $query->where('judge_id', $judge->id);
-                    }
-                ])
+            $studentQuestionSelections = StudentQuestionSelection::with([
+                'question',
+                'judgeEvaluations',
+            ])
                 ->where('competition_id', $competition->id)
+                ->orderBy('id')
                 ->get();
 
-            $studentQuestionSelectionIds = $studentQuestionSelections->pluck('id');
-
-            $judgeEvaluation =  JudgeEvaluation::whereIn('student_question_selection_id', $studentQuestionSelectionIds)->get();
-
-            return view('student.questionset_selected', compact('student', 'studentQuestionSelections', 'questionset', 'evaluationElementCount', 'competition', 'stage'));
+            return view('student.questionset_selected', compact(
+                'student',
+                'competition',
+                'questionset',
+                'studentQuestionSelections',
+                'stage'
+            ));
         }
 
-        $questionsetIds = Competition::where('committee_id', $committeeUser->committee_id)
+        /**
+         * CASE 2: Choose a new question set
+         * Prevent reusing sets already taken by this committee
+         */
+        $usedQuestionsetIds = Competition::where('committee_id', $committeeUser->committee_id)
             ->whereNotNull('questionset_id')
             ->pluck('questionset_id');
 
         $questionsets = Questionset::where('level', $student->level)
+            ->whereNotIn('id', $usedQuestionsetIds)
             ->withCount('questions')
-            ->whereNotIn('id', $questionsetIds)
             ->get();
 
-        return view('student.choose_questionset', compact('questionsets', 'student', 'competition'));
+        return view('student.choose_questionset', compact(
+            'questionsets',
+            'student',
+            'competition'
+        ));
     }
 
 
@@ -138,130 +138,35 @@ class StudentController extends Controller
     {
         $stage = Stage::where('active', 1)->first();
 
+        if (!$stage) {
+            return back()->with('error', 'لا توجد مرحلة نشطة حالياً');
+        }
         Competition::where(['questionset_id' => $questionset->id, 'committee_id' => 1])->first();
 
-        // 1. Update the competition
-        $competition->update([
-            'questionset_id' => $questionset->id,
-            'student_status' => 'with_committee'
-        ]);
-
-        // 2. Fetch questions from the selected questionset
-        $questions = Question::where('questionset_id', $questionset->id)->get();
-
-        // 3. Build selections for each question
-        foreach ($questions as $question) {
-            StudentQuestionSelection::create([
-                'center_id' => $competition->center_id,
-                'stage_id' => $competition->stage_id,
-                'committee_id' => $competition->committee_id,
-                'competition_id' => $competition->id,
+        DB::transaction(function () use ($competition, $questionset) {
+            // 1. Update the competition
+            $competition->update([
                 'questionset_id' => $questionset->id,
-                'question_id'    => $question->id,
-                'level'    => $questionset->level,
-                'student_id'     => $competition->student_id
+                'student_status' => 'with_committee'
             ]);
-        }
+
+            // 2. Fetch questions from the selected questionset
+            $questions = Question::where('questionset_id', $questionset->id)->get();
+
+            // 3. Build selections for each question
+            foreach ($questions as $question) {
+                StudentQuestionSelection::create([
+                    'competition_id' => $competition->id,
+                    'question_id'    => $question->id,
+                    'level'    => $questionset->level,
+                ]);
+            }
+        });
 
         return redirect()
             ->route('student.choose_questionset', $competition->id)
             ->with('success', 'تم اختيار مجموعة الأسئلة بنجاح');
     }
-
-    public function startEvaluation($student_question_selection_id)
-    {
-
-        $studentQuestionSelection = StudentQuestionSelection::with(['student', 'center', 'stage', 'committee', 'questionset', 'question'])
-            ->where('id', $student_question_selection_id)->first();
-
-        if (!$studentQuestionSelection) {
-            abort(404);
-        }
-
-        $evaluationElements = EvaluationElement::where('level', $studentQuestionSelection->level)->get();
-        //  return$evaluationElements;
-
-        return view('student.start_evaluation', compact('studentQuestionSelection', 'evaluationElements'));
-    }
-    public function saveEvaluation(Request $request)
-    {
-        // return $request->all();
-
-        $request->validate([
-            'student_question_selection_id' => 'required|exists:student_question_selections,id',
-            'elements' => 'required|array',
-            'elements.*' => 'required|min:0',
-        ]);
-
-        $selectionId = $request->student_question_selection_id;
-        $judgeId = auth()->id();
-        try {
-            return DB::transaction(function () use ($request, $selectionId, $judgeId) {
-
-                // 1. Clear existing judge data
-                JudgeEvaluation::where('student_question_selection_id', $selectionId)
-                    ->where('judge_id', $judgeId)
-                    ->delete();
-
-                // 2. Insert new evaluations
-                $data = [];
-                foreach ($request->elements as $elementId => $score) {
-                    $data[] = [
-                        'student_question_selection_id' => $selectionId,
-                        'evaluation_element_id' => $elementId,
-                        'judge_id' => $judgeId,
-                        'achieved_point' => $score,
-                        'created_at' => now(),
-                        'updated_at' => now(),
-                    ];
-                }
-                JudgeEvaluation::insert($data);
-
-                // 3. Update QuestionJudgeEvaluation (Using updateOrCreate to avoid duplicates)
-                $judgeEvaluationSum = JudgeEvaluation::where('student_question_selection_id', $selectionId)
-                    ->where('judge_id', $judgeId)
-                    ->sum('achieved_point');
-
-                QuestionJudgeEvaluation::updateOrCreate(
-                    ['student_question_selection_id' => $selectionId, 'judge_id' => $judgeId],
-                    ['total_question' => $judgeEvaluationSum, 'note' => $request->note]
-                );
-
-                // 4. Update Student Selection Totals
-                $studentQuestionSelection = StudentQuestionSelection::findOrFail($selectionId);
-
-                $allJudgesSum = QuestionJudgeEvaluation::where('student_question_selection_id', $selectionId)
-                    ->sum('total_question');
-
-                $studentQuestionSelection->update(['total_element_evaluation' => $allJudgesSum]);
-
-                // 5. Update Competition Grand Totals
-                $totalQuestionEvaluations = StudentQuestionSelection::where('questionset_id', $studentQuestionSelection->questionset_id)
-                    ->sum('total_element_evaluation');
-
-                $judgeCount = JudgeEvaluation::where('student_question_selection_id', $selectionId)
-                    ->distinct('judge_id')
-                    ->count('judge_id');
-
-                $competition = Competition::where('questionset_id', $studentQuestionSelection->questionset_id)->firstOrFail();
-
-                $competition->update([
-                    'grand_total' => $totalQuestionEvaluations,
-                    'judge_count' => $judgeCount,
-                    'student_status' => 'with_committee',
-                    'notes' => $request->notes
-                ]);
-
-                return redirect()
-                    ->route('student.choose_questionset', $studentQuestionSelection->competition_id)
-                    ->with('success', 'تم حفظ التقييم بنجاح');
-            });
-        } catch (\Exception $e) {
-            // This will prevent the logout and show you the actual error
-            return back()->withErrors(['error' => 'حدث خطأ: ' . $e->getMessage()])->withInput();
-        }
-    }
-
 
     // create form
     public function create()
@@ -313,7 +218,6 @@ class StudentController extends Controller
 
         return view('student.show', compact('student', 'stage', 'questionsets', 'level', 'committees'));
     }
-
 
     // edit student
     public function edit(Student $student)
