@@ -23,10 +23,10 @@
             </div>
 
             <div>
-                <label for="branch" class="block mb-1 font-medium">المستوى</label>
-                <select name="branch" id="branch">
-                    <option value="الحفظ">الحفظ</option>
-                    <option value="الحفظ والتفسير">الحفظ والتفسير</option>
+                <label for="level" class="block mb-1 font-medium">المستوى</label>
+                <select name="level" id="level">
+                    <option @if($level == 'حفظ') selected @endif value="حفظ">الحفظ</option>
+                    <option @if($level == 'حفظ وتفسير') selected @endif value="حفظ وتفسير">الحفظ والتفسير</option>
                 </select>
             </div>
 

@@ -39,7 +39,7 @@ class DatabaseSeeder extends Seeder
 		]);
 
 		User::create([
-			'name' => 'طالب القنوبي',
+			'name' => 'عبدالله القنوبي',
 			'user_type' => 'judge',
 			'gender' => 'male',
 			'national_id' => '300300300',
@@ -169,25 +169,21 @@ class DatabaseSeeder extends Seeder
 		$evaluationElements = [
 			[
 				'title' => 'الحفظ',
-				'level' => 'حفظ',
 				'max_score' => 14,
 				'scope' => 'question',
 			],
 			[
 				'title' => 'المخارج والصفات',
-				'level' => 'حفظ',
 				'max_score' => 3,
 				'scope' => 'competition',
 			],
 			[
 				'title' => 'الوقف والابتداء',
-				'level' => 'حفظ',
 				'max_score' => 2,
 				'scope' => 'competition',
 			],
 			[
 				'title' => 'تناسق الأداء وحسن الصوت',
-				'level' => 'حفظ',
 				'max_score' => 1,
 				'scope' => 'competition',
 			]
@@ -196,62 +192,5 @@ class DatabaseSeeder extends Seeder
 		EvaluationElement::insert($evaluationElements);
 
 
-		$evaluationElements = [
-			[
-				'title' => 'الحفظ',
-				'level' => 'حفظ وتفسير',
-				'max_score' => 14,
-				'scope' => 'question',
-			],
-			[
-				'title' => 'المخارج والصفات',
-				'level' => 'حفظ وتفسير',
-				'max_score' => 3,
-				'scope' => 'competition',
-			],
-			[
-				'title' => 'الوقف والابتداء',
-				'level' => 'حفظ وتفسير',
-				'max_score' => 2,
-				'scope' => 'competition',
-			],
-			[
-				'title' => 'تناسق الأداء وحسن الصوت',
-				'level' => 'حفظ وتفسير',
-				'max_score' => 1,
-				'scope' => 'competition',
-			]
-		];
-
-		EvaluationElement::insert($evaluationElements);
-
-		$tafseer = [
-			[
-				'title' => 'معاني الكلمات',
-				'level' => 'حفظ وتفسير',
-				'max_score' => 10,
-				'scope' => 'competition',
-			],
-			[
-				'title' => 'المعنى الإجمالي',
-				'level' => 'حفظ وتفسير',
-				'max_score' => 10,
-				'scope' => 'competition',
-			],
-			[
-				'title' => 'النكات والمعاني البلاغية',
-				'level' => 'حفظ وتفسير',
-				'max_score' => 10,
-				'scope' => 'competition',
-			],
-			[
-				'title' => 'ما يستفاد من حكم وأحكام',
-				'level' => 'حفظ وتفسير',
-				'max_score' => 10,
-				'scope' => 'competition',
-			]
-		];
-
-		EvaluationElement::insert($tafseer);
 	}
 }

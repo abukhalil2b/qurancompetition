@@ -1,114 +1,122 @@
 <x-app-layout>
-    <div class="max-w-4xl mx-auto py-8">
+<div class="max-w-5xl mx-auto py-8">
 
-        <h2 class="text-xl font-bold mb-6">
-            نتيجة تقييمك
-        </h2>
+    <h2 class="text-xl font-bold mb-4">
+        نتيجة السؤال: {{ $studentQuestionSelection->question->content }}
+    </h2>
 
-        {{-- Judge scores for current user --}}
-        <div class="bg-white shadow rounded p-4 mb-6">
-            <h3 class="font-semibold mb-2">نتيجة تقييمك</h3>
-            @foreach ($studentQuestionSelection->judgeEvaluations as $evaluation)
-                <div class="flex justify-between border-b py-2">
-                    <span>{{ $evaluation->element->title }}</span>
-                    <span class="font-semibold text-red-600">
-                        -{{ $evaluation->reduct_point }}
-                    </span>
-                </div>
-            @endforeach
-        </div>
+    @php
+        $evaluationsByJudge = $studentQuestionSelection->judgeEvaluations
+            ->groupBy('judge_id');
 
-        {{-- Completed judges --}}
-        <div class="bg-green-50 border border-green-200 rounded p-4 mb-4">
-            <h3 class="font-semibold text-green-700 mb-2">
-                المحكمون الذين أكملوا التقييم
-            </h3>
+        $notesByJudge = $studentQuestionSelection->judgeNotes
+            ->keyBy('judge_id');
 
-            @forelse ($completedJudges as $judge)
-                <div class="mb-2">
-                    <p class="text-green-600 font-semibold">✔ {{ $judge->name }}</p>
+        $judgeTotals = [];
+    @endphp
 
-                    {{-- Show judge note if exists --}}
+    {{-- Judges Results --}}
+    <div class="bg-white shadow rounded p-5 mb-6">
+        <h3 class="font-semibold text-lg mb-4 text-green-700">
+            نتائج المحكمين
+        </h3>
+
+        @foreach ($evaluationsByJudge as $judgeId => $evaluations)
+            @php
+                $judge = $evaluations->first()->judge;
+                $note = $notesByJudge[$judgeId]->note ?? null;
+
+                // Calculate judge total for this question
+                $judgeTotal = $evaluations->sum(function ($evaluation) {
+                    return $evaluation->element->max_score - $evaluation->reduct_point;
+                });
+
+                $judgeTotals[] = $judgeTotal;
+            @endphp
+
+            <div class="border rounded-lg p-4 mb-4">
+                <p class="font-bold text-indigo-700 mb-2">
+                    ✔ {{ $judge->name }}
+                </p>
+
+                {{-- Element scores --}}
+                @foreach ($evaluations as $evaluation)
                     @php
-                        $note = \App\Models\JudgeNote::where(
-                            'student_question_selection_id',
-                            $studentQuestionSelection->id,
-                        )
-                            ->where('judge_id', $judge->id)
-                            ->value('note');
+                        $max = $evaluation->element->max_score;
+                        $final = $max - $evaluation->reduct_point;
                     @endphp
 
-                    @if ($note)
-                        <p class="text-gray-700 text-sm border-l-2 border-green-400 pl-2 mt-1">
-                            {{ $note }}
-                        </p>
-                    @else
-                        <p class="text-gray-400 text-sm italic mt-1">لم يضف ملاحظة</p>
-                    @endif
+                    <div class="flex justify-between border-b py-1 text-sm">
+                        <span>{{ $evaluation->element->title }}</span>
+                        <span class="font-semibold">
+                            {{ number_format($final, 2) }} / {{ $max }}
+                        </span>
+                    </div>
+                @endforeach
+
+                {{-- Judge total --}}
+                <div class="flex justify-between mt-3 font-bold text-green-700">
+                    <span>مجموع المحكم</span>
+                    <span>{{ number_format($judgeTotal, 2) }}</span>
                 </div>
-            @empty
-                <p class="text-gray-500">لا يوجد بعد</p>
-            @endforelse
-        </div>
 
-        {{-- Remaining judges --}}
-        <div class="bg-yellow-50 border border-yellow-200 rounded p-4 mb-6">
-            <h3 class="font-semibold text-yellow-700 mb-2">
-                المحكمون المتبقون
-            </h3>
-
-            @forelse ($remainingJudges as $committeeUser)
-                <p class="text-yellow-600">⏳ {{ $committeeUser->user->name }}</p>
-            @empty
-                <p class="text-green-700 font-semibold">
-                    تم اكتمال تقييم جميع المحكمين
-                </p>
-            @endforelse
-        </div>
-
-        {{-- Status message --}}
-        <div class="mb-4">
-            @if (!$studentQuestionSelection->done)
-                <p class="text-yellow-600 font-semibold">
-                    بانتظار بقية المحكمين لإنهاء التقييم...
-                </p>
-            @else
-                <p class="text-green-600 font-bold">
-                    اكتمل تقييم جميع المحكمين.
-                </p>
-            @endif
-        </div>
-
-        {{-- Next question button --}}
-        <a href="{{ route('student.show_final_result', $studentQuestionSelection->competition_id) }}"
-            class="px-6 py-2 rounded text-white font-bold transition
-       {{ $studentQuestionSelection->done
-           ? 'bg-green-600 hover:bg-green-700'
-           : 'bg-gray-400 cursor-not-allowed pointer-events-none' }}">
-            السؤال التالي
-        </a>
-
-
+                {{-- Judge note --}}
+                @if ($note)
+                    <p class="mt-3 text-sm text-gray-700 border-l-4 border-indigo-400 pl-2">
+                        {{ $note }}
+                    </p>
+                @else
+                    <p class="mt-3 text-sm text-gray-400 italic">
+                        لا توجد ملاحظة
+                    </p>
+                @endif
+            </div>
+        @endforeach
     </div>
 
-    {{-- Auto-enable next question button when all judges done --}}
-    <script>
-        const selectionId = {{ $studentQuestionSelection->id }};
-        const button = document.getElementById('next-question-btn');
+    {{-- Question Average --}}
+    @if (count($judgeTotals) > 0)
+        @php
+            $questionAverage = collect($judgeTotals)->avg();
+        @endphp
 
-        if (button.hasAttribute('disabled')) {
-            const interval = setInterval(() => {
-                fetch(`/student/evaluation-status/${selectionId}`)
-                    .then(res => res.json())
-                    .then(data => {
-                        if (data.done) {
-                            button.removeAttribute('disabled');
-                            button.classList.remove('bg-gray-400', 'cursor-not-allowed');
-                            button.classList.add('bg-green-600', 'hover:bg-green-700');
-                            clearInterval(interval);
-                        }
-                    });
-            }, 5000);
-        }
-    </script>
+        <div class="bg-indigo-50 border border-indigo-200 rounded p-4 mb-6">
+            <p class="font-bold text-indigo-700 text-lg">
+                متوسط نتيجة السؤال (جميع المحكمين):
+                {{ number_format($questionAverage, 2) }}
+            </p>
+        </div>
+    @endif
+
+    {{-- Remaining Judges --}}
+    <div class="bg-yellow-50 border border-yellow-200 rounded p-4 mb-6">
+        <h3 class="font-semibold text-yellow-700 mb-2">
+            المحكمون المتبقون
+        </h3>
+
+        @forelse ($remainingJudges as $committeeUser)
+            <p class="text-yellow-600">⏳ {{ $committeeUser->user->name }}</p>
+        @empty
+            <p class="text-green-700 font-semibold">
+                تم اكتمال تقييم جميع المحكمين
+            </p>
+        @endforelse
+    </div>
+
+    {{-- Navigation --}}
+    @if ($studentQuestionSelection->done)
+        @if ($nextQuestion)
+            <a href="{{ route('student.start_evaluation', $nextQuestion->id) }}"
+               class="inline-block bg-indigo-600 text-white px-5 py-2 rounded font-semibold">
+                السؤال الآتي
+            </a>
+        @else
+            <a href="{{ route('student.show_final_result', $competition->id) }}"
+               class="inline-block bg-green-600 text-white px-5 py-2 rounded font-semibold">
+                إنهاء الأسئلة
+            </a>
+        @endif
+    @endif
+
+</div>
 </x-app-layout>

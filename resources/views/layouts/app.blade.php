@@ -252,7 +252,7 @@
         </nav>
 
         <div class="w-full">
-            <div class="p-3">
+            <div class="p-1">
                 @include('layouts._message')
             </div>
             {{ $slot }}

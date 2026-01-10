@@ -9,6 +9,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\JudgeController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\QuestionsetController;
+use App\Http\Controllers\TafseerController;
 use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\StageController;
 use Illuminate\Support\Facades\Route;
@@ -30,8 +31,31 @@ Route::middleware(['auth'])->group(function () {
     Route::post('student/save_evaluation', [EvaluationController::class, 'saveEvaluation'])->name('student.save_evaluation');
     Route::get('student/show_evaluation/{student_question_selection_id}', [EvaluationController::class, 'showEvaluation'])->name('student.show_evaluation');
     Route::get('student/show_final_result/{competition}', [EvaluationController::class, 'showFinalResult'])->name('student.show_final_result');
-   
-    Route::get('student/evaluation-status/{id}',[EvaluationController::class, 'evaluationStatus']);
+});
+
+Route::middleware(['auth'])->group(function () {
+
+    // Start tafseer evaluation
+    Route::get(
+        'tafseer/start/{competition}',
+        [TafseerController::class, 'start']
+    )->name('tafseer.start');
+
+    // Save tafseer evaluation (per question)
+    Route::post(
+        'tafseer/save/{tafseerQuestion}',
+        [TafseerController::class, 'store']
+    )->name('tafseer.save');
+
+    // Show tafseer result (optional but recommended)
+    Route::get(
+        'tafseer/show/{competition}',
+        [TafseerController::class, 'show']
+    )->name('tafseer.show');
+
+    Route::post('tafseer/store', [TafseerController::class, 'store'])
+        ->name('tafseer.store');
+
 });
 
 Route::middleware(['auth'])->group(function () {
@@ -91,7 +115,7 @@ Route::middleware(['auth'])->group(function () {
 
     // Questionsets CRUD
     Route::get('questionset/index/{id?}', [QuestionsetController::class, 'index'])->name('questionset.index');
-    Route::get('questionset/create', [QuestionsetController::class, 'create'])->name('questionset.create');
+    Route::get('questionset/create/{level}', [QuestionsetController::class, 'create'])->name('questionset.create');
     Route::post('questionset', [QuestionsetController::class, 'store'])->name('questionset.store');
     Route::get('questionset/show/{questionset}', [QuestionsetController::class, 'show'])->name('questionset.show');
     Route::get('questionset/edit/{questionset}', [QuestionsetController::class, 'edit'])->name('questionset.edit');

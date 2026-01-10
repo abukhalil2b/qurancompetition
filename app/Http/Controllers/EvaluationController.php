@@ -10,7 +10,9 @@ use App\Models\EvaluationElement;
 use App\Models\JudgeNote;
 use App\Models\Stage;
 use App\Models\Student;
+use App\Models\TafseerResult;
 use App\Models\User;
+use App\Services\ScoreCalculator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -34,10 +36,7 @@ class EvaluationController extends Controller
         ])
             ->findOrFail($student_question_selection_id);
 
-        $evaluationElements = EvaluationElement::where(
-            'level',
-            $studentQuestionSelection->level
-        )->get();
+        $evaluationElements = EvaluationElement::all();
 
         // Old scores (element_id => reduct_point)
         $oldScores = $studentQuestionSelection->judgeEvaluations
@@ -117,92 +116,116 @@ class EvaluationController extends Controller
         return redirect()->route('student.show_evaluation', $selection->id)
             ->with('success', 'تم حفظ التقييم بنجاح');
     }
-
-
-    public function showEvaluation($student_question_selection_id)
-    {
-        $judge = auth()->user();
-
-        $studentQuestionSelection = StudentQuestionSelection::with([
-            'competition',
-            'question',
-            'judgeEvaluations' => function ($q) use ($judge) {
-                $q->where('judge_id', $judge->id)
-                    ->with('element');
-            },
-        ])->findOrFail($student_question_selection_id);
-
-        $competition = $studentQuestionSelection->competition;
-
-        // Total judges in this committee
-        $totalJudges = CommitteeUser::where('committee_id', $competition->committee_id)
-            ->where('role', 'judge')
-            ->count();
-
-        // Completed judges: user IDs who have submitted at least one score
-        $completedJudgeIds = JudgeEvaluation::where('student_question_selection_id', $studentQuestionSelection->id)
-            ->pluck('judge_id')
-            ->unique();
-
-        // Fetch User models for completed judges
-        $completedJudges = User::whereIn('id', $completedJudgeIds)->get();
-
-        // Remaining judges: those who haven’t submitted
-        $remainingJudges = CommitteeUser::where('committee_id', $competition->committee_id)
-            ->where('role', 'judge')
-            ->whereNotIn('user_id', $completedJudgeIds)
-            ->with('user:id,name')
-            ->get();
-
-        // Mark question done if all judges finished
-        if ($completedJudges->count() >= $totalJudges && $totalJudges > 0) {
-            $studentQuestionSelection->update(['done' => true]);
-        }
-
-        return view('student.show_evaluation', compact(
-            'studentQuestionSelection',
-            'totalJudges',
-            'completedJudges', // now available in Blade
-            'remainingJudges'
-        ));
-    }
-
-
-
-
-
-    public function evaluationStatus($id)
-    {
-        $selection = StudentQuestionSelection::select('done')
-            ->findOrFail($id);
-
-        return response()->json([
-            'done' => $selection->done,
-        ]);
-    }
-
-    public function showFinalResult(Competition $competition)
+public function showEvaluation($student_question_selection_id)
 {
-    $questions = StudentQuestionSelection::with([
+    $studentQuestionSelection = StudentQuestionSelection::with([
+        'competition',
         'question',
         'judgeEvaluations.element',
-        'judgeNotes.judge',
-    ])
-    ->where('competition_id', $competition->id)
-    ->get();
+        'judgeEvaluations.judge:id,name',
+        'judgeNotes.judge:id,name',
+    ])->findOrFail($student_question_selection_id);
 
-    $student = Student::find($competition->student_id);
+    $competition = $studentQuestionSelection->competition;
 
-    // Check if any question is not done yet
-    $nextQuestion = $questions->firstWhere('done', false);
-    if ($nextQuestion) {
-        return redirect()->route('student.start_evaluation', $nextQuestion->id);
-    }
+    // Judges who submitted evaluations
+    $completedJudgeIds = $studentQuestionSelection->judgeEvaluations
+        ->pluck('judge_id')
+        ->unique()
+        ->values();
 
-    return view('student.final_result', compact('student', 'questions'));
+    $completedJudges = User::whereIn('id', $completedJudgeIds)->get();
+
+    // Remaining judges
+    $remainingJudges = CommitteeUser::where('committee_id', $competition->committee_id)
+        ->where('role', 'judge')
+        ->whereNotIn('user_id', $completedJudgeIds)
+        ->with('user:id,name')
+        ->get();
+
+    // Next question (if exists)
+    $nextQuestion = StudentQuestionSelection::where('competition_id', $competition->id)
+        ->where('done', false)
+        ->orderBy('id')
+        ->first();
+
+    return view('student.show_evaluation', compact(
+        'studentQuestionSelection',
+        'competition',
+        'completedJudges',
+        'remainingJudges',
+        'nextQuestion'
+    ));
 }
 
 
+    public function showFinalResult(Competition $competition)
+    {
+        $student = $competition->student;
+
+        // 1. Fetch all memorization questions
+        $questions = StudentQuestionSelection::with([
+            'judgeEvaluations.element'
+        ])
+            ->where('competition_id', $competition->id)
+            ->orderBy('id')
+            ->get();
+
+        // 2. If any memorization question is not done → redirect
+        $unfinishedQuestion = $questions->firstWhere('done', false);
+
+        if ($unfinishedQuestion) {
+            return redirect()->route(
+                'student.start_evaluation',
+                $unfinishedQuestion->id
+            );
+        }
+
+        // 3. Memorization score is always calculated
+        $scores = ScoreCalculator::final($competition);
+
+        /**
+         * ======================================
+         * LEVEL: حفظ
+         * ======================================
+         */
+        if ($student->level === 'حفظ') {
+
+            // Tafseer is NOT applicable
+            return view('student.final_result', [
+                'student'   => $student,
+                'questions' => $questions,
+                'scores'    => $scores, // max = 100
+            ]);
+        }
+
+        /**
+         * ======================================
+         * LEVEL: حفظ وتفسير
+         * ======================================
+         */
+        if ($student->level === 'حفظ وتفسير') {
+
+            $tafseerResult = TafseerResult::where('competition_id', $competition->id)
+                ->where('done', true)
+                ->first();
+
+            // Tafseer NOT finished yet → redirect
+            if (!$tafseerResult) {
+                return redirect()->route('tafseer.start', $competition->id);
+            }
+
+            // Tafseer finished → show final (out of 140)
+            return view('student.final_result', [
+                'student'   => $student,
+                'questions' => $questions,
+                'scores'    => $scores, // max = 140
+            ]);
+        }
+
+        // Fallback (should never happen)
+        abort(500, 'Invalid student level');
+    }
 
 
     protected function checkIfQuestionIsDone(StudentQuestionSelection $selection, Competition $competition)

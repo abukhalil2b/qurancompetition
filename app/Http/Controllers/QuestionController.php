@@ -26,12 +26,11 @@ class QuestionController extends Controller
     {
         $request->validate([
             'content' => 'required|string',
-            'difficulties' => 'required',
         ]);
 
         $questionset->questions()->create([
             'content' => $request->content,
-            'difficulties' => $request->difficulties,
+            'difficulties' => 'السهلة',
         ]);
 
         return redirect()->route('questionset.show', $questionset)->with('success', 'تم إضافة السؤال بنجاح');
@@ -48,12 +47,11 @@ class QuestionController extends Controller
     {
         $request->validate([
             'content' => 'required|string',
-            'difficulties' => 'required|in:السهلة,المتوسطة,الصعبة',
         ]);
 
         $question->update([
             'content' => $request->content,
-            'difficulties' => $request->difficulties,
+           'difficulties' => 'السهلة',
         ]);
 
         return redirect()

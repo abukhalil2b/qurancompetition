@@ -65,7 +65,7 @@
                         {{ $studentQuestionSelection->question->content }}
                     </span>
 
-                    <div class="text-sm flex items-center gap-2">
+                    <div class="text-xs flex items-center gap-2 bg-blue-800 p-2 rounded">
                         <span>إجمالي الخصم:</span>
                         <span x-text="totalScore" class="font-bold text-lg"></span>
                     </div>
@@ -76,10 +76,9 @@
 
                     @foreach ($evaluationElements as $element)
                         <div
-                            class="p-3 bg-white border rounded-xl flex justify-between items-center"
+                            class="p-1 bg-white border rounded flex justify-between items-center"
                             x-data="{ id: {{ $element->id }}, max: {{ $element->max_score }} }"
                         >
-
                             {{-- Element Info --}}
                             <div class="flex flex-col gap-1">
                                 <div class="text-gray-800 font-bold">
@@ -150,14 +149,12 @@
                 </div>
 
                 {{-- Judge Note --}}
-                <div class="mt-6 p-4 bg-white rounded-lg border shadow">
                     <textarea
                         name="note"
                         rows="4"
                         placeholder="ملاحظة المحكم (اختياري)"
                         class="w-full p-3 border rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-indigo-400"
                     ></textarea>
-                </div>
 
                 {{-- Save Button --}}
                 <button

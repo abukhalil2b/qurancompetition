@@ -23,21 +23,21 @@ class QuestionsetController extends Controller
         return view('questionset.index', compact('questionsets', 'level'));
     }
 
-    public function create()
+    public function create($level)
     {
-        return view('questionset.create');
+        return view('questionset.create', compact('level'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
             'title' => 'required|string|max:255',
-            'branch' => 'required|string|max:255',
+            'level' => 'required|string|max:255',
         ]);
 
         Questionset::create([
             'title' => $request->title,
-            'branch' => $request->branch,
+            'level' => $request->level,
         ]);
 
         return redirect()->route('questionset.index')->with('success', 'تم إنشاء باقة الأسئلة بنجاح');
