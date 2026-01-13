@@ -5,36 +5,43 @@
         تقييم التفسير – {{ $competition->student->name }}
     </h2>
 
-    {{-- رسالة النجاح --}}
-    @if(session('success'))
-        <div class="bg-green-100 text-green-700 p-3 mb-4 rounded">
-            {{ session('success') }}
-        </div>
-    @endif
-
     <form action="{{ route('tafseer.store') }}" method="POST">
         @csrf
+        
+        {{-- Important: Needed for the redirect in your controller --}}
+        <input type="hidden" name="competition_id" value="{{ $competition->id }}">
 
         @foreach ($questions as $question)
-            <div class="mb-4 p-3 border rounded">
+            {{-- Get existing evaluation for this question if it exists --}}
+            @php
+                $existing = $evaluations->get($question->id);
+            @endphp
+
+            <div class="mb-4 p-3 border rounded {{ $existing ? 'bg-green-50 border-green-200' : 'bg-white' }}">
                 <p class="font-semibold">{{ $question->order }}. {{ $question->content }}</p>
 
-                {{-- إدخال الدرجة --}}
                 <input type="hidden" name="questions[{{ $question->id }}][question_id]" value="{{ $question->id }}">
+                
                 <label class="block mt-1">
-                    الدرجة (0 – {{ $question->weight }}):
-                    <input type="number" name="questions[{{ $question->id }}][score]" value="0" min="0" max="{{ $question->weight }}" class="border rounded px-2 py-1 w-20">
-                </label>
-
-                {{-- ملاحظة المحكم --}}
+   الدرجة من 10
+    <input type="number" 
+           step="0.1" 
+           name="questions[{{ $question->id }}][score]" 
+           value="{{ old('questions.'.$question->id.'.score', $existing?->score ?? 0) }}" 
+           min="0" 
+           max="{{ $question->weight }}" 
+           class="border rounded px-2 py-1 w-20 focus:ring-indigo-500 focus:border-indigo-500">
+</label>
                 <label class="block mt-2">
                     ملاحظة:
-                    <textarea name="questions[{{ $question->id }}][note]" class="w-full mt-1 p-1 border rounded" placeholder="اكتب ملاحظة"></textarea>
+                    <textarea name="questions[{{ $question->id }}][note]" 
+                              class="w-full mt-1 p-1 border rounded focus:ring-indigo-500 focus:border-indigo-500" 
+                              placeholder="اكتب ملاحظة">{{ old('questions.'.$question->id.'.note', $existing?->note ?? '') }}</textarea>
                 </label>
             </div>
         @endforeach
 
-        <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded font-semibold">
+        <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded font-semibold hover:bg-indigo-700 transition">
             حفظ التقييم
         </button>
     </form>

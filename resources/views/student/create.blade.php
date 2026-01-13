@@ -154,41 +154,29 @@
                 <p class="text-xs text-gray-500 mt-1">الحد الأقصى 11 رقم</p>
             </div>
 
-            {{-- Registration Date --}}
-            <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">
-                    تاريخ التسجيل
-                </label>
-                <input 
-                    type="date" 
-                    name="registration_date" 
-                    value="{{ old('registration_date', date('Y-m-d')) }}"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors">
-            </div>
-
             {{-- State --}}
             <div>
                 <label class="block text-sm font-semibold text-gray-700 mb-2">
-                    الولاية
+                    المحافظة
                 </label>
                 <input 
                     type="text" 
                     name="state" 
                     value="{{ old('state') }}"
-                    placeholder="أدخل الولاية"
+                    placeholder="أدخل المحافظة"
                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors">
             </div>
 
             {{-- Wilaya --}}
             <div>
                 <label class="block text-sm font-semibold text-gray-700 mb-2">
-                    المنطقة
+                    الولاية
                 </label>
                 <input 
                     type="text" 
                     name="wilaya" 
                     value="{{ old('wilaya') }}"
-                    placeholder="أدخل المنطقة"
+                    placeholder="أدخل الولاية"
                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors">
             </div>
 

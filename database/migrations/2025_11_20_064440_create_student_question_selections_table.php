@@ -18,6 +18,9 @@ return new class extends Migration
             $table->enum('level', ['حفظ', 'حفظ وتفسير']);
             $table->boolean('done')->default(false);
             $table->text('note')->nullable();
+            $table->tinyInteger('position')->default(1);
+            $table->boolean('is_passed')->default(1);
+            $table->decimal('total_average_reduct_point',6,2)->default(0);
             $table->timestamps();
         });
     }

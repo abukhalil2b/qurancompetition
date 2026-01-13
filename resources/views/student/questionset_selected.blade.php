@@ -39,7 +39,7 @@
 
             {{-- Questions Grid --}}
             <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-                @foreach ($studentQuestionSelections as $index => $selection)
+                @foreach ($studentQuestionSelections as $selection)
 
                     <a href="{{ route('student.start_evaluation', $selection->id) }}"
                        class="p-5 border-2 rounded-2xl shadow-sm transition-all duration-200
@@ -53,7 +53,7 @@
                             <span
                                 class="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-white
                                 {{ $selection->done ? 'bg-green-600' : 'bg-indigo-600' }}">
-                                {{ $index + 1 }}
+                                {{ $selection->position  }}
                             </span>
 
                             {{-- Question Content --}}

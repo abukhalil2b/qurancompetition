@@ -55,7 +55,6 @@ Route::middleware(['auth'])->group(function () {
 
     Route::post('tafseer/store', [TafseerController::class, 'store'])
         ->name('tafseer.store');
-
 });
 
 Route::middleware(['auth'])->group(function () {
@@ -105,8 +104,19 @@ Route::middleware(['auth'])->group(function () {
     Route::get('committee/index', [CommitteeController::class, 'index'])
         ->name('committee.index');
 
+        Route::get('committee/show/{committee}', [CommitteeController::class, 'show'])
+        ->name('committee.show');
+
     Route::post('committee/store', [CommitteeController::class, 'store'])
         ->name('committee.store');
+
+    Route::put('committee/{committee}', [CommitteeController::class, 'update'])->name('committee.update');
+
+    Route::post('committee/{committee}/set-leader', [CommitteeController::class, 'setLeader'])
+        ->name('committee.set-leader');
+
+    Route::delete('committee/{committee}/remove-judge/{user}', [CommitteeController::class, 'removeJudge'])
+        ->name('committee.remove-judge');
 });
 
 

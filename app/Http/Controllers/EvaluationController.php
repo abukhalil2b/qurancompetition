@@ -24,6 +24,14 @@ class EvaluationController extends Controller
     {
         $judge = auth()->user();
 
+        $stage = Stage::latest('id')->where('active', 1)->first();
+
+        if (!$stage) {
+            abort(404);
+        }
+
+        $isJudgeLeader = $judge->isCommitteeLeader($stage->id);
+
         $studentQuestionSelection = StudentQuestionSelection::with([
             'competition',
             'question',
@@ -47,8 +55,10 @@ class EvaluationController extends Controller
             ->first()?->note;
 
         return view('student.start_evaluation', compact(
+            'isJudgeLeader',
             'studentQuestionSelection',
             'evaluationElements',
+            'stage',
             'oldScores',
             'oldNote'
         ));
@@ -63,6 +73,7 @@ class EvaluationController extends Controller
             'elements' => 'required|array', // The array of scores: [element_id => score]
             'elements.*' => 'numeric',      // Scores like -0.5, -1, 0
             'note' => 'nullable|string',
+            'student_lost_question' => 'nullable'
         ]);
 
         $judge = Auth::user();
@@ -79,8 +90,14 @@ class EvaluationController extends Controller
             abort(403, 'User is not a judge in this committee.');
         }
 
+
+
         // 3. Store Data Transactionally
         DB::transaction(function () use ($validated, $selection, $judge, $competition) {
+            
+            if (isset($validated['student_lost_question'])) {
+                $selection->is_passed = 0;
+            }
 
             // Loop through the evaluation elements submitted from the form
             foreach ($validated['elements'] as $elementId => $score) {
@@ -116,47 +133,58 @@ class EvaluationController extends Controller
         return redirect()->route('student.show_evaluation', $selection->id)
             ->with('success', 'تم حفظ التقييم بنجاح');
     }
-public function showEvaluation($student_question_selection_id)
-{
-    $studentQuestionSelection = StudentQuestionSelection::with([
-        'competition',
-        'question',
-        'judgeEvaluations.element',
-        'judgeEvaluations.judge:id,name',
-        'judgeNotes.judge:id,name',
-    ])->findOrFail($student_question_selection_id);
 
-    $competition = $studentQuestionSelection->competition;
+    public function showEvaluation($student_question_selection_id)
+    {
+        $studentQuestionSelection = StudentQuestionSelection::with([
+            'competition',
+            'question',
+            'judgeEvaluations.element',
+            'judgeEvaluations.judge:id,name',
+            'judgeNotes.judge:id,name',
+        ])->findOrFail($student_question_selection_id);
 
-    // Judges who submitted evaluations
-    $completedJudgeIds = $studentQuestionSelection->judgeEvaluations
-        ->pluck('judge_id')
-        ->unique()
-        ->values();
+        $competition = $studentQuestionSelection->competition;
 
-    $completedJudges = User::whereIn('id', $completedJudgeIds)->get();
+        // Judges who submitted evaluations
+        $completedJudgeIds = $studentQuestionSelection->judgeEvaluations
+            ->pluck('judge_id')
+            ->unique()
+            ->values();
 
-    // Remaining judges
-    $remainingJudges = CommitteeUser::where('committee_id', $competition->committee_id)
-        ->where('role', 'judge')
-        ->whereNotIn('user_id', $completedJudgeIds)
-        ->with('user:id,name')
-        ->get();
+        $completedJudges = User::whereIn('id', $completedJudgeIds)->get();
 
-    // Next question (if exists)
-    $nextQuestion = StudentQuestionSelection::where('competition_id', $competition->id)
-        ->where('done', false)
-        ->orderBy('id')
-        ->first();
+        // Remaining judges
+        $remainingJudges = CommitteeUser::where('committee_id', $competition->committee_id)
+            ->where('role', 'judge')
+            ->whereNotIn('user_id', $completedJudgeIds)
+            ->with('user:id,name')
+            ->get();
 
-    return view('student.show_evaluation', compact(
-        'studentQuestionSelection',
-        'competition',
-        'completedJudges',
-        'remainingJudges',
-        'nextQuestion'
-    ));
-}
+        // Next question (if exists)
+        $nextQuestion = StudentQuestionSelection::where('competition_id', $competition->id)
+            ->where('done', false)
+            ->orderBy('id')
+            ->first();
+
+        $buttonText = 'إنهاء الأسئلة';
+
+        if (!$nextQuestion) {
+            $buttonText = 'السؤال الآتي';
+            if ($competition->student->level ==  'حفظ وتفسير') {
+                $buttonText = 'أسئلة التفسير';
+            }
+        }
+
+        return view('student.show_evaluation', compact(
+            'studentQuestionSelection',
+            'competition',
+            'completedJudges',
+            'remainingJudges',
+            'nextQuestion',
+            'buttonText'
+        ));
+    }
 
 
     public function showFinalResult(Competition $competition)

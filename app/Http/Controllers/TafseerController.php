@@ -12,46 +12,51 @@ use Illuminate\Http\Request;
 class TafseerController extends Controller
 {
     public function start($competitionId)
-    {
-        // Load competition
-        $competition = \App\Models\Competition::with('student')->findOrFail($competitionId);
+{
+    $competition = Competition::with('student')->findOrFail($competitionId);
+    $judge = auth()->user();
 
-        // Load tafseer questions
-        $questions = \App\Models\TafseerQuestion::where('competition_id', $competitionId)
-            ->orderBy('order')
-            ->get();
+    // Load questions
+    $questions = TafseerQuestion::orderBy('order')->get();
 
-        return view('tafseer.start', compact('competition', 'questions'));
-    }
+    // Load existing evaluations for this judge and THESE specific questions
+    // keyBy ensures we can access them like: $evaluations[1]->score
+    $evaluations = TafseerEvaluation::where('judge_id', $judge->id)
+        ->whereIn('tafseer_question_id', $questions->pluck('id'))
+        ->get()
+        ->keyBy('tafseer_question_id');
+
+    return view('tafseer.start', compact('competition', 'questions', 'evaluations'));
+}
 
 
     public function store(Request $request)
-{
-    $validated = $request->validate([
-        'questions' => 'required|array',
-        'questions.*.question_id' => 'required|exists:tafseer_questions,id',
-        'questions.*.score' => 'required|numeric|min:0',
-        'questions.*.note' => 'nullable|string',
-    ]);
+    {
+        $validated = $request->validate([
+            'questions' => 'required|array',
+            'questions.*.question_id' => 'required|exists:tafseer_questions,id',
+            'questions.*.score' => 'required|numeric|min:0',
+            'questions.*.note' => 'nullable|string',
+        ]);
 
-    $judge = auth()->user();
+        $judge = auth()->user();
 
-    foreach ($validated['questions'] as $q) {
-        \App\Models\TafseerEvaluation::updateOrCreate(
-            [
-                'tafseer_question_id' => $q['question_id'],
-                'judge_id' => $judge->id,
-            ],
-            [
-                'score' => $q['score'],
-                'note' => $q['note'] ?? null,
-            ]
-        );
+        foreach ($validated['questions'] as $q) {
+            TafseerEvaluation::updateOrCreate(
+                [
+                    'tafseer_question_id' => $q['question_id'],
+                    'judge_id' => $judge->id,
+                ],
+                [
+                    'score' => $q['score'],
+                    'note' => $q['note'] ?? null,
+                ]
+            );
+        }
+
+        return redirect()->route('tafseer.start', $request->competition_id)
+            ->with('success', 'تم حفظ التقييم بنجاح!');
     }
-
-    return redirect()->route('tafseer.start', $request->competition_id)
-        ->with('success', 'Evaluation saved successfully!');
-}
 
 
     protected function checkIfTafseerDone(int $competitionId)

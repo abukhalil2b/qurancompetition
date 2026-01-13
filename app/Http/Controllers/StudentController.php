@@ -102,7 +102,7 @@ class StudentController extends Controller
                 'judgeEvaluations',
             ])
                 ->where('competition_id', $competition->id)
-                ->orderBy('id')
+                ->orderBy('position')
                 ->get();
 
             return view('student.questionset_selected', compact(
@@ -155,11 +155,12 @@ class StudentController extends Controller
             $questions = Question::where('questionset_id', $questionset->id)->get();
 
             // 3. Build selections for each question
-            foreach ($questions as $question) {
+            foreach ($questions as $index => $question) {
                 StudentQuestionSelection::create([
                     'competition_id' => $competition->id,
                     'question_id'    => $question->id,
                     'level'    => $questionset->level,
+                    'position'    => $index + 1,
                 ]);
             }
         });
