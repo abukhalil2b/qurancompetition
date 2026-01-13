@@ -15,6 +15,7 @@ use App\Models\Question;
 use App\Models\StudentQuestionSelection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 
 class StudentController extends Controller
 {
@@ -171,7 +172,6 @@ class StudentController extends Controller
     // create form
     public function create()
     {
-        return 'حاليا معطل';
         $levels = ['حفظ', 'حفظ وتفسير'];
 
         return view('student.create', compact('levels'));
@@ -180,17 +180,19 @@ class StudentController extends Controller
     // store student
     public function store(Request $request)
     {
+        $levels = ['حفظ', 'حفظ وتفسير'];
+
         $validated = $request->validate([
             'name'              => 'required|string|max:255',
             'gender'            => 'required|in:male,female',
             'phone'             => 'nullable|string|size:8|unique:students,phone',
             'national_id'       => 'nullable|string|max:11|unique:students,national_id',
             'nationality'       => 'required|string|max:255',
-            'dob'               => 'required|date',
-            'state'             => 'required|string|max:255',
-            'wilaya'            => 'required|string|max:255',
+            'dob'               => 'nullable|date',
+            'state'             => 'nullable|string|max:255',
+            'wilaya'            => 'nullable|string|max:255',
             'qarya'             => 'nullable|string|max:255',
-            'level'            => 'nullable|string|max:255',
+            'level' => ['nullable', 'string', 'max:255', Rule::in($levels)],
             'registration_date' => 'nullable|date',
         ]);
 
@@ -233,12 +235,12 @@ class StudentController extends Controller
             'gender'            => 'required|in:male,female',
             'phone'             => 'nullable|string|size:8|unique:students,phone,' . $student->id,
             'national_id'       => 'nullable|string|max:11|unique:students,national_id,' . $student->id,
-            'nationality'       => 'required|string|max:255',
-            'dob'               => 'required|date',
-            'state'             => 'required|string|max:255',
-            'wilaya'            => 'required|string|max:255',
+            'nationality'       => 'nullable|string|max:255',
+            'dob'               => 'nullable|date',
+            'state'             => 'nullable|string|max:255',
+            'wilaya'            => 'nullable|string|max:255',
             'qarya'             => 'nullable|string|max:255',
-            'level'             => 'nullable|string|max:255',
+            'level'             => 'required|string|max:255',
             'registration_date' => 'nullable|date',
             'active'            => 'required|boolean',
             'note'              => 'nullable|string',

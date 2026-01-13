@@ -17,10 +17,10 @@ return new class extends Migration
             $table->enum('gender', ['male','female'])->default('male');
             $table->string('phone', 8)->nullable()->unique();// local phone number = 8 digit
             $table->string('national_id', 11)->nullable()->unique();// max digit = 11
-            $table->string('nationality');
-            $table->date('dob');
-            $table->string('state');
-            $table->string('wilaya');
+            $table->string('nationality')->default('عماني');
+            $table->date('dob')->nullable();
+            $table->string('state')->nullable();
+            $table->string('wilaya')->nullable();
             $table->string('qarya')->nullable();
             $table->enum('level', ['حفظ','حفظ وتفسير'])->default('حفظ');
             $table->date('registration_date')->nullable();
