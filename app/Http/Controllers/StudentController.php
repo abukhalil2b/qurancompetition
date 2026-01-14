@@ -8,9 +8,6 @@ use App\Models\Competition;
 use App\Models\Questionset;
 use App\Models\Stage;
 use App\Models\Student;
-use App\Models\Center;
-use App\Models\EvaluationElement;
-use App\Models\JudgeEvaluation;
 use App\Models\Question;
 use App\Models\StudentQuestionSelection;
 use Illuminate\Http\Request;
@@ -21,11 +18,14 @@ class StudentController extends Controller
 {
     public function index()
     {
+        $organizer = auth()->user();
+
         // Get all student IDs already in competitions
         $assignedStudentIds = Competition::pluck('student_id')->toArray();
 
         // List students NOT in competitions
         $students = Student::whereNotIn('id', $assignedStudentIds)
+            ->where('gender', $organizer->gender)
             ->orderBy('name')
             ->get();
 
@@ -53,22 +53,31 @@ class StudentController extends Controller
         $committee = $committeeUser->committee;
         $center    = $committee->center;
 
-        $competitions = Competition::with([
+        $query = Competition::with([
             'student',
             'questionset.questions'
-        ])
-            ->where([
+        ])->where([
                 'center_id'    => $center->id,
                 'committee_id' => $committee->id,
                 'stage_id'     => $stage->id,
-            ])
-            ->whereIn('student_status', [
+            ]);
+
+        if ($user->user_type == 'judge') {
+            $query->whereIn('student_status', [
                 'with_committee',
                 'present',
-                'finish_competition'
-            ])
-            ->latest()
+            ]);
+        } else {
+            $query->whereIn('student_status', [
+                'with_committee',
+                'present',
+                'finish_competition',
+            ]);
+        }
+
+        $competitions = $query->orderby('id', 'ASC')
             ->get();
+
 
         return view(
             'student.present_index',

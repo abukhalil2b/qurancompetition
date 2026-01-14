@@ -17,6 +17,7 @@ return new class extends Migration
             $table->foreignId('judge_id')->constrained('users');
             $table->decimal('score', 5, 2); // 0–10
             $table->text('note')->nullable();
+            $table->bigInteger('competition_id');
             $table->timestamps();
 
             $table->unique(['tafseer_question_id', 'judge_id']);

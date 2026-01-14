@@ -13,6 +13,11 @@ class Competition extends Model
       return $this->hasMany(StudentQuestionSelection::class);
    }
 
+   public function tafseerResult()
+   {
+      return $this->hasOne(TafseerResult::class);
+   }
+
    public function student()
    {
       return $this->belongsTo(Student::class);

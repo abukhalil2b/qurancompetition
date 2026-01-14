@@ -11,18 +11,20 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // let this table be as attendnace records for competition.
+        // let this table be as attendnace records for competition and finalization.
         Schema::create('competitions', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('center_id');
             $table->bigInteger('stage_id');
             $table->foreignId('committee_id')->constrained()->cascadeOnDelete();
             $table->foreignId('student_id')->constrained()->cascadeOnDelete();
+            $table->tinyInteger('position')->default(1);
+            $table->enum('level',['memorize','memorize_with_tafseer'])->default('memorize');
             $table->bigInteger('questionset_id')->unsigned()->nullable();
-            $table->enum('student_status', ['present', 'with_committee', 'withdraw', 'waiting_finalization','finish_competition'])->default('present');
-            // Final computed result (after finalization)
-            $table->decimal('final_score', 6, 2)->nullable();
-            $table->string('final_grade')->nullable();
+            $table->enum('student_status', ['present', 'with_committee', 'withdraw', 'waiting_finalization', 'finish_competition'])->default('present');
+            $table->decimal('final_score', 6, 2)->nullable()->index();
+            $table->decimal('memorization_score', 6, 2)->nullable()->index();
+            $table->decimal('tafseer_score', 6, 2)->nullable()->index();
             $table->timestamps();
         });
     }

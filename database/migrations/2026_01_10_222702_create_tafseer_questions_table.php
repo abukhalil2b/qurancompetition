@@ -13,7 +13,6 @@ return new class extends Migration
     {
         Schema::create('tafseer_questions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('competition_id')->constrained()->cascadeOnDelete();
             $table->text('content');
             $table->tinyInteger('order');
             $table->timestamps();

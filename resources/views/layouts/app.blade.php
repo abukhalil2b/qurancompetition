@@ -16,7 +16,7 @@
 <body>
     <div class="flex gap-1 min-h-screen h-full">
 
-        <nav class="w-72 bg-white shadow-lg min-h-screen">
+        <nav class="print:hidden w-72 bg-white shadow-lg min-h-screen">
             <div class="h-full p-4 flex flex-col">
                 <form method="POST" action="{{ route('logout') }}" class="mt-3">
                     @csrf
@@ -47,7 +47,18 @@
                             class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-blue-100 text-blue-700 mb-2">
                             {{ __(Auth::user()->user_type) }}
                         </div>
+                        @if (Auth::user()->user_type == 'judge')
+                            @php
+                                $currentStage = App\Models\Stage::latest('id')->first();
+                            @endphp
+                            <div
+                                class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-blue-100 text-blue-700 mb-2">
+                                @if (Auth::user()->isCommitteeLeader($currentStage->id))
+                                    رئيس اللجنة
+                                @endif
+                            </div>
 
+                        @endif
                         <div class="text-gray-500 text-xs flex items-center gap-1">
                             <span class="font-medium text-gray-400 italic">رقم المدني:</span>
                             {{ Auth::user()->national_id }}
@@ -235,7 +246,7 @@
                     @endif
                     @if (in_array(auth()->user()->user_type, ['judge']))
                         <li class="menu-item">
-                            <a href="{{ route('final_result') }}"
+                            <a href="{{ route('finished_student_list') }}"
                                 class="flex items-center px-3 py-3 rounded-lg hover:bg-gray-100 text-gray-700 hover:text-blue-600 transition-colors">
                                 <svg class="w-5 h-5 ml-3" fill="currentColor" viewBox="0 0 24 24">
                                     <path d="M5 19h14V5H5v14zm10-12h2v10h-2V7zm-4 4h2v6h-2v-6zm-4 3h2v3H7v-3z"

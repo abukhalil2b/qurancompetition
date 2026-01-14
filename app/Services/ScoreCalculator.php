@@ -18,7 +18,13 @@ class ScoreCalculator
     {
         return $questions->sum(function (StudentQuestionSelection $selection) {
 
-            // Group evaluations by element
+            // 1. NEW: Check if the question is failed
+            // If is_passed is 0, they get 0 points for this question.
+            if ($selection->is_passed == 0) {
+                return 0;
+            }
+
+            // 2. Existing logic continues only if they passed...
             return $selection->judgeEvaluations
                 ->groupBy('evaluation_element_id')
                 ->map(function ($evaluations) {

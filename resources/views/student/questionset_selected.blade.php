@@ -41,7 +41,7 @@
             <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
                 @foreach ($studentQuestionSelections as $selection)
 
-                    <a href="{{ route('student.start_evaluation', $selection->id) }}"
+                    <a href="{{ route('memorization.start', $selection->id) }}"
                        class="p-5 border-2 rounded-2xl shadow-sm transition-all duration-200
                        {{ $selection->done
                             ? 'border-green-500 bg-green-50 hover:ring-2 hover:ring-green-400'
@@ -90,14 +90,6 @@
                 @endforeach
             </div>
         </div>
-
-        {{-- Final Report Button --}}
-        <a href="{{ route('final_report', $competition->id) }}"
-           class="mt-6 block text-center bg-white border-2 border-green-600
-                  text-green-700 font-bold py-3 rounded-2xl
-                  hover:bg-green-50 transition">
-            عرض التقرير النهائي
-        </a>
 
     </div>
 </x-app-layout>

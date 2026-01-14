@@ -51,6 +51,13 @@ class QuestionsetController extends Controller
         return view('questionset.show', compact('questionset', 'questionsByLevel'));
     }
 
+    public function print()
+    {
+        $questionsets = Questionset::with('questions')
+            ->has('questions')
+            ->get();
+        return view('questionset.print',  compact('questionsets'));
+    }
 
     public function edit(Questionset $questionset)
     {

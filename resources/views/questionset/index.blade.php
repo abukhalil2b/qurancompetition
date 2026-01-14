@@ -3,7 +3,7 @@
 
     <div class="max-w-7xl mx-auto">
         <!-- Header -->
-        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
+        <div class="p-3 flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
             <div>
                 <h1 class="text-2xl md:text-3xl font-bold text-gray-800">باقات الأسئلة</h1>
                 <p class="text-xl text-gray-600 mt-2">{{ $level }}</p>
@@ -12,6 +12,11 @@
                 class="mt-4 md:mt-0 px-5 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition flex items-center shadow-md">
                 <i class="fas fa-plus ml-2"></i>
                 إنشاء باقة جديدة
+            </a>
+            <a href="{{ route('questionset.print') }}"
+                class="px-3 py-2 bg-yellow-500 text-white text-sm rounded-lg hover:bg-yellow-600 transition flex items-center">
+                <i class="fas fa-edit ml-1"></i>
+                طباعة
             </a>
         </div>
 
@@ -55,6 +60,7 @@
                                 <i class="fas fa-edit ml-1"></i>
                                 تعديل
                             </a>
+
                         </div>
 
                         <div class="flex space-x-2 rtl:space-x-reverse">

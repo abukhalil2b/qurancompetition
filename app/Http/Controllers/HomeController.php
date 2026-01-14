@@ -14,7 +14,6 @@ use Illuminate\Support\Facades\DB;
 class HomeController extends Controller
 {
 
-
     public function welcome()
     {
         // return view('report');
@@ -60,47 +59,5 @@ class HomeController extends Controller
 
 
         return view('dashboard', compact('activeStage'));
-    }
-
-
-
-
-    public function finalResult()
-    {
-        // Fetch competitions with related student and center data
-        $competitions = Competition::with(['student', 'center', 'stage'])
-            ->where('student_status', 'finish_competition')
-            ->get()
-            ->map(function ($competition) {
-                // Count how many questions were assigned to this student
-                $questionCount = \App\Models\StudentQuestionSelection::where('competition_id', $competition->id)->count();
-
-                // Calculate percentage: Grand Total / (Questions * Judges)
-                $divisor = $questionCount * $competition->judge_count;
-                $competition->percentage = $divisor > 0 ? ($competition->grand_total / $divisor) : 0;
-
-                return $competition;
-            })
-            ->sortByDesc('percentage'); // Rank them from highest to lowest
-
-        return view('final_result', compact('competitions'));
-    }
-
-    public function finishStudent($id)
-    {
-        $competition = Competition::findOrFail($id);
-        $competition->update(['student_status' => 'finish_competition']);
-
-        return redirect()->route('student.present_index')
-            ->with('success', 'تم إنهاء مسابقة الطالب بنجاح');
-    }
-
-    public function unFinishStudent($id)
-    {
-        $competition = Competition::findOrFail($id);
-        $competition->update(['student_status' => 'with_committee']);
-
-        return redirect()->route('student.present_index')
-            ->with('success', 'تم إعادة فتح مسابقة الطالب بنجاح');
     }
 }
