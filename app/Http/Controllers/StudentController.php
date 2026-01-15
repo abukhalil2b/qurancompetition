@@ -57,16 +57,25 @@ class StudentController extends Controller
             'student',
             'questionset.questions'
         ])->where([
-                'center_id'    => $center->id,
-                'committee_id' => $committee->id,
-                'stage_id'     => $stage->id,
-            ]);
+            'center_id'    => $center->id,
+            'committee_id' => $committee->id,
+            'stage_id'     => $stage->id,
+        ]);
 
         if ($user->user_type == 'judge') {
-            $query->whereIn('student_status', [
-                'with_committee',
-                'present',
-            ]);
+            if ($user->isCommitteeLeader($stage->id)) {
+                $query->whereIn('student_status', [
+                    'with_committee',
+                    'present',
+                ]);
+            } else {
+                $query
+                    ->whereNotNull('questionset_id')
+                    ->whereIn('student_status', [
+                        'with_committee',
+                        'present',
+                    ]);
+            }
         } else {
             $query->whereIn('student_status', [
                 'with_committee',

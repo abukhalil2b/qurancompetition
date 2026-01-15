@@ -42,7 +42,7 @@ class CompetitionController extends Controller
 
         $level = $levelMap[$student->level] ?? null;
         if (!$level) {
-            return back()->with('error', 'مستوى الطالب غير معرّف');
+            return back()->with('error', 'مستوى المتسابق غير معرّف');
         }
 
         DB::transaction(function () use ($committee, $stage, $student, $level) {

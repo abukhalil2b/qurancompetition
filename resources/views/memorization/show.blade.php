@@ -6,8 +6,8 @@
                 <div>
                     <h1 class="text-2xl font-extrabold text-gray-900">السؤال رقم:
                         {{ $studentQuestionSelection->position }}</h1>
-                    <div class="mt-2 text-gray-600 leading-relaxed text-lg">
-                        {!! nl2br(e($studentQuestionSelection->question->content)) !!}
+                    <div class="mt-2 text-gray-600 leading-relaxed text-[10px]">
+                        {{ $studentQuestionSelection->question->content }}
                     </div>
                 </div>
 
@@ -20,15 +20,6 @@
                                 d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                         </svg>
                         <span class="font-bold">السؤال ملغي </span>
-                    </div>
-                @else
-                    <div
-                        class="flex items-center gap-2 bg-green-100 text-green-700 px-4 py-2 rounded-lg border border-green-200">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                        <span class="font-bold">السؤال معتمد</span>
                     </div>
                 @endif
             </div>
@@ -93,7 +84,7 @@
                     {{-- Footer for Judge Note & Total --}}
                     <div class="p-4 bg-gray-50 border-t">
                         <div class="flex justify-between items-center mb-3">
-                            <span class="text-gray-600 font-bold">المجموع الفرعي:</span>
+                            <span class="text-gray-600 font-bold">المجموع :</span>
                             <span class="text-xl font-black text-indigo-600">{{ number_format($judgeTotal, 2) }}</span>
                         </div>
 
@@ -128,7 +119,6 @@
                             ({{ $studentQuestionSelection->position }})</p>
                         <h3 class="text-4xl font-black">
                             {{ number_format($displayAverage, 2) }}
-                            <span class="text-lg font-normal opacity-60">نقطة</span>
                         </h3>
                     </div>
 

@@ -10,26 +10,14 @@ use Illuminate\Http\Request;
 
 class CompetitionResultController extends Controller
 {
-    /**
-     * Display the list of all finished students (Honor Board).
-     * Moved from HomeController.
-     */
-    public function index()
-    {
-        // 1. Memorization List: All finished students, ordered by Memorization Score
-        $memorizationList = Competition::with(['student', 'center'])
-            ->where('student_status', 'finish_competition')
-            ->orderByDesc('memorization_score')
-            ->get();
 
-        // 2. Tafseer List: Only students who participated in Tafseer
-        $tafseerList = Competition::with(['student', 'center'])
-            ->where('student_status', 'finish_competition')
-            ->orderByDesc('tafseer_score')
-            ->get();
-
-        return view('finished_student_list', compact('memorizationList', 'tafseerList'));
-    }
+public function index()
+{
+    // Eager load the student and the question set
+    $competitions = Competition::with(['student', 'questionset'])->get();
+    
+    return view('finished_student_list', compact('competitions'));
+}
 
     /**
      * Show the individual Final Result Certificate/Page.
@@ -101,6 +89,6 @@ class CompetitionResultController extends Controller
         $competition->update(['student_status' => 'with_committee']);
 
         return redirect()->route('student.present_index')
-            ->with('success', 'تم إعادة فتح مسابقة الطالب بنجاح');
+            ->with('success', 'تم إعادة فتح مسابقة المتسابق بنجاح');
     }
 }

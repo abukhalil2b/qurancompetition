@@ -19,14 +19,14 @@
 
                 <h2 class="text-2xl font-black text-slate-800 mb-2">تم رصد الدرجات بنجاح</h2>
                 <p class="text-slate-500 mb-8 leading-relaxed">
-                    شكراً لك، تم حفظ تقييمك للطالب <span class="font-bold text-slate-700">{{ $competition->student->name }}</span>.
+                    شكراً لك، تم حفظ تقييمك للمتسابق <span class="font-bold text-slate-700">{{ $competition->student->name }}</span>.
                     <br>
                     نحن بانتظار انتهاء باقي المحكمين لاعتماد النتيجة النهائية.
                 </p>
 
                 <a href="{{ route('tafseer.start', $competition->id) }}" 
                    class="block w-full py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-bold shadow-lg shadow-indigo-200 transition-all active:scale-95 mb-4">
-                   🔄 تحديث الحالة
+                   🔄 تحديث الصفحة لمعرفة باقي المحكمين
                 </a>
                 
                 <a href="{{ route('dashboard') }}" class="block w-full py-4 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-2xl font-bold transition-all">

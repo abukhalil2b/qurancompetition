@@ -196,7 +196,7 @@ class EvaluationController extends Controller
             'tafseer_score'      => $scores['tafseer'] ?? 0, // Split score
         ]);
 
-        return redirect()->back()->with('success', 'تم اعتماد النتيجة النهائية وإنهاء المسابقة للطالب.');
+        return redirect()->back()->with('success', 'تم اعتماد النتيجة النهائية وإنهاء المسابقة للمتسابق.');
     }
 
     // ----------------------------------------------------------------

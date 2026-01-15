@@ -17,5 +17,7 @@
     "males": "ذكور",
     "females": "اناث",
     "active": "مفعل",
-    "disable": "معطل"
+    "disable": "معطل",
+    "memorize_with_tafseer":"الحفظ مع التفسير",
+    "memorize":"الحفظ"
 }
