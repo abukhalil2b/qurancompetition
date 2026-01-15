@@ -19,6 +19,7 @@ class CompetitionController extends Controller
             'committee_id' => 'required|exists:committees,id',
         ]);
 
+        //Redundant
         $student   = Student::findOrFail($request->student_id);
         $committee = Committee::findOrFail($request->committee_id);
 
@@ -29,6 +30,7 @@ class CompetitionController extends Controller
 
         $already = Competition::where('student_id', $student->id)
             ->where('stage_id', $stage->id)
+            ->where('committee_id', $committee->id)
             ->exists();
 
         if ($already) {

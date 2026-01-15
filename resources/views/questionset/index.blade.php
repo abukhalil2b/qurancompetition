@@ -4,9 +4,9 @@
     <div class="max-w-7xl mx-auto">
         <!-- Header -->
         <div class="p-3 flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
-            <div>
+            <div class="flex gap-4 items-center">
                 <h1 class="text-2xl md:text-3xl font-bold text-gray-800">باقات الأسئلة</h1>
-                <p class="text-xl text-gray-600 mt-2">{{ $level }}</p>
+                <p class="text-xl bg-green-100 text-green-700 p-3 rounded flex justify-center border border-green-700">{{ $level }}</p>
             </div>
             <a href="{{ route('questionset.create', $level) }}"
                 class="mt-4 md:mt-0 px-5 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition flex items-center shadow-md">
@@ -21,10 +21,10 @@
         </div>
 
         <!-- Cards Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-3">
             @foreach ($questionsets as $set)
                 <div
-                    class="{{ $set->questions_count == 5 ? 'bg-green-100 text-green-700' : 'bg-white' }} rounded-xl shadow-md overflow-hidden border border-gray-200">
+                    class="{{ $set->questions_count == 5 ? 'bg-green-100 text-green-700' : 'bg-white' }} border border-green-700 rounded-xl shadow-md overflow-hidden border border-gray-200">
                     <!-- Card Header -->
                     <div class="p-5 border-b border-gray-100">
                         <div class="flex justify-between items-start">

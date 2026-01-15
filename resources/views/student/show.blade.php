@@ -21,7 +21,7 @@
                 <div><strong> العمر:</strong> {{ $age }}</div>
             </div>
             <div class="flex gap-3">
-                <div><strong>المنطقة:</strong> {{ $student->state ?? '-' }}</div>
+                <div><strong>المحافظة:</strong> {{ $student->state ?? '-' }}</div>
                 <div><strong>الولاية:</strong> {{ $student->wilaya ?? '-' }}</div>
                 <div><strong>القرية:</strong> {{ $student->qarya ?? '-' }}</div>
             </div>

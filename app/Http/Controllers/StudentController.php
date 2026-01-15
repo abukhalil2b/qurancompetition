@@ -18,16 +18,22 @@ class StudentController extends Controller
 {
     public function index()
     {
-        $organizer = auth()->user();
+        $user = auth()->user();
 
         // Get all student IDs already in competitions
         $assignedStudentIds = Competition::pluck('student_id')->toArray();
 
         // List students NOT in competitions
         $students = Student::whereNotIn('id', $assignedStudentIds)
-            ->where('gender', $organizer->gender)
+            ->where('gender', $user->gender)
             ->orderBy('name')
             ->get();
+
+        if ($user->user_type == 'admin') {
+            $students = Student::whereNotIn('id', $assignedStudentIds)
+                ->orderBy('name')
+                ->get();
+        }
 
         return view('student.index', compact('students'));
     }
@@ -55,7 +61,6 @@ class StudentController extends Controller
 
         $query = Competition::with([
             'student',
-            'questionset.questions'
         ])->where([
             'center_id'    => $center->id,
             'committee_id' => $committee->id,
@@ -155,12 +160,27 @@ class StudentController extends Controller
 
     public function saveQuestionset(Competition $competition, Questionset $questionset)
     {
+        // 1. Ensure there is an active stage
         $stage = Stage::where('active', 1)->first();
 
         if (!$stage) {
             return back()->with('error', 'لا توجد مرحلة نشطة حالياً');
         }
-        Competition::where(['questionset_id' => $questionset->id, 'committee_id' => 1])->first();
+
+        // 2. Prevent re-assigning a questionset
+        if ($competition->questionset_id) {
+            return back()->with('error', 'تم اختيار مجموعة أسئلة مسبقاً لهذه المسابقة');
+        }
+
+        $alreadySelected = Competition::where('questionset_id', $questionset->id)
+            ->exists();
+
+        if ($alreadySelected) {
+            return back()->with(
+                'error',
+                'تم استخدام مجموعة الأسئلة هذه مسبقاً في مسابقة أخرى'
+            );
+        }
 
         DB::transaction(function () use ($competition, $questionset) {
             // 1. Update the competition

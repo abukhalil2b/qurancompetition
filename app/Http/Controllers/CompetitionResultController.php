@@ -11,13 +11,22 @@ use Illuminate\Http\Request;
 class CompetitionResultController extends Controller
 {
 
-public function index()
-{
-    // Eager load the student and the question set
-    $competitions = Competition::with(['student', 'questionset'])->get();
-    
-    return view('finished_student_list', compact('competitions'));
-}
+    public function index(Request $request)
+    {
+        $competitions = Competition::with(['student', 'questionset'])
+            ->when($request->filled('gender'), function ($query) use ($request) {
+                $query->whereHas('student', function ($q) use ($request) {
+                    $q->where('gender', $request->gender);
+                });
+            })
+            ->when($request->filled('level'), function ($query) use ($request) {
+                $query->where('level', $request->level);
+            })
+            ->get();
+
+        return view('finished_student_list', compact('competitions'));
+    }
+
 
     /**
      * Show the individual Final Result Certificate/Page.

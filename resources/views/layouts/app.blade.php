@@ -244,7 +244,7 @@
                             </a>
                         </li>
                     @endif
-                    @if (in_array(auth()->user()->user_type, ['judge']))
+                    @if (in_array(auth()->user()->user_type, ['judge','admin']))
                         <li class="menu-item">
                             <a href="{{ route('finished_student_list') }}"
                                 class="flex items-center px-3 py-3 rounded-lg hover:bg-gray-100 text-gray-700 hover:text-blue-600 transition-colors">

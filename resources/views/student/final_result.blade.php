@@ -13,7 +13,7 @@
                 <div class="flex justify-between items-center mb-4 border-b pb-2">
                     <h3 class="font-bold text-lg text-gray-800">
                         السؤال {{ $qIndex + 1 }}: <span
-                            class="text-sm font-normal text-gray-500">{{ Str::limit($selection->question->content, 80) }}</span>
+                            class="text-xs font-normal text-gray-500">{{ $selection->question->content }}</span>
                     </h3>
                 </div>
 

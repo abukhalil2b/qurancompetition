@@ -28,4 +28,12 @@ class Committee extends Model
             ->withPivot('stage_id')
             ->withTimestamps();
     }
+
+    public function leaderForStage($stageId)
+    {
+        return $this->hasOne(CommitteeUser::class)
+            ->where('stage_id', $stageId)
+            ->where('is_judge_leader', true);
+    }
+    
 }
