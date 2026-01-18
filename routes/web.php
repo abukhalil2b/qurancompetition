@@ -16,11 +16,11 @@ use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\StageController;
 use Illuminate\Support\Facades\Route;
 
-
+    Route::get('/', [HomeController::class, 'welcome'])->name('welcome');
 Route::middleware(['auth'])->group(function () {
     
     // --- 1. General Dashboard ---
-    Route::get('/', [HomeController::class, 'welcome'])->name('welcome');
+
     Route::get('dashboard', [HomeController::class, 'dashboard'])->name('dashboard');
 
 

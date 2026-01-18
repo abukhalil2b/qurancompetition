@@ -26,12 +26,14 @@ class StudentController extends Controller
         // List students NOT in competitions
         $students = Student::whereNotIn('id', $assignedStudentIds)
             ->where('gender', $user->gender)
+            ->where('active', 1)
             ->orderBy('name')
             ->get();
 
         if ($user->user_type == 'admin') {
-            $students = Student::whereNotIn('id', $assignedStudentIds)
-                ->orderBy('name')
+            $students = Student::orderBy('name')
+                ->where('active', 1)
+                // ->whereNotIn('id', $assignedStudentIds)
                 ->get();
         }
 

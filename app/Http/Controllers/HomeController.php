@@ -7,7 +7,7 @@ use App\Models\Competition;
 use App\Models\JudgeEvaluation;
 
 use App\Models\Stage;
-use App\Models\StudentQuestionSelection;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -16,6 +16,7 @@ class HomeController extends Controller
 
     public function welcome()
     {
+   
         // return view('report');
         return view('welcome');
     }
