@@ -24,80 +24,13 @@
                 @endif
             </div>
         </div>
-
         @php
             $evaluationsByJudge = $studentQuestionSelection->judgeEvaluations->groupBy('judge_id');
             $notesByJudge = $studentQuestionSelection->judgeNotes->keyBy('judge_id');
             $judgeTotals = [];
         @endphp
 
-        {{-- Judges Grid --}}
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-            @foreach ($evaluationsByJudge as $judgeId => $evaluations)
-                @php
-                    $judge = $evaluations->first()->judge;
-                    $note = $notesByJudge[$judgeId]->note ?? null;
-                    $judgeTotal = $evaluations->sum(fn($ev) => $ev->element->max_score - $ev->reduct_point);
-                    $judgeTotals[] = $judgeTotal;
-                @endphp
-
-                <div class="bg-white border rounded-xl overflow-hidden shadow-sm flex flex-col">
-                    <div class="bg-gray-50 px-4 py-3 border-b flex justify-between items-center">
-                        <span class="font-bold text-indigo-700 flex items-center gap-2">
-                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"></path>
-                            </svg>
-                            {{ $judge->name }}
-                        </span>
-                        <span class="bg-indigo-100 text-indigo-700 text-xs px-2 py-1 rounded-md font-bold">تقييم
-                            المحكم</span>
-                    </div>
-
-                    <div class="p-4 flex-grow">
-                        <table class="w-full text-sm">
-                            <thead>
-                                <tr class="text-gray-400 border-b">
-                                    <th class="text-right pb-2 font-normal">العنصر</th>
-                                    <th class="text-center pb-2 font-normal">الخصم</th>
-                                    <th class="text-left pb-2 font-normal">الصافي</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-gray-50">
-                                @foreach ($evaluations as $evaluation)
-                                    @php
-                                        $max = $evaluation->element->max_score;
-                                        $final = $max - $evaluation->reduct_point;
-                                    @endphp
-                                    <tr>
-                                        <td class="py-2 text-gray-700 font-medium">{{ $evaluation->element->title }}
-                                        </td>
-                                        <td class="py-2 text-center text-red-500 font-mono">
-                                            -{{ number_format($evaluation->reduct_point, 2) }}</td>
-                                        <td class="py-2 text-left font-bold text-gray-900">
-                                            {{ number_format($final, 2) }}</td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-
-                    {{-- Footer for Judge Note & Total --}}
-                    <div class="p-4 bg-gray-50 border-t">
-                        <div class="flex justify-between items-center mb-3">
-                            <span class="text-gray-600 font-bold">المجموع :</span>
-                            <span class="text-xl font-black text-indigo-600">{{ number_format($judgeTotal, 2) }}</span>
-                        </div>
-
-                        <div class="text-xs text-gray-600 italic bg-white p-2 rounded border border-gray-200">
-                            <span class="font-bold block not-italic text-gray-400 mb-1">ملاحظة المحكم:</span>
-                            {{ $note ?? 'لا توجد ملاحظات مسجلة' }}
-                        </div>
-                    </div>
-                </div>
-            @endforeach
-        </div>
-
-        {{-- Final Average Card --}}
+                {{-- Final Average Card --}}
         @if (count($judgeTotals) > 0)
             @php
                 $questionAverage = collect($judgeTotals)->avg();
@@ -195,6 +128,75 @@
             @endif
 
         </div>
+
+
+
+        {{-- Judges Grid --}}
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            @foreach ($evaluationsByJudge as $judgeId => $evaluations)
+                @php
+                    $judge = $evaluations->first()->judge;
+                    $note = $notesByJudge[$judgeId]->note ?? null;
+                    $judgeTotal = $evaluations->sum(fn($ev) => $ev->element->max_score - $ev->reduct_point);
+                    $judgeTotals[] = $judgeTotal;
+                @endphp
+
+                <div class="bg-white border rounded-xl overflow-hidden shadow-sm flex flex-col">
+                    <div class="bg-gray-50 px-4 py-3 border-b flex justify-between items-center">
+                        <span class="font-bold text-indigo-700 flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"></path>
+                            </svg>
+                            {{ $judge->name }}
+                        </span>
+                        <span class="bg-indigo-100 text-indigo-700 text-xs px-2 py-1 rounded-md font-bold">تقييم
+                            المحكم</span>
+                    </div>
+
+                    <div class="p-4 flex-grow">
+                        <table class="w-full text-sm">
+                            <thead>
+                                <tr class="text-gray-400 border-b">
+                                    <th class="text-right pb-2 font-normal">العنصر</th>
+                                    <th class="text-center pb-2 font-normal">الخصم</th>
+                                    <th class="text-left pb-2 font-normal">الصافي</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-50">
+                                @foreach ($evaluations as $evaluation)
+                                    @php
+                                        $max = $evaluation->element->max_score;
+                                        $final = $max - $evaluation->reduct_point;
+                                    @endphp
+                                    <tr>
+                                        <td class="py-2 text-gray-700 font-medium">{{ $evaluation->element->title }}
+                                        </td>
+                                        <td class="py-2 text-center text-red-500 font-mono">
+                                            -{{ number_format($evaluation->reduct_point, 2) }}</td>
+                                        <td class="py-2 text-left font-bold text-gray-900">
+                                            {{ number_format($final, 2) }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+
+                    {{-- Footer for Judge Note & Total --}}
+                    <div class="p-4 bg-gray-50 border-t">
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="text-gray-600 font-bold">المجموع :</span>
+                            <span class="text-xl font-black text-indigo-600">{{ number_format($judgeTotal, 2) }}</span>
+                        </div>
+
+                        <div class="text-xs text-gray-600 italic bg-white p-2 rounded border border-gray-200">
+                            <span class="font-bold block not-italic text-gray-400 mb-1">ملاحظة المحكم:</span>
+                            {{ $note ?? 'لا توجد ملاحظات مسجلة' }}
+                        </div>
+                    </div>
+                </div>
+            @endforeach
+        </div>
+
 
         <div class="border-t pt-8 print:hidden">
             <h3 class="text-lg font-bold text-gray-700 mb-4">قائمة الأسئلة وحالة الإنجاز</h3>

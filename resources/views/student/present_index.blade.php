@@ -1,5 +1,5 @@
 <x-app-layout>
-    <div class="space-y-6 p-4 sm:p-8" dir="rtl">
+    <div class="space-y-6 sm:p-8" dir="rtl">
 
         <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
             <div class="px-6 py-4 bg-gray-50 border-b border-gray-100 flex items-center justify-between">

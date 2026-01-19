@@ -1,5 +1,5 @@
 <x-app-layout>
-    <div class="p-6" x-data="{ filter: '' }">
+    <div  x-data="{ filter: '' }">
         
         <div class="flex justify-between items-center mb-4">
             <h2 class="text-xl font-bold">قائمة المتسابقين</h2>

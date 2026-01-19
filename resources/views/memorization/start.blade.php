@@ -29,11 +29,23 @@
             touch-action: manipulation;
         }
 
-        .btn-plus-big { background-color: #16a34a; }
-        .btn-plus-big:hover { background-color: #15803d; transform: scale(1.05); }
+        .btn-plus-big {
+            background-color: #16a34a;
+        }
 
-        .btn-minus-big { background-color: #dc2626; }
-        .btn-minus-big:hover { background-color: #b91c1c; transform: scale(1.05); }
+        .btn-plus-big:hover {
+            background-color: #15803d;
+            transform: scale(1.05);
+        }
+
+        .btn-minus-big {
+            background-color: #dc2626;
+        }
+
+        .btn-minus-big:hover {
+            background-color: #b91c1c;
+            transform: scale(1.05);
+        }
 
         .score-input-big {
             padding: 0.5rem;
@@ -43,20 +55,31 @@
         }
 
         /* Custom scrollbar for the right side for a cleaner look */
-        .custom-scroll::-webkit-scrollbar { width: 6px; }
-        .custom-scroll::-webkit-scrollbar-track { background: #f1f1f1; }
-        .custom-scroll::-webkit-scrollbar-thumb { background: #c7d2fe; border-radius: 10px; }
+        .custom-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .custom-scroll::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: #c7d2fe;
+            border-radius: 10px;
+        }
     </style>
 </head>
 
-<body class="antialiased overflow-hidden"> {{-- Prevent body scroll for the split view --}}
+<body class="antialiased overflow-hidden">
 
     <div class="h-screen flex flex-col md:flex-row" x-data="evaluationPage({{ $evaluationElements }}, {{ $oldScores->toJson() }})">
 
         {{-- LEFT SIDE: Question Header (Approx 40-50% width) --}}
-        <div class="w-full md:w-5/12 bg-indigo-700 text-white p-6 flex flex-col justify-center items-center text-center shadow-2xl z-10">
+        <div
+            class="w-full md:w-5/12 bg-indigo-700 text-white p-6 flex flex-col justify-center items-center text-center shadow-2xl z-10">
             <div class="mb-6">
-                <span class="bg-indigo-900 h-20 w-20 flex items-center justify-center rounded-2xl font-black text-3xl mx-auto mb-4 shadow-inner">
+                <span
+                    class="bg-indigo-900 h-20 w-20 flex items-center justify-center rounded-2xl font-black text-3xl mx-auto mb-4 shadow-inner">
                     {{ $studentQuestionSelection->position }}
                 </span>
                 <h2 class="text-2xl md:text-3xl font-bold leading-relaxed">
@@ -68,7 +91,7 @@
                 <span class="text-lg block mb-1 opacity-80">إجمالي الخصم الحالي</span>
                 <span x-text="totalScore" class="font-black text-6xl tracking-tight"></span>
             </div>
-            
+
             <div class="mt-8 text-indigo-200 text-sm">
                 المرحلة الحالية: {{ $stage->title }}
             </div>
@@ -81,11 +104,12 @@
                 <input type="hidden" name="student_question_selection_id" value="{{ $studentQuestionSelection->id }}">
 
                 <div class="max-w-3xl mx-auto space-y-6 pb-20">
-                    
+
                     {{-- Evaluation Elements --}}
                     <div class="space-y-4">
                         @foreach ($evaluationElements as $element)
-                            <div class="p-4 bg-white border border-gray-200 rounded-2xl shadow-sm flex flex-col lg:flex-row justify-between items-center gap-4">
+                            <div
+                                class="p-4 bg-white border border-gray-200 rounded-2xl shadow-sm flex flex-col lg:flex-row justify-between items-center gap-4">
 
                                 {{-- Element Info --}}
                                 <div class="flex flex-col text-center lg:text-right w-full lg:w-1/3">
@@ -99,15 +123,24 @@
 
                                 {{-- Controls --}}
                                 <div class="flex items-center gap-2 lg:w-2/3 justify-center lg:justify-end">
-                                    <button type="button" @click="decrease({{ $element->id }}, 1, {{ $element->max_score }})" class="btn-minus-big">-1</button>
-                                    <button type="button" @click="decrease({{ $element->id }}, 0.5, {{ $element->max_score }})" class="btn-minus-big">-0.5</button>
+                                    <button type="button"
+                                        @click="decrease({{ $element->id }}, 1, {{ $element->max_score }})"
+                                        class="btn-minus-big">-1</button>
+                                    <button type="button"
+                                        @click="decrease({{ $element->id }}, 0.5, {{ $element->max_score }})"
+                                        class="btn-minus-big">-0.5</button>
 
-                                    <input type="number" class="score-input-big rounded-xl w-20 text-center font-black text-xl text-red-600" x-model="scores[{{ $element->id }}]" readonly>
+                                    <input type="number"
+                                        class="score-input-big rounded-xl w-20 text-center font-black text-xl text-red-600"
+                                        x-model="scores[{{ $element->id }}]" readonly>
 
-                                    <button type="button" @click="increase({{ $element->id }}, 0.5)" class="btn-plus-big">+0.5</button>
-                                    <button type="button" @click="increase({{ $element->id }}, 1)" class="btn-plus-big">+1</button>
+                                    <button type="button" @click="increase({{ $element->id }}, 0.5)"
+                                        class="btn-plus-big">+0.5</button>
+                                    <button type="button" @click="increase({{ $element->id }}, 1)"
+                                        class="btn-plus-big">+1</button>
 
-                                    <input type="hidden" name="elements[{{ $element->id }}]" x-model="scores[{{ $element->id }}]">
+                                    <input type="hidden" name="elements[{{ $element->id }}]"
+                                        x-model="scores[{{ $element->id }}]">
                                 </div>
                             </div>
                         @endforeach
@@ -126,23 +159,33 @@
                     @if ($isJudgeLeader)
                         <div class="flex items-center justify-between bg-red-50 p-5 rounded-2xl border border-red-200">
                             <div class="flex flex-col ml-4">
-                                <label for="student_lost_question" class="text-lg font-bold text-red-800 cursor-pointer">إلغاء السؤال</label>
+                                <label for="student_lost_question"
+                                    class="text-lg font-bold text-red-800 cursor-pointer">إلغاء السؤال</label>
                                 <span class="text-xs text-red-600">نتيجة السؤال لن تحسب في الاعتماد النهائي</span>
                             </div>
                             <label class="relative inline-flex items-center cursor-pointer">
-                                <input type="checkbox" name="student_lost_question" id="student_lost_question" value="1" class="sr-only peer" {{ !$studentQuestionSelection->is_passed ? 'checked' : '' }}>
-                                <div class="w-14 h-7 bg-gray-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:bg-red-600 after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:rounded-full after:h-6 after:w-6 after:transition-all"></div>
+                                <input type="checkbox" name="student_lost_question" id="student_lost_question"
+                                    value="1" class="sr-only peer"
+                                    {{ !$studentQuestionSelection->is_passed ? 'checked' : '' }}>
+                                <div
+                                    class="w-14 h-7 bg-gray-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:bg-red-600 after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:rounded-full after:h-6 after:w-6 after:transition-all">
+                                </div>
                             </label>
                         </div>
                     @endif
 
                     {{-- Actions --}}
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <button type="submit" class="px-6 py-4 bg-indigo-600 text-white font-black text-xl rounded-xl shadow-lg flex items-center justify-center gap-3 hover:bg-indigo-700 transition active:scale-95">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                        <button type="submit"
+                            class="px-6 py-4 bg-indigo-600 text-white font-black text-xl rounded-xl shadow-lg flex items-center justify-center gap-3 hover:bg-indigo-700 transition active:scale-95">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M5 13l4 4L19 7" />
+                            </svg>
                             حفظ التقييم
                         </button>
-                        <a href="{{ route('memorization.show', $studentQuestionSelection->id) }}" class="px-6 py-4 bg-white border-2 border-indigo-600 text-indigo-600 font-bold text-lg rounded-xl shadow flex items-center justify-center gap-3 hover:bg-indigo-50 transition">
+                        <a href="{{ route('memorization.show', $studentQuestionSelection->id) }}"
+                            class="px-6 py-4 bg-white border-2 border-indigo-600 text-indigo-600 font-bold text-lg rounded-xl shadow flex items-center justify-center gap-3 hover:bg-indigo-50 transition">
                             عرض الملخص
                         </a>
                     </div>
@@ -172,11 +215,12 @@
                 },
                 decrease(id, amount, max) {
                     let next = parseFloat((this.scores[id] - amount).toFixed(1));
-                    if (id === this.firstElementId && next <= -4) {
-                        this.scores[id] = -max;
-                        return;
+
+                    if (next < -max) {
+                        next = -max;
                     }
-                    this.scores[id] = Math.abs(next) > max ? -max : next;
+
+                    this.scores[id] = next;
                 },
                 increase(id, amount) {
                     let next = parseFloat((this.scores[id] + amount).toFixed(1));
@@ -186,4 +230,5 @@
         }
     </script>
 </body>
+
 </html>

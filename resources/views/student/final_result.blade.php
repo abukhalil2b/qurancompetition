@@ -1,4 +1,19 @@
-<x-app-layout>
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تقييم المتسابق | {{ $student->name }}</title>
+
+    {{-- Vite Assets for Tailwind and Alpine --}}
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+
+</head>
+
+<body>
+
     <div class="max-w-6xl mx-auto py-8" dir="rtl">
 
         {{-- Top Header --}}
@@ -7,6 +22,53 @@
             <div class="text-sm text-gray-500">المستوى: {{ $student->level }}</div>
         </div>
 
+         {{-- 3. Grand Total Section --}}
+        <div class="bg-indigo-900 text-white p-6 rounded-xl shadow-lg mb-8 text-center break-inside-avoid">
+            <h2 class="text-xl opacity-80 mb-2">المجموع الكلي النهائي</h2>
+            <div class="text-5xl font-extrabold tracking-wider">
+                {{ number_format($scores['total'], 2) }}
+                <span class="text-2xl font-normal opacity-50">/ {{ $scores['max'] }}</span>
+            </div>
+        </div>
+
+        {{-- 4. Action Buttons (Hide on Print) --}}
+        <div class="flex flex-col md:flex-row gap-4 justify-center items-center mb-10 print:hidden">
+            <a href="{{ route('student.present_index') }}"
+                class="px-6 py-3 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition flex items-center gap-2">المتسابقون
+                الحاضرون</a>
+            {{-- Print Button --}}
+            <button onclick="window.print()"
+                class="px-6 py-3 bg-gray-600 text-white rounded-lg shadow hover:bg-gray-700 transition flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z">
+                    </path>
+                </svg>
+                طباعة التقرير
+            </button>
+
+            {{-- Finish Competition Form --}}
+            @if ($competition->student_status !== 'finish_competition')
+                @if ($isJudgeLeader)
+                    <form action="{{ route('competition.finalize', $competition->id) }}" method="POST"
+                        onsubmit="return confirm('هل أنت متأكد من اعتماد النتيجة النهائية؟ لا يمكن التراجع بعد ذلك.');">
+                        @csrf
+                        <button type="submit"
+                            class="px-6 py-3 bg-green-600 text-white rounded-lg shadow hover:bg-green-700 transition flex items-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            اعتماد النتيجة وإنهاء المسابقة
+                        </button>
+                    </form>
+                @endif
+            @else
+                <div class="px-6 py-3 bg-green-100 text-green-800 rounded-lg border border-green-200 font-bold">
+                    تم اعتماد النتيجة
+                </div>
+            @endif
+        </div>
         {{-- 1. Memorization Questions Loop --}}
         @foreach ($questions as $qIndex => $selection)
             <div class="bg-white border rounded-xl shadow p-5 mb-6 break-inside-avoid">
@@ -112,24 +174,24 @@
                     تفاصيل درجات التفسير
                 </h3>
                 <div class="space-y-2">
-            @php
-                // Fetch all raw evaluations for this competition
-                $allTafseerEvals = \App\Models\TafseerEvaluation::with('judge')
-                    ->where('competition_id', $competition->id)
-                    ->get()
-                    ->groupBy('judge_id');
-            @endphp
+                    @php
+                        // Fetch all raw evaluations for this competition
+                        $allTafseerEvals = \App\Models\TafseerEvaluation::with('judge')
+                            ->where('competition_id', $competition->id)
+                            ->get()
+                            ->groupBy('judge_id');
+                    @endphp
 
-            @foreach($allTafseerEvals as $judgeId => $evals)
-                <div class="flex justify-between text-xs bg-white border border-orange-100 p-2 rounded">
-                    <span class="font-bold">{{ $evals->first()->judge->name }}</span>
-                    <span>
-                        المجموع: {{ $evals->sum('score') }}
-                        {{-- Note: This assumes simple sum. If you average per question, logic differs --}}
-                    </span>
+                    @foreach ($allTafseerEvals as $judgeId => $evals)
+                        <div class="flex justify-between text-xs bg-white border border-orange-100 p-2 rounded">
+                            <span class="font-bold">{{ $evals->first()->judge->name }}</span>
+                            <span>
+                                المجموع: {{ $evals->sum('score') }}
+                                {{-- Note: This assumes simple sum. If you average per question, logic differs --}}
+                            </span>
+                        </div>
+                    @endforeach
                 </div>
-            @endforeach
-        </div>
                 <div class="flex justify-between items-center bg-orange-50 p-4 rounded-lg">
                     <div>
                         <p class="text-sm text-gray-600">تم تقييم التفسير بنجاح</p>
@@ -141,51 +203,7 @@
             </div>
         @endif
 
-        {{-- 3. Grand Total Section --}}
-        <div class="bg-indigo-900 text-white p-6 rounded-xl shadow-lg mb-8 text-center break-inside-avoid">
-            <h2 class="text-xl opacity-80 mb-2">المجموع الكلي النهائي</h2>
-            <div class="text-5xl font-extrabold tracking-wider">
-                {{ number_format($scores['total'], 2) }}
-                <span class="text-2xl font-normal opacity-50">/ {{ $scores['max'] }}</span>
-            </div>
-        </div>
-
-        {{-- 4. Action Buttons (Hide on Print) --}}
-        <div class="flex flex-col md:flex-row gap-4 justify-center items-center mb-10 print:hidden">
-
-            {{-- Print Button --}}
-            <button onclick="window.print()"
-                class="px-6 py-3 bg-gray-600 text-white rounded-lg shadow hover:bg-gray-700 transition flex items-center gap-2">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z">
-                    </path>
-                </svg>
-                طباعة التقرير
-            </button>
-
-            {{-- Finish Competition Form --}}
-            @if ($competition->student_status !== 'finish_competition')
-                @if ($isJudgeLeader)
-                    <form action="{{ route('competition.finalize', $competition->id) }}" method="POST"
-                        onsubmit="return confirm('هل أنت متأكد من اعتماد النتيجة النهائية؟ لا يمكن التراجع بعد ذلك.');">
-                        @csrf
-                        <button type="submit"
-                            class="px-6 py-3 bg-green-600 text-white rounded-lg shadow hover:bg-green-700 transition flex items-center gap-2">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                            </svg>
-                            اعتماد النتيجة وإنهاء المسابقة
-                        </button>
-                    </form>
-                @endif
-            @else
-                <div class="px-6 py-3 bg-green-100 text-green-800 rounded-lg border border-green-200 font-bold">
-                    تم اعتماد النتيجة
-                </div>
-            @endif
-        </div>
+       
 
         {{-- 5. Navigation/Questions List (Hide on Print) --}}
         <div class="border-t pt-8 print:hidden">
@@ -264,4 +282,6 @@
             }
         }
     </style>
-</x-app-layout>
+</body>
+
+</html>

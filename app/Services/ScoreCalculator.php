@@ -79,7 +79,7 @@ class ScoreCalculator
 
         if ($competition->student->level === 'حفظ وتفسير') {
             $tafseerScore = self::tafseer($competition);
-            $totalScore += $tafseerScore;
+            $totalScore += $tafseerScore;// This means: $totalScore = $memorizationScore + $tafseerScore
             $maxScore = 140;
         }
 
