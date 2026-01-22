@@ -12,20 +12,22 @@ class CompetitionResultController extends Controller
 {
 
     public function index(Request $request)
-    {
-        $competitions = Competition::with(['student', 'questionset'])
-            ->when($request->filled('gender'), function ($query) use ($request) {
-                $query->whereHas('student', function ($q) use ($request) {
-                    $q->where('gender', $request->gender);
-                });
-            })
-            ->when($request->filled('level'), function ($query) use ($request) {
-                $query->where('level', $request->level);
-            })
-            ->get();
+{
+    $competitions = Competition::with(['student', 'questionset'])
+        ->when($request->filled('gender'), function ($query) use ($request) {
+            $query->whereHas('student', function ($q) use ($request) {
+                $q->where('gender', $request->gender);
+            });
+        })
+        ->when($request->filled('level'), function ($query) use ($request) {
+            $query->where('level', $request->level);
+        })
+        // Simple, fast, and uses your Database Index
+        ->orderByDesc('final_score')
+        ->get();
 
-        return view('finished_student_list', compact('competitions'));
-    }
+    return view('finished_student_list', compact('competitions'));
+}
 
 
     /**
