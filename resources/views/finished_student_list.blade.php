@@ -14,6 +14,15 @@
             <button onclick="window.print()" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">
                 طباعة
             </button>
+            <a href="{{ route('finished_student_list', array_merge(request()->all(), ['export' => 'true'])) }}"
+                target="_blank"
+                class="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700 flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                تصدير إكسل
+            </a>
 
             <form method="GET" action="{{ route('finished_student_list') }}" class="flex gap-3">
                 <select name="gender" class="border rounded px-3 py-2">
@@ -51,13 +60,14 @@
                         <th class="border px-4 py-3 text-center">التفسير</th>
                         <th class="border px-4 py-3 text-center">المجموع</th>
                         <th class="border px-4 py-3 text-center bg-gray-200">النسبة %</th>
+                        <th class="border px-4 py-3 text-center no-print">إجراءات</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse ($competitions as $index => $comp)
                         @php
                             $percentage = '-';
-                            if(is_numeric($comp->final_score)) {
+                            if (is_numeric($comp->final_score)) {
                                 if ($comp->level === 'memorize_with_tafseer') {
                                     // Equation: (Score / 140) * 100
                                     $calc = ($comp->final_score / 140) * 100;
@@ -86,10 +96,31 @@
                             <td class="border px-4 py-2 text-center font-bold text-blue-700 bg-gray-50" dir="ltr">
                                 {{ $percentage }}
                             </td>
+                            <td class="border px-4 py-2 text-center no-print">
+                                <div class="flex justify-center gap-2">
+                                    <a href="{{ route('result.show', $comp->id) }}"
+                                        class="text-blue-600 hover:text-blue-800" title="عرض النتيجة">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                        </svg>
+                                    </a>
+                                    <a href="{{ route('result.detailed', $comp->id) }}"
+                                        class="text-indigo-600 hover:text-indigo-800" title="تفاصيل الدرجات">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
+                                            </path>
+                                        </svg>
+                                    </a>
+                                </div>
+                            </td>
                         </tr>
                     @empty
-                        <tr>
-                            <td colspan="9" class="border px-4 py-6 text-center text-gray-500">
+                        <tr class="no-print">
+                            <td colspan="10" class="border px-4 py-6 text-center text-gray-500">
                                 لا توجد نتائج مطابقة
                             </td>
                         </tr>

@@ -22,7 +22,7 @@
             <div class="text-sm text-gray-500">المستوى: {{ $student->level }}</div>
         </div>
 
-         {{-- 3. Grand Total Section --}}
+        {{-- 3. Grand Total Section --}}
         <div class="bg-indigo-900 text-white p-6 rounded-xl shadow-lg mb-8 text-center break-inside-avoid">
             <h2 class="text-xl opacity-80 mb-2">المجموع الكلي النهائي</h2>
             <div class="text-5xl font-extrabold tracking-wider">
@@ -46,6 +46,17 @@
                 </svg>
                 طباعة التقرير
             </button>
+
+            {{-- New Detailed Result Button --}}
+            <a href="{{ route('result.detailed', $competition->id) }}"
+                class="px-6 py-3 bg-indigo-600 text-white rounded-lg shadow hover:bg-indigo-700 transition flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01">
+                    </path>
+                </svg>
+                تفاصيل درجات المحكمين
+            </a>
 
             {{-- Finish Competition Form --}}
             @if ($competition->student_status !== 'finish_competition')
@@ -107,8 +118,7 @@
                                     <td class="border px-3 py-2 text-center">{{ $maxScore }}</td>
                                     <td class="border px-3 py-2 text-red-600 text-xs">
                                         @foreach ($evaluations as $ev)
-                                            <span
-                                                class="inline-block bg-red-50 px-1 rounded ml-1 border border-red-100">
+                                            <span class="inline-block bg-red-50 px-1 rounded ml-1 border border-red-100">
                                                 {{ $ev->judge->name ?? 'محكم' }}: -{{ $ev->reduct_point }}
                                             </span>
                                         @endforeach
@@ -203,7 +213,7 @@
             </div>
         @endif
 
-       
+
 
         {{-- 5. Navigation/Questions List (Hide on Print) --}}
         <div class="border-t pt-8 print:hidden">
@@ -211,44 +221,42 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 @foreach ($questions as $selection)
-                    <a href="{{ route('memorization.start', $selection->id) }}"
-                        class="group p-4 border rounded-xl transition-all duration-200 flex items-center gap-4
-                       {{ $selection->done
-                           ? 'border-green-200 bg-green-50 hover:border-green-300'
-                           : 'border-gray-200 bg-white hover:border-indigo-300 hover:shadow-md' }}">
+                            <a href="{{ route('memorization.start', $selection->id) }}" class="group p-4 border rounded-xl transition-all duration-200 flex items-center gap-4
+                                   {{ $selection->done
+                    ? 'border-green-200 bg-green-50 hover:border-green-300'
+                    : 'border-gray-200 bg-white hover:border-indigo-300 hover:shadow-md' }}">
 
-                        {{-- Number Badge --}}
-                        <span
-                            class="w-10 h-10 rounded-lg flex items-center justify-center font-bold text-white shrink-0
-                            {{ $selection->done ? 'bg-green-500' : 'bg-gray-400 group-hover:bg-indigo-500' }}">
-                            {{ $selection->position }}
-                        </span>
+                                {{-- Number Badge --}}
+                                <span class="w-10 h-10 rounded-lg flex items-center justify-center font-bold text-white shrink-0
+                                        {{ $selection->done ? 'bg-green-500' : 'bg-gray-400 group-hover:bg-indigo-500' }}">
+                                    {{ $selection->position }}
+                                </span>
 
-                        <div class="flex-1">
-                            <h4 class="font-bold text-gray-800 text-sm mb-1">
-                                السؤال {{ $selection->position }}
-                            </h4>
+                                <div class="flex-1">
+                                    <h4 class="font-bold text-gray-800 text-sm mb-1">
+                                        السؤال {{ $selection->position }}
+                                    </h4>
 
-                            @if ($selection->done)
-                                <div class="text-xs text-green-700 flex items-center gap-1">
-                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M5 13l4 4L19 7"></path>
-                                    </svg>
-                                    تم التقييم
+                                    @if ($selection->done)
+                                        <div class="text-xs text-green-700 flex items-center gap-1">
+                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M5 13l4 4L19 7"></path>
+                                            </svg>
+                                            تم التقييم
+                                        </div>
+                                        {{-- Show unique judges who evaluated this question --}}
+                                        <div class="text-[10px] text-gray-500 mt-1">
+                                            بواسطة:
+                                            {{ $selection->judgeEvaluations->unique('judge_id')->pluck('judge.name')->join('، ') }}
+                                        </div>
+                                    @else
+                                        <div class="text-xs text-gray-500">
+                                            بانتظار التقييم...
+                                        </div>
+                                    @endif
                                 </div>
-                                {{-- Show unique judges who evaluated this question --}}
-                                <div class="text-[10px] text-gray-500 mt-1">
-                                    بواسطة:
-                                    {{ $selection->judgeEvaluations->unique('judge_id')->pluck('judge.name')->join('، ') }}
-                                </div>
-                            @else
-                                <div class="text-xs text-gray-500">
-                                    بانتظار التقييم...
-                                </div>
-                            @endif
-                        </div>
-                    </a>
+                            </a>
                 @endforeach
             </div>
         </div>

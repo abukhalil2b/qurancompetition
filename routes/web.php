@@ -4,6 +4,7 @@ use App\Http\Controllers\CenterController;
 use App\Http\Controllers\CommitteeController;
 use App\Http\Controllers\CompetitionController;
 use App\Http\Controllers\CompetitionResultController;
+use App\Http\Controllers\DetailedResultController;
 use App\Http\Controllers\EvaluationController;
 use App\Http\Controllers\EvaluationElementController;
 use App\Http\Controllers\HomeController;
@@ -16,9 +17,9 @@ use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\StageController;
 use Illuminate\Support\Facades\Route;
 
-    Route::get('/', [HomeController::class, 'welcome'])->name('welcome');
+Route::get('/', [HomeController::class, 'welcome'])->name('welcome');
 Route::middleware(['auth'])->group(function () {
-    
+
     // --- 1. General Dashboard ---
 
     Route::get('dashboard', [HomeController::class, 'dashboard'])->name('dashboard');
@@ -37,11 +38,12 @@ Route::middleware(['auth'])->group(function () {
 
     // A. Individual Student Result
     Route::get('result/show/{competition}', [CompetitionResultController::class, 'show'])->name('result.show');
+    Route::get('result/detailed/{competition}', [DetailedResultController::class, 'show'])->name('result.detailed');
     Route::post('result/finalize/{competition}', [CompetitionResultController::class, 'finalize'])->name('competition.finalize');
-    
+
     // B. Admin/Management Actions (Moved from HomeController)
     Route::get('result/reopen/{competition}', [CompetitionResultController::class, 'unFinishStudent'])->name('unfinish_student');
-    
+
     // C. Public/Dashboard Lists (The one you asked about)
     Route::get('results/list', [CompetitionResultController::class, 'index'])->name('finished_student_list');
 });

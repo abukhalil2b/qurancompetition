@@ -8,26 +8,34 @@ use App\Models\TafseerResult;
 use App\Services\ScoreCalculator; // Ensure this import is correct
 use Illuminate\Http\Request;
 
+use App\Exports\CompetitionResultsExport;
+use Maatwebsite\Excel\Facades\Excel;
+
 class CompetitionResultController extends Controller
 {
 
     public function index(Request $request)
-{
-    $competitions = Competition::with(['student', 'questionset'])
-        ->when($request->filled('gender'), function ($query) use ($request) {
-            $query->whereHas('student', function ($q) use ($request) {
-                $q->where('gender', $request->gender);
-            });
-        })
-        ->when($request->filled('level'), function ($query) use ($request) {
-            $query->where('level', $request->level);
-        })
-        // Simple, fast, and uses your Database Index
-        ->orderByDesc('final_score')
-        ->get();
+    {
+        // ... existing index code ...
+        if ($request->has('export')) {
+            return Excel::download(new CompetitionResultsExport($request), 'competition_results_' . date('Y-m-d') . '.xlsx');
+        }
 
-    return view('finished_student_list', compact('competitions'));
-}
+        $competitions = Competition::with(['student', 'questionset'])
+            ->when($request->filled('gender'), function ($query) use ($request) {
+                $query->whereHas('student', function ($q) use ($request) {
+                    $q->where('gender', $request->gender);
+                });
+            })
+            ->when($request->filled('level'), function ($query) use ($request) {
+                $query->where('level', $request->level);
+            })
+            // Simple, fast, and uses your Database Index
+            ->orderByDesc('final_score')
+            ->get();
+
+        return view('finished_student_list', compact('competitions'));
+    }
 
 
     /**
@@ -68,10 +76,10 @@ class CompetitionResultController extends Controller
         $tafseerResult = TafseerResult::where('competition_id', $competitionId)->first();
 
         return view('student.final_result', [
-            'competition'   => $competition,
-            'student'       => $student,
-            'questions'     => $questions,
-            'scores'        => $scores,
+            'competition' => $competition,
+            'student' => $student,
+            'questions' => $questions,
+            'scores' => $scores,
             'isJudgeLeader' => $isJudgeLeader,
             'tafseerResult' => $tafseerResult
         ]);
@@ -85,10 +93,10 @@ class CompetitionResultController extends Controller
         $scores = ScoreCalculator::final($competition);
 
         $competition->update([
-            'student_status'     => 'finish_competition',
-            'final_score'        => $scores['total'],
+            'student_status' => 'finish_competition',
+            'final_score' => $scores['total'],
             'memorization_score' => $scores['memorization'],
-            'tafseer_score'      => $scores['tafseer'] ?? 0,
+            'tafseer_score' => $scores['tafseer'] ?? 0,
         ]);
 
         return redirect()->back()->with('success', 'تم اعتماد النتيجة النهائية.');
