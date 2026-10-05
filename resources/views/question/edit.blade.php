@@ -1,135 +1,502 @@
 <x-app-layout>
-    <div class="min-h-screen bg-gradient-to-br from-emerald-50 to-green-50 p-4 md:p-6">
-        <div class="max-w-4xl mx-auto">
-            <!-- Header -->
-            <div class="mb-8">
-                <h1 class="text-3xl md:text-4xl font-bold text-emerald-800 mb-2">تعديل السؤال</h1>
-                <div class="flex flex-col md:flex-row gap-2 md:items-center">
-                    <span class="text-xl font-semibold text-emerald-700">{{ $questionset->title }}</span>
-                    <span class="hidden md:block text-emerald-600 mx-2">–</span>
-                    <span class="inline-block bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full text-sm font-medium">
-                        {{ $questionset->branch }}
-                    </span>
+
+    <div class="min-h-screen bg-gray-50 p-4" dir="rtl">
+
+        <div class="max-w-2xl mx-auto">
+
+            {{-- Header --}}
+            <div class="bg-white rounded-2xl shadow-sm p-6 mb-6">
+
+                <h1 class="text-2xl font-bold text-gray-800 mb-4">
+                    {{ $question->questionset->title }}
+                </h1>
+
+                <div class="flex flex-wrap gap-4 text-gray-600">
+
+                    <div class="flex items-center gap-2">
+                        <span class="font-medium">
+                            المستوى:
+                        </span>
+
+                        <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">
+                            {{ $question->questionset->level }}
+                        </span>
+                    </div>
+
                 </div>
+
             </div>
 
-            <!-- Error Messages -->
-            @if ($errors->any())
-            <div class="mb-6 bg-red-50 border border-red-200 rounded-xl p-4 shadow-sm">
-                <div class="flex items-start gap-3">
-                    <div class="flex-shrink-0">
-                        <svg class="w-5 h-5 text-red-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
-                    </div>
-                    <div>
-                        <h3 class="text-red-800 font-semibold mb-1">يوجد أخطاء في المدخلات</h3>
-                        <ul class="text-red-700 space-y-1">
-                            @foreach ($errors->all() as $error)
-                            <li class="flex items-center gap-2">
-                                <span class="w-1.5 h-1.5 bg-red-500 rounded-full"></span>
-                                {{ $error }}
-                            </li>
-                            @endforeach
-                        </ul>
-                    </div>
-                </div>
-            </div>
-            @endif
 
-            <!-- Edit Form -->
-            <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8 border border-emerald-100">
-                <form action="{{ route('question.update', $question) }}" method="POST" class="space-y-6">
+            {{-- Form --}}
+            <div
+                class="bg-white rounded-2xl shadow-sm p-6"
+                x-data="questionEditForm()"
+                x-init="init()"
+            >
+
+                <h2 class="text-xl font-semibold text-gray-800 mb-6">
+                    تعديل السؤال
+                </h2>
+
+
+                <form
+                    action="{{ route('question.update', $question) }}"
+                    method="POST"
+                    class="space-y-6"
+                >
+
                     @csrf
                     @method('PUT')
 
-                    <!-- Content Field -->
+
+                    {{-- Riwaya --}}
                     <div>
-                        <div class="flex items-center justify-between mb-3">
-                            <label for="content" class="block text-lg font-semibold text-emerald-800">
-                                محتوى السؤال
-                            </label>
-                            <span class="text-sm text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full">
-                                إجباري
-                            </span>
-                        </div>
-                        <textarea 
-                            name="content" 
-                            id="content" 
-                            rows="6"
-                            class="w-full px-4 py-3 border-2 border-emerald-200 rounded-xl focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 transition-all duration-200 text-lg text-emerald-900 placeholder-emerald-400"
-                            placeholder="أدخل محتوى السؤال هنا..."
+
+                        <label
+                            for="riwaya"
+                            class="block text-gray-700 font-medium mb-2"
+                        >
+                            الرواية
+                        </label>
+
+                        <select
+                            name="riwaya"
+                            id="riwaya"
+                            class="w-full border border-gray-300 rounded-lg px-4 py-3
+                                   focus:outline-none focus:border-green-500
+                                   focus:ring-1 focus:ring-green-500"
                             required
-                            autofocus>{{ old('content', $question->content) }}</textarea>
-                        <p class="mt-2 text-sm text-emerald-600">
-                            يمكنك كتابة السؤال بالكامل مع التفاصيل المطلوبة
-                        </p>
+                        >
+
+                            <option value="حفص"
+                                @selected(old('riwaya', $question->riwaya) === 'حفص')>
+                                حفص
+                            </option>
+
+                            <option value="شعبة"
+                                @selected(old('riwaya', $question->riwaya) === 'شعبة')>
+                                شعبة
+                            </option>
+
+                        </select>
+
+                        @error('riwaya')
+                            <p class="mt-1 text-sm text-red-600">
+                                {{ $message }}
+                            </p>
+                        @enderror
+
                     </div>
 
-                    <!-- Form Actions -->
-                    <div class="pt-6 border-t border-emerald-100">
-                        <div class="flex flex-col sm:flex-row gap-3 justify-end">
-                            <a href="{{ route('questionset.show', $questionset) }}"
-                               class="inline-flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-gray-100 to-gray-200 text-gray-800 font-medium rounded-xl hover:from-gray-200 hover:to-gray-300 transition-all duration-200 shadow-sm hover:shadow">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-                                </svg>
-                                إلغاء والعودة
-                            </a>
-                            
-                            <button type="submit"
-                                    class="inline-flex items-center justify-center gap-2 px-8 py-3 bg-gradient-to-r from-emerald-600 to-green-600 text-white font-semibold rounded-xl hover:from-emerald-700 hover:to-green-700 transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                                </svg>
-                                حفظ التعديلات
-                            </button>
-                        </div>
+
+                    {{-- Juz --}}
+                    <div>
+
+                        <label
+                            for="juz"
+                            class="block text-gray-700 font-medium mb-2"
+                        >
+                            الجزء
+                        </label>
+
+                        <select
+                            name="juz"
+                            id="juz"
+                            class="w-full border border-gray-300 rounded-lg px-4 py-3
+                                   focus:outline-none focus:border-green-500
+                                   focus:ring-1 focus:ring-green-500"
+                            required
+                        >
+
+                            <option value="">
+                                اختر الجزء
+                            </option>
+
+                            @foreach ($juzs as $juz)
+
+                                <option
+                                    value="{{ $juz }}"
+                                    @selected(old('juz', $question->juz) == $juz)
+                                >
+                                    الجزء {{ $juz }}
+                                </option>
+
+                            @endforeach
+
+                        </select>
+
+                        @error('juz')
+                            <p class="mt-1 text-sm text-red-600">
+                                {{ $message }}
+                            </p>
+                        @enderror
+
                     </div>
+
+
+                    {{-- Surat --}}
+                    <div>
+
+                        <label
+                            for="quran_surat_id"
+                            class="block text-gray-700 font-medium mb-2"
+                        >
+                            السورة
+                        </label>
+
+                        <select
+                            name="quran_surat_id"
+                            id="quran_surat_id"
+                            x-model="selectedSurat"
+                            @change="loadAyas()"
+                            class="w-full border border-gray-300 rounded-lg px-4 py-3
+                                   focus:outline-none focus:border-green-500
+                                   focus:ring-1 focus:ring-green-500"
+                            required
+                        >
+
+                            <option value="">
+                                اختر السورة
+                            </option>
+
+                            @foreach ($surats as $surat)
+
+                                <option
+                                    value="{{ $surat->id }}"
+                                >
+                                    {{ $surat->number }} - {{ $surat->title }}
+                                </option>
+
+                            @endforeach
+
+                        </select>
+
+                        @error('quran_surat_id')
+                            <p class="mt-1 text-sm text-red-600">
+                                {{ $message }}
+                            </p>
+                        @enderror
+
+                    </div>
+
+
+                    {{-- Loading --}}
+                    <template x-if="loading">
+
+                        <div class="flex items-center gap-2 text-gray-500 text-sm">
+
+                            <svg
+                                class="animate-spin h-4 w-4"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                            >
+
+                                <circle
+                                    class="opacity-25"
+                                    cx="12"
+                                    cy="12"
+                                    r="10"
+                                    stroke="currentColor"
+                                    stroke-width="4"
+                                />
+
+                                <path
+                                    class="opacity-75"
+                                    fill="currentColor"
+                                    d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                                />
+
+                            </svg>
+
+                            جاري تحميل الآيات...
+
+                        </div>
+
+                    </template>
+
+
+                    {{-- From Aya --}}
+                    <div>
+
+                        <label
+                            for="aya_from"
+                            class="block text-gray-700 font-medium mb-2"
+                        >
+                            من الآية
+                        </label>
+
+                        <select
+                            name="aya_from"
+                            id="aya_from"
+                            x-model="selectedAyaFrom"
+                            @change="validateAyaRange()"
+                            :disabled="loading || !selectedSurat"
+                            class="w-full border border-gray-300 rounded-lg px-4 py-3
+                                   disabled:bg-gray-100 disabled:text-gray-400
+                                   focus:outline-none focus:border-green-500
+                                   focus:ring-1 focus:ring-green-500"
+                            required
+                        >
+
+                            <option value="">
+                                اختر الآية
+                            </option>
+
+                            <template
+                                x-for="aya in ayas"
+                                :key="aya.id"
+                            >
+
+                                <option
+                                    :value="aya.number"
+                                    x-text="'الآية ' + aya.number"
+                                ></option>
+
+                            </template>
+
+                        </select>
+
+                        @error('aya_from')
+                            <p class="mt-1 text-sm text-red-600">
+                                {{ $message }}
+                            </p>
+                        @enderror
+
+                    </div>
+
+
+                    {{-- To Aya --}}
+                    <div>
+
+                        <label
+                            for="aya_to"
+                            class="block text-gray-700 font-medium mb-2"
+                        >
+                            إلى الآية
+                        </label>
+
+                        <select
+                            name="aya_to"
+                            id="aya_to"
+                            x-model="selectedAyaTo"
+                            :disabled="loading || !selectedSurat || !selectedAyaFrom"
+                            class="w-full border border-gray-300 rounded-lg px-4 py-3
+                                   disabled:bg-gray-100 disabled:text-gray-400
+                                   focus:outline-none focus:border-green-500
+                                   focus:ring-1 focus:ring-green-500"
+                            required
+                        >
+
+                            <option value="">
+                                اختر الآية
+                            </option>
+
+                            <template
+                                x-for="aya in availableToAyas"
+                                :key="aya.id"
+                            >
+
+                                <option
+                                    :value="aya.number"
+                                    x-text="'الآية ' + aya.number"
+                                ></option>
+
+                            </template>
+
+                        </select>
+
+                        @error('aya_to')
+                            <p class="mt-1 text-sm text-red-600">
+                                {{ $message }}
+                            </p>
+                        @enderror
+
+                    </div>
+
+
+                    {{-- Selected Quran Preview --}}
+                    <template x-if="selectedAyaFrom && selectedAyaTo">
+
+                        <div class="bg-emerald-50 border border-emerald-100 rounded-xl p-4">
+
+                            <div class="text-sm text-emerald-700 font-medium mb-2">
+                                نطاق الآيات المحدد
+                            </div>
+
+                            <div class="text-gray-700">
+
+                                من الآية
+
+                                <span
+                                    class="font-bold"
+                                    x-text="selectedAyaFrom"
+                                ></span>
+
+                                إلى الآية
+
+                                <span
+                                    class="font-bold"
+                                    x-text="selectedAyaTo"
+                                ></span>
+
+                            </div>
+
+                        </div>
+
+                    </template>
+
+
+                    {{-- Actions --}}
+                    <div class="flex gap-3 justify-end pt-4 border-t border-gray-100">
+
+                        <a
+                            href="{{ route('questionset.show', $question->questionset_id) }}"
+                            class="px-5 py-2.5 border border-gray-300 text-gray-700
+                                   rounded-lg hover:bg-gray-50 transition-colors"
+                        >
+                            إلغاء
+                        </a>
+
+
+                        <button
+                            type="submit"
+                            :disabled="loading || !selectedAyaFrom || !selectedAyaTo"
+                            class="px-6 py-2.5 bg-green-600 text-white
+                                   rounded-lg hover:bg-green-700
+                                   disabled:bg-gray-300 disabled:cursor-not-allowed
+                                   transition-colors font-medium"
+                        >
+                            حفظ التعديلات
+                        </button>
+
+                    </div>
+
                 </form>
+
             </div>
 
-            <!-- Additional Info -->
-            <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-4">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center">
-                            <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                            </svg>
-                        </div>
-                        
-                    </div>
-                </div>
-                
-                <div class="bg-amber-50 border border-amber-200 rounded-xl p-4">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center">
-                            <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-                            </svg>
-                        </div>
-                        <div>
-                            <p class="text-sm font-medium text-amber-800">حالة السؤال</p>
-                            <p class="text-sm text-amber-600">نشط وجاهز للاستخدام</p>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="bg-blue-50 border border-blue-200 rounded-xl p-4">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                            <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                            </svg>
-                        </div>
-                        <div>
-                            <p class="text-sm font-medium text-blue-800">المستوى</p>
-                            <p class="text-sm text-blue-600">{{ $questionset->title }}</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
+
     </div>
+
+
+    <script>
+
+        function questionEditForm() {
+
+            return {
+
+                selectedSurat: @js(old('quran_surat_id', $question->quran_surat_id)),
+
+                selectedAyaFrom: @js(old('aya_from', $question->aya_from)),
+
+                selectedAyaTo: @js(old('aya_to', $question->aya_to)),
+
+                ayas: [],
+
+                loading: false,
+
+
+                async init() {
+
+                    /*
+                     * Load the ayahs for the question's
+                     * existing surat when the page opens.
+                     */
+                    if (this.selectedSurat) {
+                        await this.loadAyas(false);
+                    }
+
+                },
+
+
+                async loadAyas(resetValues = true) {
+
+                    if (resetValues) {
+                        this.selectedAyaFrom = '';
+                        this.selectedAyaTo = '';
+                    }
+
+                    this.ayas = [];
+
+                    if (!this.selectedSurat) {
+                        return;
+                    }
+
+                    this.loading = true;
+
+                    try {
+
+                        const url = @json(
+                            route('quran.surats.ayas', [
+                                'quranSurat' => '__SURAT__'
+                            ])
+                        ).replace(
+                            '__SURAT__',
+                            this.selectedSurat
+                        );
+
+
+                        const response = await fetch(url);
+
+
+                        if (!response.ok) {
+                            throw new Error('Failed to load ayas');
+                        }
+
+
+                        this.ayas = await response.json();
+
+                    } catch (error) {
+
+                        console.error(error);
+
+                    } finally {
+
+                        this.loading = false;
+
+                    }
+
+                },
+
+
+                validateAyaRange() {
+
+                    if (!this.selectedAyaFrom) {
+                        this.selectedAyaTo = '';
+                        return;
+                    }
+
+                    if (
+                        this.selectedAyaTo &&
+                        Number(this.selectedAyaTo) <
+                        Number(this.selectedAyaFrom)
+                    ) {
+                        this.selectedAyaTo = '';
+                    }
+
+                },
+
+
+                get availableToAyas() {
+
+                    if (!this.selectedAyaFrom) {
+                        return [];
+                    }
+
+                    return this.ayas.filter(
+                        aya =>
+                            Number(aya.number) >=
+                            Number(this.selectedAyaFrom)
+                    );
+
+                }
+
+            }
+
+        }
+
+    </script>
+
 </x-app-layout>

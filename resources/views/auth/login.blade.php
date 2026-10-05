@@ -9,8 +9,7 @@
             <div class="simple-login-header flex justify-center items-center flex-col">
                  @include('layouts._logo')
      
-                <h1 class="simple-title">فاستمسك</h1>
-                <p class="simple-subtitle">المسابقة القرآنية</p>
+                <p class="simple-subtitle">الدخول إلى النظام</p>
             </div>
 
             <!-- نموذج تسجيل الدخول -->

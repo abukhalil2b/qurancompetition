@@ -18,8 +18,8 @@ class Student extends Model
         return $this->belongsToMany(Committee::class, 'committee_students', 'student_id', 'committee_id');
     }
 
-    public function questionAttempts()
+    public function competitions()
     {
-        return $this->hasMany(StudentQuestionAttempt::class);
+        return $this->hasMany(Competition::class);
     }
 }

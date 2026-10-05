@@ -74,7 +74,6 @@
             <tr>
                 <th style="width:60px;">#</th>
                 <th>نص السؤال</th>
-                <th style="width:150px;">الصعوبة</th>
             </tr>
         </thead>
         <tbody>
@@ -86,9 +85,7 @@
                     <td>
                         {{ $question->content }}
                     </td>
-                    <td>
-                        {{ $question->difficulties }}
-                    </td>
+                   
                 </tr>
             @endforeach
         </tbody>

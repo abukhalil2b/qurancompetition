@@ -4,7 +4,7 @@
 
             <h2 class="text-xl font-bold mb-6">
                 <div>اختيار الباقة للمتسابق: {{ $student->name }}</div>
-                <div class="text-sm text-gray-500">المستوى: {{ $student->level }}</div>
+                <div class="text-sm text-gray-500">المستوى: {{ $competition->level }}</div>
             </h2>
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

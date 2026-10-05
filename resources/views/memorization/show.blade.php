@@ -7,8 +7,11 @@
                     <h1 class="text-2xl font-extrabold text-gray-900">السؤال رقم:
                         {{ $studentQuestionSelection->position }}</h1>
                     <div class="mt-2 text-gray-600 leading-relaxed text-[10px]">
-                        {{ $studentQuestionSelection->question->content }}
+                        {{ $studentQuestionSelection->question->surat->title }}
+                        من الآية: {{ $studentQuestionSelection->question->aya_from }}
+                        إلى الآية: {{ $studentQuestionSelection->question->aya_to }}
                     </div>
+                    المستوى {{ $competition->level }}
                 </div>
 
                 {{-- Fail/Pass Badge --}}
@@ -169,7 +172,9 @@
                                         $final = $max - $evaluation->reduct_point;
                                     @endphp
                                     <tr>
-                                        <td class="py-2 text-gray-700 font-medium">{{ $evaluation->element->title }}
+                                        <td class="py-2 text-gray-700 font-medium">
+                                            {{ $evaluation->element->title }}
+                                            <span>({{ $max }})</span>
                                         </td>
                                         <td class="py-2 text-center text-red-500 font-mono">
                                             -{{ number_format($evaluation->reduct_point, 2) }}</td>

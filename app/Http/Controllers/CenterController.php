@@ -35,11 +35,16 @@ class CenterController extends Controller
 
     public function show(Center $center)
     {
-        $center->load('committees');
+        $center->load([
+            'committees' => function ($query) {
+                $query->with('stage')
+                    ->orderByDesc('active')
+                    ->latest('id');
+            },
+        ]);
 
         return view('center.show', compact('center'));
     }
-
 
     /**
      * Show the form for editing the specified resource.

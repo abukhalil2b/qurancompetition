@@ -35,7 +35,7 @@ class JudgeScoreCalculatorTest extends TestCase
 
         $student = Student::create([
             'name' => 'Test Student',
-            'level' => 'حفظ', // Arabic
+            'level' => 'المستوى الأول', // Arabic
             'gender' => 'male',
             'dob' => now()->subYears(10),
             'registration_date' => now(),
@@ -61,7 +61,7 @@ class JudgeScoreCalculatorTest extends TestCase
             'password' => Hash::make('password'),
         ]);
 
-        $questionset = Questionset::create(['title' => 'Set 1', 'level' => 'حفظ']);
+        $questionset = Questionset::create(['title' => 'Set 1', 'level' => 'المستوى الأول']);
         $question = Question::create(['content' => 'Q1', 'questionset_id' => $questionset->id]);
         $element = EvaluationElement::create(['title' => 'Element 1', 'max_score' => 20]);
 
@@ -70,7 +70,7 @@ class JudgeScoreCalculatorTest extends TestCase
             'question_id' => $question->id,
             'position' => 1,
             'is_passed' => 1,
-            'level' => 'حفظ'
+            'level' => 'المستوى الأول'
         ]);
 
         // Judge 1 Deducts 2 points -> Score 18
@@ -114,7 +114,7 @@ class JudgeScoreCalculatorTest extends TestCase
 
         $student = Student::create([
             'name' => 'Student 2',
-            'level' => 'حفظ',
+            'level' => 'المستوى الأول',
             'gender' => 'male',
         ]);
 
@@ -133,7 +133,7 @@ class JudgeScoreCalculatorTest extends TestCase
         ]);
 
         $element = EvaluationElement::create(['title' => 'E1', 'max_score' => 20]);
-        $questionset = Questionset::create(['title' => 'Set 1', 'level' => 'حفظ']);
+        $questionset = Questionset::create(['title' => 'Set 1', 'level' => 'المستوى الأول']);
         $question = Question::create(['content' => 'Q1', 'questionset_id' => $questionset->id]);
 
         // Failed Question
@@ -142,7 +142,7 @@ class JudgeScoreCalculatorTest extends TestCase
             'question_id' => $question->id,
             'is_passed' => 0, // FAILED
             'position' => 1,
-            'level' => 'حفظ'
+            'level' => 'المستوى الأول'
         ]);
 
         JudgeEvaluation::create([

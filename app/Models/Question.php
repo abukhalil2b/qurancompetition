@@ -19,13 +19,18 @@ class Question extends Model
         return $this->hasMany(StudentQuestionSelection::class);
     }
 
-    public function getLevelClassAttribute()
+    public function surat()
     {
-        return match ($this->difficulties) {
-            'القوية' => 'hard',
-            'المتوسطة' => 'medium',
-            'السهلة' => 'easy',
-            default => 'easy',
-        };
+        return $this->belongsTo(QuranSurat::class, 'quran_surat_id');
     }
+
+    public function ayas()
+    {
+        return $this->hasMany(
+            QuranAya::class,
+            'quran_surat_id',
+            'quran_surat_id'
+        );
+    }
+
 }

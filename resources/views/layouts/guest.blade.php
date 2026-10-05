@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>مسابقة فاستمسك</title>
+    <title>مسابقة مؤسسة الشيخ مستهيل للقرآن الكريم وقراءاته</title>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     

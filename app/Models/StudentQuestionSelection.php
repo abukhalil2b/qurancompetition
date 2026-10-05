@@ -9,8 +9,9 @@ class StudentQuestionSelection extends Model
     protected $guarded = [];
 
     protected $casts = [
-        'done' => 'boolean',
-    ];
+    'done'  => 'boolean',
+    'level' => 'integer',   // ← add this
+];
 
     public function isFinished()
     {

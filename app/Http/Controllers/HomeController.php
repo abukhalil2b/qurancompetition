@@ -5,14 +5,34 @@ namespace App\Http\Controllers;
 use App\Models\CommitteeUser;
 use App\Models\Competition;
 use App\Models\JudgeEvaluation;
-
+use App\Models\QuranAya;
+use App\Models\QuranSurat;
 use App\Models\Stage;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
 
 class HomeController extends Controller
 {
+
+
+  	public function testDashboard()
+	{
+
+		$users = User::all();
+
+		return view('test_dashboard', compact('users'));
+	}
+
+    	public function testLoginToUserAccount(Request $request, User $user)
+	{
+		Auth::login($user);
+
+		$request->session()->regenerate();
+
+		return redirect()->route('dashboard');
+	}
 
     public function welcome()
     {
@@ -35,7 +55,7 @@ class HomeController extends Controller
         if ($loggedUser->user_type == 'judge') {
 
             // dashboard for judge
-            $committeeUser = CommitteeUser::where('stage_id', $activeStage->id)->where('user_id', $loggedUser->id)->first();
+            $committeeUser = CommitteeUser::where('user_id', $loggedUser->id)->first();
 
             if (!$committeeUser) {
                 abort(403, 'يجب أن يرتبط المستخم بلجنة معينة. التواصل مع الدعم الفني');

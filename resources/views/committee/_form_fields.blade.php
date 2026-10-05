@@ -2,7 +2,7 @@
     <label class="block text-sm font-semibold text-gray-700 mb-1">اسم اللجنة</label>
     <input type="text" name="title" id="field_title"
         class="w-full border-gray-200 rounded-lg p-2.5 focus:ring-blue-500 focus:border-blue-500 shadow-sm" 
-        placeholder="مثال: لجنة مسقط" required>
+        placeholder="مثال: اللجنة الأولى" required>
 </div>
 
 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">

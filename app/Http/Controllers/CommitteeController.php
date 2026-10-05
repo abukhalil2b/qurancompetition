@@ -2,21 +2,44 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Committee;
 use App\Models\Center;
+use App\Models\Committee;
+use App\Models\Competition;
+use App\Models\Stage;
 use App\Models\User;
 use Illuminate\Http\Request;
 
 class CommitteeController extends Controller
 {
-    public function index()
-    {
-        $committees = Committee::with(['center', 'judges'])->latest('id')->get();
+public function index()
+{
+    $stage = Stage::whereActive(true)->latest('id')->first();
 
-        $centers = Center::all();
-
-        return view('committee.index', compact('committees', 'centers'));
+    if (! $stage) {
+        abort(403, 'لم يتم تحديد مرحلة التصفيات');
     }
+
+    $committees = Committee::with(['center', 'users'])
+        ->where('stage_id', $stage->id)
+        ->get()
+        ->groupBy('center_id');
+
+    // Count competitions (students) per center for the badge
+    $centerStudentCounts = Competition::query()
+        ->where('stage_id', $stage->id)
+        ->selectRaw('center_id, COUNT(*) as total')
+        ->groupBy('center_id')
+        ->pluck('total', 'center_id');
+
+    $centers = Center::orderBy('title')->get();
+
+    return view('committee.index', compact(
+        'committees',
+        'centers',
+        'stage',
+        'centerStudentCounts'
+    ));
+}
 
     public function store(Request $request)
     {
@@ -27,7 +50,7 @@ class CommitteeController extends Controller
         ]);
 
         Committee::create([
-            'title'     => $validated['title'],
+            'title' => $validated['title'],
             'center_id' => $validated['center_id'],
             'gender' => $validated['gender'],
         ]);
@@ -41,6 +64,7 @@ class CommitteeController extends Controller
             'title' => 'required|string|max:255',
             'gender' => 'required|in:males,females',
             'center_id' => 'required|exists:centers,id',
+            'active' => 'boolean',
         ]);
 
         $committee->update($validated);
@@ -48,32 +72,30 @@ class CommitteeController extends Controller
         return back()->with('success', 'تم تحديث بيانات اللجنة بنجاح');
     }
 
-
     public function setLeader(Request $request, Committee $committee)
     {
         $request->validate([
-            'user_id' => 'required|exists:users,id'
+            'user_id' => 'required|exists:users,id',
         ]);
 
         // 1. Reset all members of this committee to NOT be leaders
-        $committee->judges()->updateExistingPivot($committee->judges->pluck('id'), [
-            'is_judge_leader' => false
+        $committee->users()->updateExistingPivot($committee->users->pluck('id'), [
+            'is_judge_leader' => false,
         ]);
 
         // 2. Set the selected user as leader
         $committee->judges()->updateExistingPivot($request->user_id, [
-            'is_judge_leader' => true
+            'is_judge_leader' => true,
         ]);
 
         return back()->with('success', 'تم تعيين رئيس اللجنة بنجاح');
     }
 
-    public function removeJudge(Committee $committee, User $user)
-{
-    // Detach the user from the committee's judges relationship
-    $committee->judges()->detach($user->id);
+    public function removeUser(Committee $committee, User $user)
+    {
+        // Detach the user from the committee's judges relationship
+        $committee->users()->detach($user->id);
 
-    return back()->with('success', 'تم حذف المحكم من اللجنة بنجاح');
-}
-
+        return back()->with('success', 'تم حذف المحكم من اللجنة بنجاح');
+    }
 }

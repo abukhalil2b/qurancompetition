@@ -14,11 +14,8 @@ return new class extends Migration
         Schema::create('evaluation_elements', function (Blueprint $table) {
             $table->id();
             $table->string('title'); // التجويد- الوقف والابتداء- التفسير
-            $table->enum('level', ['حفظ', 'حفظ وتفسير'])->default('حفظ');
+            $table->tinyInteger('level')->default(1);
             $table->smallInteger('max_score');
-            // The idea of scope is abandoned.
-            $table->enum('scope', ['question', 'competition'])
-                ->default('question');
         });
     }
 

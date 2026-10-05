@@ -1,6 +1,28 @@
 <x-app-layout>
     <div class="space-y-6 sm:p-8" dir="rtl">
 
+        @php
+            $isLeader = auth()->user()->isCommitteeLeader($committee->id);
+
+            $genderLabels = [
+                'male'   => 'ذكر',
+                'female' => 'أنثى',
+            ];
+
+            $statusStyles = [
+                'with_committee'     => 'bg-red-50 text-red-700 border border-red-100',
+                'present'            => 'bg-yellow-50 text-yellow-700 border border-yellow-100',
+                'finish_competition' => 'bg-emerald-50 text-emerald-700 border border-emerald-100',
+            ];
+
+            $statusLabels = [
+                'with_committee'     => 'مع اللجنة',
+                'present'            => 'حاضر',
+                'finish_competition' => 'أنهى المسابقة',
+            ];
+        @endphp
+
+        {{-- Committee info card (unchanged) --}}
         <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
             <div class="px-6 py-4 bg-gray-50 border-b border-gray-100 flex items-center justify-between">
                 <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2">
@@ -42,9 +64,10 @@
             </div>
         </div>
 
-        @if (!auth()->user()->isCommitteeLeader($stage->id))
+        {{-- Non-leader notice --}}
+        @unless ($isLeader)
             @php
-                $leader = $committee->leaderForStage($stage->id)->with('user')->first()?->user;
+                $leader = $committee->leader?->user;
             @endphp
 
             <div class="bg-amber-50 border-r-4 border-amber-400 rounded-lg p-5 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -75,103 +98,104 @@
                     تحديث القائمة
                 </button>
             </div>
-        @endif
+        @endunless
 
+        {{-- Competitions table --}}
         <div class="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
             <div class="px-6 py-4 border-b border-gray-100 bg-gray-50">
-                <h3 class="font-bold text-gray-800">قائمة المتسابقين ({{ count($competitions) }})</h3>
+                <h3 class="font-bold text-gray-800">قائمة المتسابقين ({{ $competitions->count() }})</h3>
             </div>
 
             <div class="overflow-x-auto">
                 <table class="min-w-full text-right">
-                    <thead class="bg-gray-50 text-gray-500 text-sm font-medium uppercase tracking-wider">
+                    <thead class="bg-gray-50 text-gray-500 text-sm font-medium tracking-wider">
                         <tr>
                             <th class="px-6 py-3 border-b">#</th>
                             <th class="px-6 py-3 border-b w-1/3">بيانات المتسابق</th>
                             <th class="px-6 py-3 border-b text-center">المستوى</th>
                             <th class="px-6 py-3 border-b text-center">الحالة</th>
-                            <th class="px-6 py-3 border-b text-center">وقت الحضور</th>
+                            <th class="px-6 py-3 border-b text-center">وقت التسجيل</th>
                             <th class="px-6 py-3 border-b text-center">الإجراءات</th>
                         </tr>
                     </thead>
 
                     <tbody class="divide-y divide-gray-100 bg-white">
-                        @forelse ($competitions as $item)
-                            @php
-                                $statusStyles = [
-                                    'with_committee' => 'bg-red-50 text-red-700 border border-red-100',
-                                    'present' => 'bg-yellow-50 text-yellow-700 border border-yellow-100',
-                                    'finish_competition' => 'bg-emerald-50 text-emerald-700 border border-emerald-100',
-                                ];
-                                $statusLabel = [
-                                    'with_committee' => 'مع اللجنة',
-                                    'present' => 'حاضر',
-                                    'finish_competition' => 'أنهى المسابقة',
-                                ]; // Or use translation key
-                            @endphp
-
+                        @forelse ($competitions as $competition)
                             <tr class="hover:bg-gray-50 transition-colors">
                                 <td class="px-6 py-4 text-gray-500 font-mono text-sm">
-                                    {{ $item->id }}
+                                    {{ $loop->iteration }}
                                 </td>
 
                                 <td class="px-6 py-4">
                                     <div class="flex flex-col">
                                         <span class="text-base font-bold text-gray-900 mb-1">
-                                            {{ $item->student->name ?? 'غير معروف' }}
+                                            {{ $competition->student->name ?? 'غير معروف' }}
                                         </span>
                                         <div class="text-xs text-gray-500 flex flex-wrap gap-x-3 gap-y-1">
-                                            <span><span class="font-medium text-gray-400">النوع:</span> {{ __($item->student->gender ?? '-') }}</span>
+                                            <span>
+                                                <span class="font-medium text-gray-400">النوع:</span>
+                                                {{ $genderLabels[$competition->student->gender] ?? '—' }}
+                                            </span>
                                             <span class="text-gray-300">|</span>
-                                            <span><span class="font-medium text-gray-400">الرقم المدني:</span> {{ $item->student->national_id ?? '-' }}</span>
-                                            <span class="text-gray-300">|</span>
-                                            <span><span class="font-medium text-gray-400">الجنسية:</span> {{ $item->student->nationality ?? '-' }}</span>
+                                            <span>
+                                                <span class="font-medium text-gray-400">الرقم المدني:</span>
+                                                {{ $competition->student->national_id ?? '—' }}
+                                            </span>
+                                            @if (!empty($competition->student->nationality))
+                                                <span class="text-gray-300">|</span>
+                                                <span>
+                                                    <span class="font-medium text-gray-400">الجنسية:</span>
+                                                    {{ $competition->student->nationality }}
+                                                </span>
+                                            @endif
                                         </div>
                                     </div>
                                 </td>
 
                                 <td class="px-6 py-4 text-center">
                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 border border-gray-200">
-                                        {{ $item->student->level }}
+                                {{ $competition->level }}
                                     </span>
                                 </td>
 
                                 <td class="px-6 py-4 text-center">
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold {{ $statusStyles[$item->student_status] ?? 'bg-gray-100 text-gray-600' }}">
-                                        {{ __($item->student_status) }}
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold
+                                                 {{ $statusStyles[$competition->student_status] ?? 'bg-gray-100 text-gray-600' }}">
+                                        {{ $statusLabels[$competition->student_status] ?? $competition->student_status }}
                                     </span>
                                 </td>
 
                                 <td class="px-6 py-4 text-center text-sm text-gray-500 font-mono" dir="ltr">
-                                    {{ $item->created_at->format('H:i') }}
+                                    {{ $competition->present_at?->format('H:i') ?? '—' }}
                                 </td>
 
                                 <td class="px-6 py-4 text-center">
-                                    <div class="flex flex-col items-center gap-2">
-                                        @if ($item->questionset)
-                                            <div class="flex items-center gap-1 text-emerald-600 bg-emerald-50 px-3 py-1 rounded-lg border border-emerald-100">
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                                                <span class="text-xs font-bold">{{ $item->questionset->title }}</span>
-                                            </div>
-                                        @else
-                                            <span class="text-xs text-gray-400 bg-gray-50 px-2 py-1 rounded">لم يتم الاختيار</span>
-                                        @endif
-
-                                        @if ($committeeUser->role === 'judge')
-                                            <a href="{{ route('student.choose_questionset', $item->id) }}"
-                                               class="inline-flex items-center justify-center gap-1 w-full max-w-[140px] px-3 py-1.5 
-                                                      {{ $item->questionset ? 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50' : 'bg-purple-600 text-white hover:bg-purple-700 shadow-sm' }} 
-                                                      text-xs font-bold rounded-lg transition-all duration-200">
-                                                @if($item->questionset)
-                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
-                                                    عرض الأسئلة
-                                                @else
-                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
-                                                    اختيار باقة
-                                                @endif
-                                            </a>
-                                        @endif
-                                    </div>
+                                    @if ($competition->questionset)
+                                        <a href="{{ route('student.choose_questionset', $competition->id) }}"
+                                           class="inline-flex items-center justify-center gap-1 w-full max-w-[140px] px-3 py-1.5
+                                                  bg-white border border-gray-300 text-gray-700 hover:bg-gray-50
+                                                  text-xs font-bold rounded-lg transition-all duration-200">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                            </svg>
+                                            عرض الأسئلة
+                                        </a>
+                                    @elseif ($isLeader)
+                                        <a href="{{ route('student.choose_questionset', $competition->id) }}"
+                                           class="inline-flex items-center justify-center gap-1 w-full max-w-[140px] px-3 py-1.5
+                                                  bg-purple-600 text-white hover:bg-purple-700 shadow-sm
+                                                  text-xs font-bold rounded-lg transition-all duration-200">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                            </svg>
+                                            اختيار باقة
+                                        </a>
+                                    @else
+                                        <span class="text-xs text-gray-400 bg-gray-50 px-2 py-1 rounded">
+                                            لم يتم الاختيار
+                                        </span>
+                                    @endif
                                 </td>
                             </tr>
                         @empty
@@ -179,7 +203,9 @@
                                 <td colspan="6" class="px-6 py-12 text-center">
                                     <div class="flex flex-col items-center justify-center">
                                         <div class="bg-gray-100 p-4 rounded-full mb-3">
-                                            <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                                            <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                                            </svg>
                                         </div>
                                         <p class="text-gray-500 text-sm font-medium">لا توجد سجلات حضور حالياً</p>
                                     </div>

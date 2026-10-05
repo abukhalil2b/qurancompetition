@@ -17,9 +17,13 @@ return new class extends Migration
 
             $table->string('title');
             
+            $table->bigInteger('stage_id');
+
             $table->foreignId('center_id')->constrained()->cascadeOnDelete();
 
             $table->enum('gender', ['males','females'])->default('males');
+
+            $table->boolean('active')->default(false);
         });
     }
 

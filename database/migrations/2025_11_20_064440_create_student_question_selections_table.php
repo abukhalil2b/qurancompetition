@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('competition_id')->constrained()->cascadeOnDelete();
             $table->foreignId('question_id')->constrained();
-            $table->enum('level', ['حفظ', 'حفظ وتفسير']);
+            $table->enum('level', [1, 2]);
             $table->boolean('done')->default(false);
             $table->text('note')->nullable();
             $table->tinyInteger('position')->default(1);

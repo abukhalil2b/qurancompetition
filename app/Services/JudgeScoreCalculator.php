@@ -3,80 +3,159 @@
 namespace App\Services;
 
 use App\Models\Competition;
-use App\Models\StudentQuestionSelection;
 use Illuminate\Support\Collection;
+use InvalidArgumentException;
 
 class JudgeScoreCalculator
 {
     /**
-     * Calculate results broken down by judge.
+     * Calculate the memorization result for each judge.
      *
-     * @param Competition $competition
-     * @return Collection
+     * Level 1:
+     * - 6 questions
+     * - Maximum raw score: 120
+     *
+     * Level 2:
+     * - 5 questions
+     * - Maximum raw score: 100
+     *
+     * A failed question contributes zero points.
+     *
+     * Each judge's score is calculated independently:
+     *
+     *     element max score - judge deduction
+     *
+     * @return Collection<int, array{
+     *     judge_id: int,
+     *     judge_name: string,
+     *     total_score: float,
+     *     max_score: float,
+     *     percentage: float
+     * }>
+     *
+     * @throws InvalidArgumentException
      */
-    public static function calculateStudentResults(Competition $competition): Collection
+    public static function calculateStudentResults(Competition $competition): Collection 
     {
-        // 1. Get all questions with evaluations
-        $questions = $competition->studentQuestionSelections()->with([
-            'judgeEvaluations.element',
-            'judgeEvaluations.judge'
-        ])->get();
 
-        // 2. Prepare to aggregate scores
-        // Structure: [ judge_id => [ 'name' => '...', 'memorization_score' => 0 ] ]
+        // Get all questions and their judge evaluations.
+        $questions = $competition->studentQuestionSelections()
+            ->with([
+                'judgeEvaluations.element',
+                'judgeEvaluations.judge',
+            ])
+            ->get();
+
+        // Determine the maximum score for this competition level.
+        $maxScore = self::maxScore($competition);
+
+        // Store scores grouped by judge.
         $judgeScores = collect();
 
-        // Iterate through each question
         foreach ($questions as $question) {
-            // If the question is failed (is_passed == 0), the student gets 0 for this question.
-            // This means NO judge gives points for this question.
-            if ($question->is_passed == 0) {
+
+            /*
+             * A failed question receives zero points.
+             *
+             * Therefore, do not add any of its evaluations
+             * to the judges' scores.
+             */
+            if ((int) $question->is_passed === 0) {
                 continue;
             }
 
-            // Iterate through evaluations for this question
             foreach ($question->judgeEvaluations as $evaluation) {
-                $judgeId = $evaluation->judge_id;
-                $judgeName = $evaluation->judge->name ?? 'Unknown Judge';
 
-                if (!$judgeScores->has($judgeId)) {
+                // Ignore evaluations whose element no longer exists.
+                if (! $evaluation->element) {
+                    continue;
+                }
+
+                $judgeId = $evaluation->judge_id;
+
+                $judgeName = $evaluation->judge->name ?? 'محكم';
+
+                $elementMaxScore = (float) $evaluation->element->max_score;
+
+                $deduction = (float) $evaluation->reduct_point;
+
+                /*
+                 * Judge's score for this evaluation element:
+                 *
+                 * Maximum element score - deduction
+                 *
+                 * Never allow a negative score.
+                 */
+
+                $score = max(0,$elementMaxScore - $deduction);//MAX: we don't want a negative score
+
+                // Create the judge record if it does not exist.
+                if (! $judgeScores->has($judgeId)) {
                     $judgeScores->put($judgeId, [
                         'judge_id' => $judgeId,
                         'judge_name' => $judgeName,
-                        'memorization_score' => 0,
+                        'total_score' => 0,
                     ]);
                 }
 
-                // Calculate the score for this specific evaluation
-                // Score = Max Score of Element - Reduction
-                $elementMaxScore = $evaluation->element->max_score;
-                $score = max(0, $elementMaxScore - $evaluation->reduct_point);
+                // Add this evaluation score to the judge's total.
+                $judgeData = $judgeScores->get($judgeId);
 
-                // Add to judge's total
-                $currentData = $judgeScores->get($judgeId);
-                $currentData['memorization_score'] += $score;
-                $judgeScores->put($judgeId, $currentData);
+                $judgeData['total_score'] += $score;
+
+                $judgeScores->put($judgeId, $judgeData);
             }
         }
 
-        // 3. Handle Tafseer if applicable
-        $tafseerScore = 0;
-        $maxScore = 100;
-        if ($competition->student->level === 'حفظ وتفسير') {
-            // Use ScoreCalculator service to get the official tafseer score
-            $tafseerScore = ScoreCalculator::tafseer($competition);
-            $maxScore = 140;
-        }
+        /*
+         * Finalize each judge's result.
+         */
+        return $judgeScores
+            ->map(function (array $judgeData) use ($maxScore) {
 
-        // 4. Finalize the collection with totals
-        return $judgeScores->map(function ($judgeData) use ($tafseerScore, $maxScore) {
-            $total = $judgeData['memorization_score'] + $tafseerScore;
+                $totalScore = round($judgeData['total_score'],2); 
+                /*
+                 * Normalize the judge's raw score to 100%.
+                 *
+                 * Level 1:
+                 *     score / 120 × 100
+                 *
+                 * Level 2:
+                 *     score / 100 × 100
+                 */
+                $percentage = ($totalScore / $maxScore) * 100;
 
-            return array_merge($judgeData, [
-                'tafseer_score' => $tafseerScore,
-                'total_score' => $total,
-                'max_score' => $maxScore
-            ]);
-        })->values(); // Reset keys to be a simple array
+                return [
+                    'judge_id' => $judgeData['judge_id'],
+                    'judge_name' => $judgeData['judge_name'],
+                    'total_score' => $totalScore,
+                    'max_score' => $maxScore,
+                    'percentage' => round($percentage, 2),
+                ];
+            })
+            ->values();
+    }
+
+    /**
+     * Get the maximum raw score according to the competition level.
+     *
+     * Level 1 = 120 points
+     * Level 2 = 100 points
+     *
+     * @throws InvalidArgumentException
+     */
+    private static function maxScore(Competition $competition): float
+    {
+        return match ((int) $competition->level) {
+
+            1 => 120.0,
+
+            2 => 100.0,
+
+            default => throw new InvalidArgumentException(
+                "Invalid competition level: {$competition->level}. ".
+                'Expected level 1 or 2.'
+            ),
+        };
     }
 }

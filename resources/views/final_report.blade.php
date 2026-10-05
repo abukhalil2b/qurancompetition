@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>المسابقة القرآنية فاستمسك - {{ $competition->stage->title }}</title>
+    <title>مسابقة مؤسسة الشيخ مستهيل للقرآن الكريم وقراءاته - {{ $competition->stage->title }}</title>
     @vite(['resources/css/app.css'])
 </head>
 
@@ -46,8 +46,8 @@
 
         {{-- Header --}}
         <div class="text-center mb-12">
-            <h1 class="text-3xl font-extrabold text-slate-800 mb-2">
-                المسابقة القرآنية فاستمسك – {{ $competition->stage->title }}
+            <h1 class="text-2xl font-extrabold text-slate-800 mb-2">
+                مسابقة مؤسسة الشيخ مستهيل للقرآن الكريم وقراءاته – {{ $competition->stage->title }}
             </h1>
             <p class="text-sm text-slate-500">{{ $competition->created_at->format('Y/m/d') }}</p>
             <p class="text-slate-400 text-sm">2025 / 1447</p>
@@ -84,7 +84,6 @@
 
                 <div class="flex justify-between items-center bg-slate-50 px-6 py-4 border-b">
                     <span class="font-extrabold text-blue-600">السؤال {{ $index + 1 }}</span>
-                    <span class="text-sm text-slate-500">{{ $data['question']->difficulties }}</span>
                 </div>
 
                 <div class="p-6">

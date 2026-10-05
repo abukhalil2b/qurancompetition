@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('centers', function (Blueprint $table) {
             $table->id();
             $table->string('title'); // maybe name of place
+            $table->string('period')->nullable(); 
         });
     }
 

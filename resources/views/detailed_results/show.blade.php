@@ -14,7 +14,7 @@
         <div class="flex flex-col md:flex-row justify-between items-center mb-8 border-b pb-6">
             <div>
                 <h1 class="text-3xl font-bold text-gray-900 mb-2">{{ $student->name }}</h1>
-                <p class="text-gray-500 text-lg">{{ $student->branch_name }} - {{ $student->level }}</p>
+                <p class="text-gray-500 text-lg">المستوى {{ $student->level }}</p>
             </div>
             <div class="mt-4 md:mt-0">
                 <a href="{{ route('result.show', $competition->id) }}"
@@ -70,10 +70,6 @@
                     <thead>
                         <tr class="bg-gray-50 text-gray-600 border-b border-gray-200">
                             <th class="py-4 px-6 font-semibold w-1/3">المحكم</th>
-                            <th class="py-4 px-6 font-semibold text-center">أداء الحفظ</th>
-                            @if ($competition->student->level === 'حفظ وتفسير')
-                                <th class="py-4 px-6 font-semibold text-center">درجة التفسير</th>
-                            @endif
                             <th class="py-4 px-6 font-semibold text-center">المجموع الكلي</th>
                             <th class="py-4 px-6 font-semibold text-center">النسبة</th>
                         </tr>
@@ -93,34 +89,23 @@
                                         </div>
                                     </div>
                                 </td>
-                                <td class="py-4 px-6 text-center">
-                                    <span class="inline-block py-1 px-3 rounded-full bg-gray-100 text-gray-700 font-bold">
-                                        {{ number_format($score['memorization_score'], 1) }}
-                                    </span>
-                                </td>
-                                @if ($competition->student->level === 'حفظ وتفسير')
-                                    <td class="py-4 px-6 text-center">
-                                        <span
-                                            class="inline-block py-1 px-3 rounded-full bg-orange-100 text-orange-700 font-bold">
-                                            {{ number_format($score['tafseer_score'], 1) }}
-                                        </span>
-                                    </td>
-                                @endif
+                               
                                 <td class="py-4 px-6 text-center">
                                     <span class="text-xl font-bold text-indigo-700">
                                         {{ number_format($score['total_score'], 1) }}
                                     </span>
                                     <span class="text-sm text-gray-400">/ {{ $score['max_score'] }}</span>
                                 </td>
+
                                 <td class="py-4 px-6 text-center">
                                     @php
-                                        $percentage = ($score['total_score'] / $score['max_score']) * 100;
-                                        $colorClass = $percentage >= 90 ? 'text-green-600' : ($percentage >= 80 ? 'text-blue-600' : 'text-red-500');
+                                        $colorClass = $score['percentage'] >= 90 ? 'text-green-600' : ($score['percentage'] >= 80 ? 'text-blue-600' : 'text-red-500');
                                     @endphp
                                     <div class="font-bold {{ $colorClass }}">
-                                        {{ number_format($percentage, 1) }}%
+                                        {{ number_format($score['percentage'], 1) }}%
                                     </div>
                                 </td>
+
                             </tr>
                         @endforeach
                     </tbody>

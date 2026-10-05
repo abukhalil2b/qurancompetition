@@ -3,61 +3,76 @@
 namespace App\Http\Controllers;
 
 use App\Models\EvaluationElement;
-use App\Models\Student;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
 
 class EvaluationElementController extends Controller
 {
-
     public function index($id = 1)
     {
+        $levels = [
+            1 => 'المستوى الأول',
+            2 => 'المستوى الثاني',
+        ];
 
+        $levelId = isset($levels[$id]) ? $id : 1;
 
-        $levels = [1 => 'حفظ', 2 => 'حفظ وتفسير'];
+        $level = $levels[$levelId];
 
-        $level_id = $levels[$id] ? $id : 1;
+        $elements = EvaluationElement::where('level', $levelId)->get();
 
-        // get the level name
-        $level = $levels[$level_id];
-
-        $elements = EvaluationElement::where('level', $level)->get();
-
-        return view('evaluation_element.index', compact('elements', 'level'));
+        return view('evaluation_element.index', compact(
+            'elements',
+            'level',
+            'levelId'
+        ));
     }
 
     public function store(Request $request)
     {
         $request->validate([
             'title' => 'required|string|max:255',
-            'level' => 'required|in:حفظ,حفظ وتفسير',
+            'level_id' => 'required|in:1,2',
             'max_score' => 'required|integer|min:1|max:100',
         ]);
 
-        EvaluationElement::create($request->only('title', 'level', 'max_score'));
+        EvaluationElement::create([
+            'title' => $request->title,
+            'level' => $request->level_id,
+            'max_score' => $request->max_score,
+        ]);
 
         return back()->with('success', 'تمت إضافة عنصر التقييم بنجاح');
     }
 
-     public function edit(EvaluationElement $evaluationElement)
+    public function edit(EvaluationElement $evaluationElement)
     {
-        return view('evaluation_element.edit', compact('evaluationElement'));
-    }
+        $levels = [
+            1 => 'المستوى الأول',
+            2 => 'المستوى الثاني',
+        ];
 
+        $level = $levels[$evaluationElement->level] ?? 'غير محدد';
+
+        return view('evaluation_element.edit', compact(
+            'evaluationElement',
+            'level'
+        ));
+    }
 
     public function update(Request $request, EvaluationElement $evaluationElement)
     {
         $request->validate([
             'title' => 'required|string|max:255',
-            'max_score' => 'required|integer|min:1|max:20',
+            'max_score' => 'required|integer|min:1|max:100',
         ]);
 
-        $evaluationElement->update($request->only('title', 'max_score'));
+        $evaluationElement->update([
+            'title' => $request->title,
+            'max_score' => $request->max_score,
+        ]);
 
-        
-        return back()
+        return redirect()
+            ->route('evaluation_element.index', $evaluationElement->level)
             ->with('success', 'تم تحديث عنصر التقييم بنجاح');
     }
-
-
 }

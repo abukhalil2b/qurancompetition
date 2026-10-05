@@ -8,14 +8,13 @@ class Competition extends Model
 {
    protected $guarded = [];
 
+   protected $casts = [
+    'present_at' => 'datetime'
+];
+
    public function studentQuestionSelections()
    {
       return $this->hasMany(StudentQuestionSelection::class);
-   }
-
-   public function tafseerResult()
-   {
-      return $this->hasOne(TafseerResult::class);
    }
 
    public function student()
@@ -43,8 +42,4 @@ class Competition extends Model
       return $this->belongsTo(Questionset::class, 'questionset_id');
    }
 
-   public function judges()
-   {
-      return $this->belongsToMany(User::class, 'competition_judges');
-   }
 }

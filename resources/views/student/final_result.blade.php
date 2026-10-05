@@ -5,21 +5,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>تقييم المتسابق | {{ $student->name }}</title>
-
     {{-- Vite Assets for Tailwind and Alpine --}}
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-
-
 </head>
 
 <body>
-
     <div class="max-w-6xl mx-auto py-8" dir="rtl">
-
         {{-- Top Header --}}
         <div class="flex justify-between items-center mb-6">
             <h2 class="text-2xl font-bold text-gray-800">تقرير النتيجة: {{ $student->name }}</h2>
-            <div class="text-sm text-gray-500">المستوى: {{ $student->level }}</div>
+            <div class="text-sm text-gray-500">المستوى: {{ $level }}</div>
         </div>
 
         {{-- 3. Grand Total Section --}}
@@ -80,16 +75,18 @@
                 </div>
             @endif
         </div>
+
         {{-- 1. Memorization Questions Loop --}}
         @foreach ($questions as $qIndex => $selection)
             <div class="bg-white border rounded-xl shadow p-5 mb-6 break-inside-avoid">
                 <div class="flex justify-between items-center mb-4 border-b pb-2">
                     <h3 class="font-bold text-lg text-gray-800">
-                        السؤال {{ $qIndex + 1 }}: <span
-                            class="text-xs font-normal text-gray-500">{{ $selection->question->content }}</span>
+                        السؤال {{ $qIndex + 1 }}: 
+                        <span class="text-xs font-normal text-gray-500">
+                            {{ $selection->question->content }}
+                        </span>
                     </h3>
                 </div>
-
                 <div class="overflow-x-auto">
                     <table class="w-full text-sm border-collapse">
                         <thead>
@@ -101,6 +98,7 @@
                                 <th class="border px-3 py-2 text-center w-24">الدرجة</th>
                             </tr>
                         </thead>
+                        
                         <tbody>
                             @php
                                 $elementGroups = $selection->judgeEvaluations->groupBy('evaluation_element_id');
@@ -177,48 +175,9 @@
             </div>
         @endforeach
 
-        {{-- 2. Tafseer Section (If Applicable) --}}
-        @if (isset($tafseerResult) && $student->level === 'حفظ وتفسير')
-            <div class="bg-white border rounded-xl shadow p-5 mb-6 break-inside-avoid border-orange-200">
-                <h3 class="font-bold text-lg text-orange-800 mb-4 border-b border-orange-100 pb-2">
-                    تفاصيل درجات التفسير
-                </h3>
-                <div class="space-y-2">
-                    @php
-                        // Fetch all raw evaluations for this competition
-                        $allTafseerEvals = \App\Models\TafseerEvaluation::with('judge')
-                            ->where('competition_id', $competition->id)
-                            ->get()
-                            ->groupBy('judge_id');
-                    @endphp
-
-                    @foreach ($allTafseerEvals as $judgeId => $evals)
-                        <div class="flex justify-between text-xs bg-white border border-orange-100 p-2 rounded">
-                            <span class="font-bold">{{ $evals->first()->judge->name }}</span>
-                            <span>
-                                المجموع: {{ $evals->sum('score') }}
-                                {{-- Note: This assumes simple sum. If you average per question, logic differs --}}
-                            </span>
-                        </div>
-                    @endforeach
-                </div>
-                <div class="flex justify-between items-center bg-orange-50 p-4 rounded-lg">
-                    <div>
-                        <p class="text-sm text-gray-600">تم تقييم التفسير بنجاح</p>
-                    </div>
-                    <div class="text-2xl font-bold text-orange-700">
-                        {{ number_format($tafseerResult->total_score, 2) }} / 40
-                    </div>
-                </div>
-            </div>
-        @endif
-
-
-
         {{-- 5. Navigation/Questions List (Hide on Print) --}}
         <div class="border-t pt-8 print:hidden">
             <h3 class="text-lg font-bold text-gray-700 mb-4">قائمة الأسئلة وحالة الإنجاز</h3>
-
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 @foreach ($questions as $selection)
                             <a href="{{ route('memorization.start', $selection->id) }}" class="group p-4 border rounded-xl transition-all duration-200 flex items-center gap-4
@@ -260,7 +219,6 @@
                 @endforeach
             </div>
         </div>
-
     </div>
 
     {{-- CSS for Print formatting --}}

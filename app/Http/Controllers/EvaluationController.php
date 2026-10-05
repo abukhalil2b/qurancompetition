@@ -2,15 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Committee;
+use App\Models\CommitteeUser;
 use App\Models\Competition;
-use App\Models\StudentQuestionSelection;
-use App\Models\Stage;
 use App\Models\EvaluationElement;
 use App\Models\JudgeEvaluation;
 use App\Models\JudgeNote;
-use App\Models\CommitteeUser;
-use App\Models\TafseerResult;
+use App\Models\Stage;
+use App\Models\StudentQuestionSelection;
 use App\Models\TafseerEvaluation;
+use App\Models\TafseerResult;
 use App\Services\ScoreCalculator as ServicesScoreCalculator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -24,11 +25,9 @@ class EvaluationController extends Controller
 
         // Ensure we are in an active stage
         $stage = Stage::latest('id')->where('active', 1)->first();
-        if (!$stage) {
+        if (! $stage) {
             abort(404, 'No active stage found');
         }
-
-        $isJudgeLeader = $judge->isCommitteeLeader($stage->id);
 
         $studentQuestionSelection = StudentQuestionSelection::with([
             'competition',
@@ -40,6 +39,10 @@ class EvaluationController extends Controller
                 $q->where('judge_id', $judge->id);
             },
         ])->findOrFail($student_question_selection_id);
+
+        $competition = Competition::findOrFail($studentQuestionSelection->competition_id);
+
+        $isJudgeLeader = $judge->isCommitteeLeader($competition->committee_id);
 
         $evaluationElements = EvaluationElement::all();
 
@@ -69,7 +72,7 @@ class EvaluationController extends Controller
             'elements' => 'required|array',
             'elements.*' => 'numeric',
             'note' => 'nullable|string',
-            'student_lost_question' => 'nullable'
+            'student_lost_question' => 'nullable',
         ]);
 
         $judge = Auth::user();
@@ -82,18 +85,17 @@ class EvaluationController extends Controller
             ->where('role', 'judge')
             ->exists();
 
-        if (!$isJudge) {
+        if (! $isJudge) {
             abort(403, 'User is not a judge in this committee.');
         }
 
         DB::transaction(function () use ($validated, $selection, $judge, $competition) {
 
             // Mark pass/fail
-            if ($judge->isCommitteeLeader($competition->stage_id)) {
+            if ($judge->isCommitteeLeader($competition->committee_id)) {
                 $selection->is_passed = isset($validated['student_lost_question']) ? 0 : 1;
                 $selection->save();
             }
-
 
             // Save Scores
             foreach ($validated['elements'] as $elementId => $score) {
@@ -127,11 +129,15 @@ class EvaluationController extends Controller
             ->with('success', 'تم حفظ التقييم بنجاح');
     }
 
-   
-
     public function showFinalResult(Competition $competition)
     {
         $student = $competition->student;
+
+        $committee = Committee::find($competition->committee_id);
+
+        if(!$committee){
+            abort(403,'لم يتم تحديد لجنة لهذا المتسابق');
+        }
 
         // 1. Ensure all memorization questions are actually marked 'done'
         $unfinishedQuestion = StudentQuestionSelection::where('competition_id', $competition->id)
@@ -146,11 +152,11 @@ class EvaluationController extends Controller
 
         // 2. Check Tafseer status if applicable
         $tafseerResult = null;
-        if ($student->level === 'حفظ وتفسير') {
+        if ($student->level === 'المستوى الثاني') {
             $tafseerResult = TafseerResult::where('competition_id', $competition->id)->first();
 
             // If Tafseer not done/started, redirect them
-            if (!$tafseerResult || !$tafseerResult->done) {
+            if (! $tafseerResult || ! $tafseerResult->done) {
                 return redirect()->route('tafseer.start', $competition->id)
                     ->with('warning', 'يجب إكمال اختبار التفسير قبل عرض النتيجة النهائية.');
             }
@@ -163,23 +169,22 @@ class EvaluationController extends Controller
         $questions = $competition->studentQuestionSelections()->with([
             'judgeEvaluations.element',
             'judgeEvaluations.judge',
-            'question'
+            'question',
         ])->get();
 
         // if is_passed = 0. then do not caculate score of this
 
         $judge = auth()->user();
 
-        $isJudgeLeader = $judge->isCommitteeLeader($competition->stage_id);
-
+        $isJudgeLeader = $judge->isCommitteeLeader($committee->id);
 
         return view('student.final_result', [
             'competition' => $competition,
-            'student'     => $student,
-            'questions'   => $questions,
-            'scores'      => $scores,
-            'isJudgeLeader'      => $isJudgeLeader,
-            'tafseerResult' => $tafseerResult
+            'student' => $student,
+            'questions' => $questions,
+            'scores' => $scores,
+            'isJudgeLeader' => $isJudgeLeader,
+            'tafseerResult' => $tafseerResult,
         ]);
     }
 
@@ -190,10 +195,9 @@ class EvaluationController extends Controller
 
         // 2. Update status AND save the split scores to DB
         $competition->update([
-            'student_status'     => 'finish_competition',
-            'final_score'        => $scores['total'],       // Total (100 or 140)
+            'student_status' => 'finish_competition',
+            'final_score' => $scores['total'],       // Total (100 or 140)
             'memorization_score' => $scores['memorization'], // Split score
-            'tafseer_score'      => $scores['tafseer'] ?? 0, // Split score
         ]);
 
         return redirect()->back()->with('success', 'تم اعتماد النتيجة النهائية وإنهاء المسابقة للمتسابق.');
@@ -221,6 +225,7 @@ class EvaluationController extends Controller
         // If everyone has finished, update DB and return true
         if ($evaluatedJudges >= $totalJudges && $totalJudges > 0) {
             $selection->update(['done' => true]);
+
             return true;
         }
 

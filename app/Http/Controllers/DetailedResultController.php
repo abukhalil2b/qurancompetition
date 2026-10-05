@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Committee;
 use App\Models\Competition;
 use App\Services\JudgeScoreCalculator;
-use Illuminate\Http\Request;
 
 class DetailedResultController extends Controller
 {
@@ -13,11 +13,19 @@ class DetailedResultController extends Controller
      */
     public function show(Competition $competition)
     {
+
+        $committee = Committee::find($competition->committee_id);
+
+        if (! $committee) {
+            abort(403, 'لم يتم تحديد لجنة لهذا المتسابق');
+        }
+
         // 1. Calculate scores per judge
         $judgeScores = JudgeScoreCalculator::calculateStudentResults($competition);
 
         $judge = auth()->user();
-        $isJudgeLeader = $judge->isCommitteeLeader($competition->stage_id);
+
+        $isJudgeLeader = $judge->isCommitteeLeader($committee->id);
 
         // 2. Pass data to the view
         return view('detailed_results.show', [

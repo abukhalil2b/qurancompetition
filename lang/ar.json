@@ -3,21 +3,26 @@
     "judge": "محكم",
     "organizer": "منظم",
     "student": "متسابق",
+
+    "registration": "مسجل في التصفيات",
     "present": "حاضر",
     "with_committee": "مع اللجنة",
     "withdraw": "منسحب",
+    "waiting_finalization": "بانتظار الاعتماد النهائي",
     "finish_competition": "أنهى المسابقة",
+
     "waiting_evaluation": "ينتظر التقويم",
     "running_evaluation": "جاري التقويم",
     "done_evaluation": "أنهى التقويم",
+
     "students": "طلاب",
     "content": "محتوى السؤال",
+
     "male": "ذكر",
     "female": "أنثى",
     "males": "ذكور",
     "females": "اناث",
+
     "active": "مفعل",
-    "disable": "معطل",
-    "memorize_with_tafseer":"الحفظ مع التفسير",
-    "memorize":"الحفظ"
+    "disable": "معطل"
 }

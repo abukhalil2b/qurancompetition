@@ -22,7 +22,8 @@ return new class extends Migration
             $table->string('state')->nullable();
             $table->string('wilaya')->nullable();
             $table->string('qarya')->nullable();
-            $table->enum('level', ['حفظ','حفظ وتفسير'])->default('حفظ');
+            $table->boolean('level')->default(1);
+            $table->foreignId('center_id')->constrained()->cascadeOnDelete();
             $table->date('registration_date')->nullable();
             $table->boolean('active')->default(1);
             $table->string('note')->nullable();

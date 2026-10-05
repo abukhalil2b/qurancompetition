@@ -2,26 +2,37 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Competition;
-use App\Models\StudentQuestionSelection;
-use App\Models\TafseerResult;
-use App\Services\ScoreCalculator; // Ensure this import is correct
-use Illuminate\Http\Request;
-
 use App\Exports\CompetitionResultsExport;
+use App\Models\Center;
+use App\Models\Committee;
+use App\Models\Competition; // Ensure this import is correct
+use App\Models\StudentQuestionSelection;
+use App\Services\ScoreCalculator;
+use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Str;
 
 class CompetitionResultController extends Controller
 {
-
-    public function index(Request $request)
+   
+public function index(Request $request)
     {
-        // ... existing index code ...
-        if ($request->has('export')) {
-            return Excel::download(new CompetitionResultsExport($request), 'competition_results_' . date('Y-m-d') . '.xlsx');
+        $user = auth()->user();
+
+        if (! in_array($user->user_type, ['admin'])) {
+            abort(403, 'غير مصرح دخول هذه الصفحة');
         }
 
-        $competitions = Competition::with(['student', 'questionset'])
+        // Handle Excel export with dynamic filename
+        if ($request->has('export')) {
+            $filename = $this->generateExportFilename($request);
+            return Excel::download(new CompetitionResultsExport($request), $filename);
+        }
+
+        $competitions = Competition::with(['student', 'questionset', 'center'])
+            ->when($request->filled('center_id'), function ($query) use ($request) {
+                $query->where('center_id', $request->center_id);
+            })
             ->when($request->filled('gender'), function ($query) use ($request) {
                 $query->whereHas('student', function ($q) use ($request) {
                     $q->where('gender', $request->gender);
@@ -30,13 +41,48 @@ class CompetitionResultController extends Controller
             ->when($request->filled('level'), function ($query) use ($request) {
                 $query->where('level', $request->level);
             })
-            // Simple, fast, and uses your Database Index
+            ->whereNotNull('final_score')
             ->orderByDesc('final_score')
             ->get();
 
-        return view('finished_student_list', compact('competitions'));
+            $centers = Center::all();
+
+        return view('finished_student_list', compact('competitions', 'centers'));
     }
 
+    /**
+     * Generate descriptive filename reflecting active filters.
+     */
+    protected function generateExportFilename(Request $request): string
+    {
+        $parts = ['نتائج_المسابقة'];
+
+        // Add Center name if filtered
+        if ($request->filled('center_id')) {
+            $center = Center::find($request->center_id);
+            if ($center) {
+                $parts[] = Str::slug($center->title, '_', null);
+            }
+        }
+
+        // Add Level
+        if ($request->filled('level')) {
+            $parts[] = ((int) $request->level === 1) ? 'المستوى_الأول' : 'المستوى_الثاني';
+        }
+
+        // Add Gender
+        if ($request->filled('gender')) {
+            $parts[] = ($request->gender === 'male') ? 'ذكور' : 'إناث';
+        }
+
+        // Add Date timestamp
+        $parts[] = date('Y-m-d');
+
+        // Clean double underscores or trailing separators
+        $cleanName = implode('_', array_filter($parts));
+
+        return $cleanName . '.xlsx';
+    }
 
     /**
      * Show the individual Final Result Certificate/Page.
@@ -44,7 +90,15 @@ class CompetitionResultController extends Controller
     public function show($competitionId)
     {
         $competition = Competition::with('student')->findOrFail($competitionId);
+
+        $committee = Committee::find($competition->committee_id);
+
+        if (! $committee) {
+            abort(403, 'لم يتم تحديد لجنة لهذا المتسابق');
+        }
+
         $student = $competition->student;
+        $level = $competition->level;
 
         // Guards: Ensure questions are done before showing result
         $unfinished = StudentQuestionSelection::where('competition_id', $competitionId)
@@ -52,36 +106,30 @@ class CompetitionResultController extends Controller
 
         if ($unfinished) {
             return redirect()->route('memorization.start', $unfinished->id)
-                ->with('warning', 'يجب إكمال الحفظ أولاً.');
-        }
-
-        if ($student->level === 'حفظ وتفسير') {
-            $tafseerResult = TafseerResult::where('competition_id', $competitionId)->first();
-            if (!$tafseerResult || !$tafseerResult->done) {
-                return redirect()->route('tafseer.start', $competitionId)
-                    ->with('warning', 'يجب إكمال التفسير أولاً.');
-            }
+                ->with('warning', 'يجب إكمال جميع الأسئلة.');
         }
 
         $scores = ScoreCalculator::final($competition);
 
-        $questions = $competition->studentQuestionSelections()->with([
-            'judgeEvaluations.element',
-            'judgeEvaluations.judge',
-            'question'
-        ])->get();
+        $questions = $competition->studentQuestionSelections()
+            ->with([
+                'judgeEvaluations.element',
+                'judgeEvaluations.judge',
+                'question',
+            ])
+            ->get();
 
         $judge = auth()->user();
-        $isJudgeLeader = $judge->isCommitteeLeader($competition->stage_id);
-        $tafseerResult = TafseerResult::where('competition_id', $competitionId)->first();
+
+        $isJudgeLeader = $judge->isCommitteeLeader($committee->id);
 
         return view('student.final_result', [
+            'level' => $level,
             'competition' => $competition,
             'student' => $student,
             'questions' => $questions,
             'scores' => $scores,
             'isJudgeLeader' => $isJudgeLeader,
-            'tafseerResult' => $tafseerResult
         ]);
     }
 
@@ -94,14 +142,11 @@ class CompetitionResultController extends Controller
 
         $competition->update([
             'student_status' => 'finish_competition',
-            'final_score' => $scores['total'],
-            'memorization_score' => $scores['memorization'],
-            'tafseer_score' => $scores['tafseer'] ?? 0,
+            'final_score' => $scores['total']
         ]);
 
         return redirect()->back()->with('success', 'تم اعتماد النتيجة النهائية.');
     }
-
 
     public function unFinishStudent(Competition $competition)
     {

@@ -15,7 +15,7 @@
                 </div>
             @endif
 
-            <form action="{{ route('student.store') }}" method="POST" class="space-y-6" x-data="{ gender: '{{ old('gender', 'male') }}', level: '{{ old('level', 'حفظ') }}' }">
+            <form action="{{ route('student.store') }}" method="POST" class="space-y-6" x-data="{ gender: '{{ old('gender', 'male') }}', level: '{{ old('level', 'المستوى الأول') }}' }">
     @csrf
 
     {{-- Required Fields Section --}}
@@ -87,17 +87,17 @@
                 <div class="flex gap-2">
                     <button 
                         type="button"
-                        @click="level = 'حفظ'"
-                        :class="level === 'حفظ' ? 'bg-purple-600 text-white border-purple-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'"
+                        @click="level = 'المستوى الأول'"
+                        :class="level === 'المستوى الأول' ? 'bg-purple-600 text-white border-purple-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'"
                         class="flex-1 px-4 py-3 border-2 rounded-lg font-semibold transition-all duration-200">
-                        حفظ
+                        المستوى الأول
                     </button>
                     <button 
                         type="button"
-                        @click="level = 'حفظ وتفسير'"
-                        :class="level === 'حفظ وتفسير' ? 'bg-purple-600 text-white border-purple-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'"
+                        @click="level = 'المستوى الثاني'"
+                        :class="level === 'المستوى الثاني' ? 'bg-purple-600 text-white border-purple-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'"
                         class="flex-1 px-4 py-3 border-2 rounded-lg font-semibold transition-all duration-200">
-                        حفظ وتفسير
+                        المستوى الثاني
                     </button>
                 </div>
             </div>
@@ -204,7 +204,7 @@
 
         <button type="submit" 
                 class="px-6 py-2.5 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 shadow-md hover:shadow-lg transition-all duration-200">
-            حفظ المتسابق
+            المستوى الأول المتسابق
         </button>
     </div>
 

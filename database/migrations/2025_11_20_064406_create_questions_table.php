@@ -14,8 +14,11 @@ return new class extends Migration
         Schema::create('questions', function (Blueprint $table) {
             $table->id();
             $table->foreignId('questionset_id')->nullable();
-            $table->longText('content');
-            $table->enum('difficulties', ['القوية','المتوسطة','السهلة'])->default('السهلة');
+            $table->string('riwaya',50);
+            $table->string('juz',10);//[الاول، الثاني]
+            $table->integer('quran_surat_id',10);
+            $table->smallInteger('aya_from');
+            $table->smallInteger('aya_to');
         });
     }
 
