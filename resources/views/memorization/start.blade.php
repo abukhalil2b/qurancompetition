@@ -91,7 +91,7 @@
             <div class="w-full mb-4">
 
                 <div
-                    class="bg-indigo-900 h-11 px-6
+                    class="bg-[#161526] h-11 px-6
                            flex items-center justify-center
                            rounded-xl
                            font-black text-lg
