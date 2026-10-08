@@ -226,36 +226,27 @@
                             من الآية
                         </label>
 
-                        <select
-                            name="aya_from"
-                            id="aya_from"
-                            x-model="selectedAyaFrom"
-                            @change="validateAyaRange()"
-                            :disabled="loading || !selectedSurat"
-                            class="w-full border border-gray-300 rounded-lg px-4 py-3
-                                   disabled:bg-gray-100 disabled:text-gray-400
-                                   focus:outline-none focus:border-green-500
-                                   focus:ring-1 focus:ring-green-500"
-                            required
-                        >
+<select name="aya_from"
+    id="aya_from"
+    x-model="selectedAyaFrom"
+    @change="validateAyaRange()"
+    :disabled="loading || !selectedSurat"
+    class="w-full border border-gray-300 rounded-lg px-4 py-3
+           disabled:bg-gray-100 disabled:text-gray-400
+           focus:outline-none focus:border-green-500
+           focus:ring-1 focus:ring-green-500"
+    required
+>
+    <option value="">اختر الآية</option>
 
-                            <option value="">
-                                اختر الآية
-                            </option>
-
-                            <template
-                                x-for="aya in ayas"
-                                :key="aya.id"
-                            >
-
-                                <option
-                                    :value="aya.number"
-                                    x-text="'الآية ' + aya.number"
-                                ></option>
-
-                            </template>
-
-                        </select>
+    <template x-for="aya in ayas" :key="aya.id">
+        <option
+            :value="aya.number"
+            x-text="'الآية ' + aya.number"
+            :selected="String(aya.number) === String(selectedAyaFrom)"
+        ></option>
+    </template>
+</select>
 
                         @error('aya_from')
                             <p class="mt-1 text-sm text-red-600">
@@ -277,34 +268,26 @@
                         </label>
 
                         <select
-                            name="aya_to"
-                            id="aya_to"
-                            x-model="selectedAyaTo"
-                            :disabled="loading || !selectedSurat || !selectedAyaFrom"
-                            class="w-full border border-gray-300 rounded-lg px-4 py-3
-                                   disabled:bg-gray-100 disabled:text-gray-400
-                                   focus:outline-none focus:border-green-500
-                                   focus:ring-1 focus:ring-green-500"
-                            required
-                        >
+    name="aya_to"
+    id="aya_to"
+    x-model="selectedAyaTo"
+    :disabled="loading || !selectedSurat || !selectedAyaFrom"
+    class="w-full border border-gray-300 rounded-lg px-4 py-3
+           disabled:bg-gray-100 disabled:text-gray-400
+           focus:outline-none focus:border-green-500
+           focus:ring-1 focus:ring-green-500"
+    required
+>
+    <option value="">اختر الآية</option>
 
-                            <option value="">
-                                اختر الآية
-                            </option>
-
-                            <template
-                                x-for="aya in availableToAyas"
-                                :key="aya.id"
-                            >
-
-                                <option
-                                    :value="aya.number"
-                                    x-text="'الآية ' + aya.number"
-                                ></option>
-
-                            </template>
-
-                        </select>
+    <template x-for="aya in availableToAyas" :key="aya.id">
+        <option
+            :value="aya.number"
+            x-text="'الآية ' + aya.number"
+            :selected="String(aya.number) === String(selectedAyaTo)"
+        ></option>
+    </template>
+</select>
 
                         @error('aya_to')
                             <p class="mt-1 text-sm text-red-600">

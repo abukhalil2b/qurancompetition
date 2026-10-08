@@ -48,6 +48,7 @@
                                 <h2 class="text-lg font-bold text-slate-800">
                                     {{ $center?->title ?? 'بدون مركز' }}
                                 </h2>
+                                <p class="py-1 text-xs text-gray-600"> {{ $center?->period }}</p>
                                 <p class="text-xs text-slate-500 mt-0.5">
                                     {{ $centerCommittees->count() }} لجنة
                                     @if ($center)
