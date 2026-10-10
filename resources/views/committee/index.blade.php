@@ -203,7 +203,7 @@
                                                     <form
                                                         action="{{ route('committee.remove_user', [$committee, $user]) }}"
                                                         method="POST"
-                                                        onsubmit="return confirm('هل أنت متأكد من حذف هذا المستخدم من اللجنة؟');">
+                                                        onsubmit="return confirm('هل أنت متأكد من إزالة هذا المستخدم من اللجنة؟');">
                                                         @csrf
                                                         @method('DELETE')
                                                         <button type="submit"

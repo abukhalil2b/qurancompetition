@@ -4,12 +4,7 @@
     <meta charset="UTF-8">
     <title>المستخدمون</title>
 
-    <!-- Tailwind -->
-    <script src="https://cdn.tailwindcss.com"></script>
-
-    <!-- Alpine -->
-    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
-
+  @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         body {
             font-family: "Tajawal", sans-serif;

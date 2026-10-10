@@ -77,7 +77,7 @@
         {{-- LEFT SIDE: Question / Quran --}}
         <div
             class="w-full md:w-2/5
-                   bg-indigo-700 text-white
+                   bg-[#161526] text-white
                    p-4 md:p-6
                    flex flex-col
                    overflow-y-auto
@@ -91,7 +91,7 @@
             <div class="w-full mb-4">
 
                 <div
-                    class="bg-[#161526] h-11 px-6
+                    class="bg-indigo-900/50 border border-indigo-500 h-11 px-6
                            flex items-center justify-center
                            rounded-xl
                            font-black text-lg
@@ -149,10 +149,9 @@
 
             {{-- Current Total Deduction --}}
             <div
-                class="bg-indigo-900/50
+                class="bg-indigo-900/50 border border-indigo-500
                        px-6 py-4
                        rounded-2xl
-                       border border-indigo-500
                        w-full
                        max-w-xs
                        text-center">

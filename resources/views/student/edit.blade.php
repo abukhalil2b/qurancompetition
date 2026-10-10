@@ -7,21 +7,9 @@
                 تعديل بيانات المتسابق: <span class="text-blue-600">{{ $student->name }}</span>
             </h2>
 
-            {{-- الأخطاء --}}
-            @if ($errors->any())
-                <div class="bg-red-100 text-red-700 p-3 rounded mb-4">
-                    <ul class="list-disc mr-4">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
-
             <form action="{{ route('student.update', $student) }}" method="POST" class="space-y-6" x-data="{
                 gender: '{{ old('gender', $student->gender) }}',
-                level: '{{ old('level', $student->level) }}',
-                active: {{ old('active', $student->active) ? '1' : '0' }}
+                level: '{{ old('level', $student->level) }}'
             }">
                 @csrf
                 @method('PUT')
@@ -83,17 +71,17 @@
                             </label>
                             <input type="hidden" name="level" x-model="level">
                             <div class="flex gap-2">
-                                <button type="button" @click="level = 'حفظ'"
-                                    :class="level === 'حفظ' ? 'bg-green-600 text-white border-green-600' :
+                                <button type="button" @click="level = '1'"
+                                    :class="level === '1' ? 'bg-green-600 text-white border-green-600' :
                                         'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'"
                                     class="flex-1 px-4 py-3 border-2 rounded-lg font-semibold transition-all duration-200">
-                                    حفظ
+                                    المستوى الأول
                                 </button>
-                                <button type="button" @click="level = 'حفظ وتفسير'"
-                                    :class="level === 'حفظ وتفسير' ? 'bg-green-600 text-white border-green-600' :
+                                <button type="button" @click="level = '2'"
+                                    :class="level === '2' ? 'bg-green-600 text-white border-green-600' :
                                         'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'"
                                     class="flex-1 px-4 py-3 border-2 rounded-lg font-semibold transition-all duration-200">
-                                    حفظ وتفسير
+                                       المستوى الثاني
                                 </button>
                             </div>
                         </div>
@@ -107,16 +95,6 @@
                     </h3>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {{-- Date of Birth --}}
-                        <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">
-                                تاريخ الميلاد
-                            </label>
-                            <input type="date" name="dob"
-                                value="{{ old('dob', $student->dob ? \Carbon\Carbon::parse($student->dob)->format('Y-m-d') : '') }}"
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors">
-                        </div>
-
                         {{-- Phone --}}
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-2">
@@ -137,60 +115,6 @@
                                 value="{{ old('national_id', $student->national_id) }}" placeholder="حتى 11 رقم"
                                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors">
                             <p class="text-xs text-gray-500 mt-1">الحد الأقصى 11 رقم</p>
-                        </div>
-
-                       
-
-                        {{-- State --}}
-                        <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">
-                                المحافظة
-                            </label>
-                            <input type="text" name="state" value="{{ old('state', $student->state) }}"
-                                placeholder="أدخل المحافظة"
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors">
-                        </div>
-
-                        {{-- Wilaya --}}
-                        <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">
-                                الولاية
-                            </label>
-                            <input type="text" name="wilaya" value="{{ old('wilaya', $student->wilaya) }}"
-                                placeholder="أدخل الولاية"
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors">
-                        </div>
-
-                        {{-- Qarya --}}
-                        <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">
-                                القرية
-                            </label>
-                            <input type="text" name="qarya" value="{{ old('qarya', $student->qarya) }}"
-                                placeholder="أدخل القرية"
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors">
-                        </div>
-
-                        {{-- Active Status --}}
-                        <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">
-                                حالة المتسابق
-                            </label>
-                            <input type="hidden" name="active" x-model="active">
-                            <div class="flex gap-2">
-                                <button type="button" @click="active = 1"
-                                    :class="active == 1 ? 'bg-green-600 text-white border-green-600' :
-                                        'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'"
-                                    class="flex-1 px-4 py-2 border-2 rounded-lg font-semibold transition-all duration-200">
-                                    نشط
-                                </button>
-                                <button type="button" @click="active = 0"
-                                    :class="active == 0 ? 'bg-red-600 text-white border-red-600' :
-                                        'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'"
-                                    class="flex-1 px-4 py-2 border-2 rounded-lg font-semibold transition-all duration-200">
-                                    معطل
-                                </button>
-                            </div>
                         </div>
 
                         {{-- Notes --}}

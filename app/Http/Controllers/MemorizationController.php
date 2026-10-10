@@ -94,6 +94,11 @@ class MemorizationController extends Controller
         ]);
 
         $judge = Auth::user();
+
+        if($judge->user_type !='judge'){
+            abort(403,'حسابك غير مصرح له بالتقييم');
+        }
+
         $selection = StudentQuestionSelection::findOrFail($validated['student_question_selection_id']);
         $competition = Competition::findOrFail($selection->competition_id);
         // return $selection;

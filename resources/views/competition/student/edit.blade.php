@@ -46,6 +46,10 @@
                     <dd class="font-semibold text-slate-800">{{ $competition->stage->title ?? '—' }}</dd>
                 </div>
                 <div>
+                    <dt class="text-slate-500">رقم اللجنة</dt>
+                    <dd class="font-semibold text-slate-800">{{ $competition->committee_id }}</dd>
+                </div>
+                <div>
                     <dt class="text-slate-500">باقة الأسئلة</dt>
                     <dd class="font-semibold text-slate-800">{{ $competition->questionset->title ?? '—' }}</dd>
                 </div>
@@ -85,6 +89,7 @@
                                 @foreach ($group as $committee)
                                     <option value="{{ $committee->id }}"
                                         @selected((int) old('committee_id', $competition->committee_id) === $committee->id)>
+                                        {{ $committee->id }}
                                         {{ $committee->title }}
                                         ({{ __($committee->gender) }})
                                         {{ $committee->active ? '• نشطة' : '• غير نشطة' }}
@@ -106,15 +111,33 @@
                             $statuses = [
                                 'registration'         => 'مسجل',
                                 'present'              => 'حاضر',
-                                'with_committee'       => 'مع اللجنة',
                                 'withdraw'             => 'منسحب',
-                                'waiting_finalization' => 'بانتظار الإنهاء',
-                                'finish_competition'   => 'أنهى المسابقة',
                             ];
                         @endphp
                         @foreach ($statuses as $value => $label)
                             <option value="{{ $value }}"
                                 @selected(old('student_status', $competition->student_status) === $value)>
+                                {{ $label }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">
+                        المستوى  
+                    </label>
+                    <select name="level"
+                            class="w-full border-gray-200 rounded-lg p-2.5 focus:border-blue-500 focus:ring-blue-500">
+                        @php
+                            $levels = [
+                                '1'         => 'المستوى الأول',
+                                '2'              => 'المستوى الثاني',
+                            ];
+                        @endphp
+                        @foreach ($levels as $value => $label)
+                            <option value="{{ $value }}"
+                                @selected(old('level', $competition->level) === $value)>
                                 {{ $label }}
                             </option>
                         @endforeach

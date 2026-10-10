@@ -17,14 +17,15 @@ use Illuminate\Validation\Rule;
 
 class StudentController extends Controller
 {
-    public function index()
+    public function attendanceeIndex()
     {
         $user = auth()->user();
-        
+
         abort_unless(($user->user_type == 'organizer'), 403, 'هذه الصفحة مخصصة لمنظم المسابقة.');
 
         // 1. Active stage
         $stage = Stage::where('active', 1)->latest('id')->first();
+        
         abort_unless($stage, 403, 'لا توجد مرحلة نشطة حالياً.');
 
         // 2. User's active committee for that stage
@@ -44,15 +45,18 @@ class StudentController extends Controller
         // 4. Competitions (renamed from $students)
         $competitions = Competition::with('student')
             ->where('stage_id', $stage->id)
-            ->whereRelation('committee','center_id', $center->id)
+            ->whereRelation('committee', 'center_id', $center->id)
             ->where('committee_id', $committee->id)
             ->get();
 
-            $judges = CommitteeUser::with('user')
-           ->where('committee_id',$committee->id)
-           ->whereHas('user',function($query){$query->where('users.user_type','judge');})
-           ->get();
-        return view('student.index', compact(
+        $judges = CommitteeUser::with('user')
+            ->where('committee_id', $committee->id)
+            ->whereHas('user', function ($query) {
+                $query->where('users.user_type', 'judge');
+            })
+            ->get();
+
+        return view('student.attendance_index', compact(
             'stage',
             'center',
             'committee',
@@ -79,7 +83,7 @@ class StudentController extends Controller
             ->where('stage_id', $stage->id)
             ->latest('id')
             ->first();
-            
+
         abort_unless($committee, 403, 'لا توجد لجنة نشطة مرتبطة بحسابك في هذه المرحلة.');
 
         // 3. Center
@@ -159,6 +163,7 @@ class StudentController extends Controller
             ])
                 ->where('competition_id', $competition->id)
                 ->orderBy('position')
+                ->limit(1)
                 ->get();
 
             return view('student.questionset_selected', compact(
@@ -186,7 +191,7 @@ class StudentController extends Controller
 
         $questionsets = Questionset::where('level', $competition->level)
             ->whereNotIn('id', $usedQuestionsetIds)
-            ->where('selected',0)
+            ->where('selected', 0)
             ->withCount('questions')
             ->get();
 
@@ -239,7 +244,7 @@ class StudentController extends Controller
                     ->lockForUpdate()
                     ->firstOrFail();
 
-                //Does any competition other than the current competition already have this questionset?
+                // Does any competition other than the current competition already have this questionset?
                 $alreadySelected = Competition::where('questionset_id', $freshQuestionset->id)
                     ->where('id', '!=', $competition->id)
                     ->exists();
@@ -261,9 +266,9 @@ class StudentController extends Controller
                     StudentQuestionSelection::create([
                         'competition_id' => $competition->id,
                         'question_id' => $question->id,
-                        'level' => $freshQuestionset->level,   
+                        'level' => $freshQuestionset->level,
                         'position' => $index + 1,
-                        'is_passed'=>1
+                        'is_passed' => 1,
                     ]);
                 }
 
@@ -283,10 +288,25 @@ class StudentController extends Controller
             ->with('success', 'تم اختيار باقة الأسئلة بنجاح.');
     }
 
+    public function index()
+    {
+        $user = auth()->user();
+
+        abort_unless(($user->user_type == 'admin'), 403, 'هذه الصفحة مخصصة الادارة.');
+
+        $students = Student::latest('id')->get();
+
+        return view('student.index', compact('students'));
+    }
+
     // create form
     public function create()
     {
-        $levels = ['المستوى الأول', 'المستوى الثاني'];
+        $user = auth()->user();
+
+        abort_unless(($user->user_type == 'admin'), 403, 'هذه الصفحة مخصصة الادارة.');
+
+        $levels = [1, 2];
 
         return view('student.create', compact('levels'));
     }
@@ -294,7 +314,7 @@ class StudentController extends Controller
     // store student
     public function store(Request $request)
     {
-        $levels = ['المستوى الأول', 'المستوى الثاني'];
+        $levels = [1, 2];
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -302,12 +322,8 @@ class StudentController extends Controller
             'phone' => 'nullable|string|size:8|unique:students,phone',
             'national_id' => 'nullable|string|max:11|unique:students,national_id',
             'nationality' => 'required|string|max:255',
-            'dob' => 'nullable|date',
-            'state' => 'nullable|string|max:255',
-            'wilaya' => 'nullable|string|max:255',
-            'qarya' => 'nullable|string|max:255',
-            'level' => ['nullable', 'string', 'max:255', Rule::in($levels)],
-            'registration_date' => 'nullable|date',
+            'level' => ['required', 'string', 'max:1', Rule::in($levels)],
+            'note' => 'nullable|string',
         ]);
 
         Student::create($validated);
@@ -341,19 +357,15 @@ class StudentController extends Controller
     // update student
     public function update(Request $request, Student $student)
     {
+        $levels = [1, 2];
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'gender' => 'required|in:male,female',
             'phone' => 'nullable|string|size:8|unique:students,phone,'.$student->id,
             'national_id' => 'nullable|string|max:11|unique:students,national_id,'.$student->id,
             'nationality' => 'nullable|string|max:255',
-            'dob' => 'nullable|date',
-            'state' => 'nullable|string|max:255',
-            'wilaya' => 'nullable|string|max:255',
-            'qarya' => 'nullable|string|max:255',
-            'level' => 'required|string|max:255',
-            'registration_date' => 'nullable|date',
-            'active' => 'required|boolean',
+            'level' => ['required', 'string', 'max:1', Rule::in($levels)],
             'note' => 'nullable|string',
         ]);
 

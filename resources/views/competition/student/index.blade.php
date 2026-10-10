@@ -11,8 +11,8 @@
                         اللجان
                     </a>
 
-                   
-                  
+
+
                 </div>
 
                 <h1 class="text-2xl font-bold text-slate-800">
@@ -151,6 +151,11 @@
                             متسابق
                         </p>
 
+                        <select name="committee_id">
+                            @foreach ($committees as $committee)
+                                <option value="{{ $committee->id }}">{{ $committee->title }}</option>
+                            @endforeach
+                        </select>
                         <button type="submit" :disabled="selected.length === 0"
                             class="inline-flex items-center justify-center gap-2
                                    px-5 py-2.5 rounded-lg
@@ -183,13 +188,18 @@
             <div class="px-6 py-4 bg-slate-50 border-b border-slate-200">
 
                 <h2 class="font-bold text-slate-800">
-                        المتسابقون المسجلون في {{ $stage->title }}. ({{ $competitions->count() }})
+                    المتسابقون المسجلون في {{ $stage->title }}. ({{ $competitions->count() }})
                 </h2>
 
-                <p class="text-xs text-slate-500 mt-1">
-           {{ $center->title }} / {{ $center->period }}
+                <p class="py-2 text-xs text-slate-500 mt-1">
+                    {{ $center->title }} / {{ $center->period }}
                 </p>
 
+                @foreach ($committees as $committee)
+                    <a class="bg-blue-200 text-blue-800 rounded text-xs px-1 m-2" href="{{ route('competition.student.print', ['center' => $center, 'committee' => $committee]) }}">
+                        طباعة بيانات المتسابقين {{ $committee->title }}
+                    </a>
+                @endforeach
             </div>
 
 
@@ -274,7 +284,8 @@
 
                                     </td>
                                     <td>
-                                        <a href="{{ route('competition.student.edit', $competition->id) }}" class="font-bold">
+                                        <a href="{{ route('competition.student.edit', $competition->id) }}"
+                                            class="font-bold">
                                             تعديل ونقل
                                         </a>
                                     </td>

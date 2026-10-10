@@ -53,8 +53,7 @@
                     </button>
                 </form>
 
-                <a href="/"
-                    class="flex items-center justify-center gap-2 w-full px-4 py-3 bg-white text-purple-600 font-bold text-lg mt-2">
+                <a href="/" class="flex items-center justify-center gap-2 w-full px-4 py-3 bg-white text-purple-600 font-bold text-lg mt-2">
                     مؤسسة الشيخ مستهيل للقرآن الكريم وقراءاته
                 </a>
 
@@ -150,6 +149,19 @@
                             </a>
                         </li>
 
+                        <li class="menu-item">
+                            <a href="{{ route('student.index') }}"
+                                class="flex items-center px-3 py-3 rounded-lg hover:bg-gray-100 text-gray-700 hover:text-blue-600 transition-colors">
+                                <svg class="w-5 h-5 ml-3" fill="currentColor" viewBox="0 0 24 24">
+                                    <path opacity="0.5"
+                                        d="M12 12c2.2091 0 4-1.7909 4-4s-1.7909-4-4-4-4 1.7909-4 4 1.7909 4 4 4z"
+                                        fill="currentColor" />
+                                    <path d="M4 20c0-3.3137 3.5817-6 8-6s8 2.6863 8 6v1H4v-1z" fill="currentColor" />
+                                </svg>
+                                <span> المتسابقون </span>
+                            </a>
+                        </li>
+
                         <li class="menu-header text-xs uppercase text-gray-500 font-semibold px-2 py-2 mt-4">
                             الأسئلة
                         </li>
@@ -221,7 +233,7 @@
                         </li>
 
                         <li class="menu-item">
-                            <a href="{{ route('student.index') }}"
+                            <a href="{{ route('student.attendance_index') }}"
                                 class="flex items-center px-3 py-3 rounded-lg hover:bg-gray-100 text-gray-700 hover:text-blue-600 transition-colors">
                                 <svg class="w-5 h-5 ml-3" fill="currentColor" viewBox="0 0 24 24">
                                     <path opacity="0.5"

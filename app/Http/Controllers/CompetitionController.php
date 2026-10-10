@@ -32,24 +32,23 @@ class CompetitionController extends Controller
     public function update(Request $request, Competition $competition)
     {
         $validated = $request->validate([
+            'level'=>'required',
             'committee_id' => ['nullable', Rule::exists('committees', 'id')],
             'student_status' => [
                 'required',
                 Rule::in([
                     'registration',
                     'present',
-                    'with_committee',
                     'withdraw',
-                    'waiting_finalization',
-                    'finish_competition',
                 ]),
             ],
         ]);
 
-        // Derive center_id from the selected committee
+        // Derive center_id, stage_id from the selected committee
         if (! empty($validated['committee_id'])) {
             $committee = Committee::find($validated['committee_id']);
             $validated['center_id'] = $committee->center_id;
+            $validated['stage_id'] = $committee->stage_id;
         }
 
         // Business rules ------------------------------------------------
@@ -84,7 +83,7 @@ class CompetitionController extends Controller
             ->whereDoesntHave('competitions', function ($query) use ($stage) {
                 $query->where('stage_id', $stage->id);
             })
-            ->orderBy('name')
+            ->orderBy('id')
             ->get(['id', 'name', 'level', 'phone']);
 
         $competitions = Competition::with([
@@ -93,7 +92,7 @@ class CompetitionController extends Controller
         ])
             ->where('center_id', $center->id)
             ->where('stage_id', $stage->id)
-            ->orderBy('position')
+            ->orderBy('id')
             ->get([
                 'id',
                 'student_id',
@@ -103,10 +102,36 @@ class CompetitionController extends Controller
                 'student_status',
             ]);
 
+        $committees = Committee::where('center_id', $center->id)->get();
+
         return view('competition.student.index', compact(
+            'committees',
             'center',
             'stage',
             'unregisteredStudents',
+            'competitions'
+        ));
+    }
+
+    public function print(Center $center, Committee $committee)
+    {
+        $stage = Stage::whereActive(true)->latest('id')->first();
+
+        if (! $stage) {
+            abort(403, 'لم يتم تحديد مرحلة التصفيات');
+        }
+
+        $competitions = Competition::with(['student:id,name,phone', 'committee:id,title'])
+            ->where('center_id', $center->id)
+            ->where('stage_id', $stage->id)
+            ->where('committee_id', $committee->id)
+            ->orderBy('id')
+            ->get(['id', 'student_id', 'committee_id', 'level', 'position', 'student_status']);
+
+
+        return view('competition.student.print', compact(
+            'center',
+            'stage',
             'competitions'
         ));
     }
@@ -120,6 +145,7 @@ class CompetitionController extends Controller
         }
 
         $request->validate([
+            'committee_id' => 'required',
             'student_ids' => ['required', 'array', 'min:1'],
             'student_ids.*' => ['integer', 'exists:students,id'],
         ]);
@@ -131,6 +157,7 @@ class CompetitionController extends Controller
         $now = now();
 
         $rows = $students->map(fn ($student) => [
+            'committee_id' => $request->committee_id,
             'center_id' => $center->id,
             'stage_id' => $stage->id,
             'student_id' => $student->id,
@@ -167,7 +194,7 @@ class CompetitionController extends Controller
         $competition->update(['student_status' => 'present', 'present_at' => now()]);
 
         return redirect()
-            ->route('student.index')
+            ->route('student.attendance_index')
             ->with('success', 'تم تسجيل حضور المتسابق بنجاح');
     }
 }

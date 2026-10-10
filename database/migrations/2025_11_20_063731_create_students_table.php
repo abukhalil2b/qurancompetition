@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('phone', 8)->nullable()->unique();// local phone number = 8 digit
             $table->string('national_id', 11)->nullable()->unique();// max digit = 11
             $table->string('nationality')->default('عماني');
-            $table->boolean('level')->default(1);
+            $table->unsignedTinyInteger('level')->default(1);
             $table->string('note')->nullable();
             $table->timestamps();
         });

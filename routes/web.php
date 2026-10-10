@@ -52,10 +52,11 @@ Route::middleware(['auth'])->group(function () {
 
 Route::middleware(['auth'])->group(function () {
     // Students
-    Route::get('student/index', [StudentController::class, 'index'])->name('student.index');
+    Route::get('student/attendance_index', [StudentController::class, 'attendanceeIndex'])->name('student.attendance_index');
     Route::get('student/present_index', [StudentController::class, 'presentIndex'])->name('student.present_index');
     Route::get('student/choose_questionset/{competition}', [StudentController::class, 'chooseQuestionset'])->name('student.choose_questionset');
     Route::get('student/save_questionset/{competition}/{questionset}', [StudentController::class, 'saveQuestionset'])->name('student.save_questionset');
+    Route::get('student/index', [StudentController::class, 'index'])->name('student.index');
     Route::get('student/create', [StudentController::class, 'create'])->name('student.create');
     Route::post('student/store', [StudentController::class, 'store'])->name('student.store');
     Route::get('student/show/{competition}', [StudentController::class, 'show'])
@@ -68,6 +69,9 @@ Route::middleware(['auth'])->group(function () {
 Route::middleware(['auth'])->group(function () {
     Route::get('competition/student/index/{center}', [CompetitionController::class, 'index'])
         ->name('competition.student.index');
+
+        Route::get('competition/student/print/{center}/{committee}', [CompetitionController::class, 'print'])
+        ->name('competition.student.print');
 
     Route::get('competition/student/edit/{competition}', [CompetitionController::class, 'edit'])
         ->name('competition.student.edit');

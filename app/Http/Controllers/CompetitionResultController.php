@@ -9,13 +9,12 @@ use App\Models\Competition; // Ensure this import is correct
 use App\Models\StudentQuestionSelection;
 use App\Services\ScoreCalculator;
 use Illuminate\Http\Request;
-use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Str;
+use Maatwebsite\Excel\Facades\Excel;
 
 class CompetitionResultController extends Controller
 {
-   
-public function index(Request $request)
+    public function index(Request $request)
     {
         $user = auth()->user();
 
@@ -26,6 +25,7 @@ public function index(Request $request)
         // Handle Excel export with dynamic filename
         if ($request->has('export')) {
             $filename = $this->generateExportFilename($request);
+
             return Excel::download(new CompetitionResultsExport($request), $filename);
         }
 
@@ -45,7 +45,7 @@ public function index(Request $request)
             ->orderByDesc('final_score')
             ->get();
 
-            $centers = Center::all();
+        $centers = Center::all();
 
         return view('finished_student_list', compact('competitions', 'centers'));
     }
@@ -81,7 +81,7 @@ public function index(Request $request)
         // Clean double underscores or trailing separators
         $cleanName = implode('_', array_filter($parts));
 
-        return $cleanName . '.xlsx';
+        return $cleanName.'.xlsx';
     }
 
     /**
@@ -89,6 +89,13 @@ public function index(Request $request)
      */
     public function show($competitionId)
     {
+
+        $user = auth()->user();
+
+        if (! in_array($user->user_type, ['judge', 'admin'])) {
+            abort(403, 'غير مصرح لك الدخول لهذه الصفحة');
+        }
+
         $competition = Competition::with('student')->findOrFail($competitionId);
 
         $committee = Committee::find($competition->committee_id);
@@ -105,8 +112,7 @@ public function index(Request $request)
             ->where('done', false)->orderBy('id')->first();
 
         if ($unfinished) {
-            return redirect()->route('memorization.start', $unfinished->id)
-                ->with('warning', 'يجب إكمال جميع الأسئلة.');
+            return back()->with('warning', 'يجب إكمال جميع الأسئلة.');
         }
 
         $scores = ScoreCalculator::final($competition);
@@ -138,11 +144,17 @@ public function index(Request $request)
      */
     public function finalize(Request $request, Competition $competition)
     {
+        $user = auth()->user();
+
+        if (! in_array($user->user_type, ['judge'])) {
+            abort(403, 'غير مصرح لك اعتماد النتيجة النهائية');
+        }
+
         $scores = ScoreCalculator::final($competition);
 
         $competition->update([
             'student_status' => 'finish_competition',
-            'final_score' => $scores['total']
+            'final_score' => $scores['total'],
         ]);
 
         return redirect()->back()->with('success', 'تم اعتماد النتيجة النهائية.');
