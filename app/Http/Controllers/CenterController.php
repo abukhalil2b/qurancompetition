@@ -45,15 +45,15 @@ class CenterController extends Controller
             },
         ]);
 
-        $committeeIds = Committee::where('center_id',$center->id)->pluck('id');
+        $committeeIds = Committee::where('center_id', $center->id)->pluck('id');
 
-            $competitions = Competition::with(['student', 'questionset'])
+        $competitions = Competition::with(['student', 'questionset'])
             ->where('center_id', $center->id)
             ->whereIn('committee_id', $committeeIds)
             ->orderBy('present_at')
             ->get();
 
-        return view('center.show', compact('center','competitions'));
+        return view('center.show', compact('center', 'competitions'));
     }
 
     /**
