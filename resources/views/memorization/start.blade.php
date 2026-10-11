@@ -71,61 +71,55 @@
 </head>
 
 <body class="antialiased overflow-hidden">
-
     <div class="h-screen flex flex-col md:flex-row" x-data="evaluationPage({{ $evaluationElements }}, {{ $oldScores->toJson() }})">
-
         {{-- LEFT SIDE: Question / Quran --}}
-        <div
-            class="w-full md:w-2/5
-                   bg-[#161526] text-white
-                   p-4 md:p-6
-                   flex flex-col
-                   overflow-y-auto
-                   justify-start
-                   items-center
-                   text-center
-                   shadow-2xl
-                   z-10">
+        <div :class="isDarkTheme ? 'bg-[#161526] text-white' : 'bg-white text-gray-900'" 
+             class="w-full md:w-2/5 p-4 md:p-6 flex flex-col overflow-y-auto justify-start items-center text-center shadow-2xl z-10 transition-colors duration-300">
+
+            {{-- Background Toggle Button --}}
+            <div class="w-full flex justify-end mb-2">
+                <button type="button" @click="toggleBackground()" 
+                        class="px-3 py-1 text-xs font-bold rounded-lg border transition"
+                        :class="isDarkTheme ? 'border-indigo-400/40 text-indigo-200 hover:bg-white/10' : 'border-gray-300 text-gray-700 hover:bg-gray-100'">
+                    تغيير لون الخلفية
+                </button>
+            </div>
 
             {{-- Question Header --}}
             <div class="w-full mb-4">
-
-                <div
-                    class="bg-indigo-900/50 border border-indigo-500 h-11 px-6
-                           flex items-center justify-center
-                           rounded-xl
-                           font-black text-lg
-                           mx-auto
-                           mb-3
-                           shadow-inner
-                           w-fit">
+                <div class="border h-11 px-6 flex items-center justify-center rounded-xl font-black text-lg mx-auto mb-3 shadow-inner w-fit"
+                     :class="isDarkTheme ? 'bg-indigo-900/50 border-indigo-500 text-white' : 'bg-indigo-50 border-indigo-200 text-indigo-900'">
                     السؤال: {{ $studentQuestionSelection->position }}
                 </div>
+                <h2 class="text-xl md:text-2xl font-bold leading-relaxed">
+                    {{ $studentQuestionSelection->question->surat->title }}
+                </h2>
                 <div class="flex gap-2 justify-center items-center">
-
-                    <h2 class="text-xl md:text-2xl font-bold leading-relaxed">
-                        {{ $studentQuestionSelection->question->surat->title }}
-                    </h2>
-
-                    <div class="mt-1 text-indigo-200 text-sm">
+                    <div class="mt-1 text-sm" :class="isDarkTheme ? 'text-indigo-200' : 'text-gray-600'">
                         من الآية
-                        <span class="font-bold text-white">
+                        <span class="font-bold" :class="isDarkTheme ? 'text-white' : 'text-gray-900'">
                             {{ $studentQuestionSelection->question->aya_from }}
                         </span>
                         إلى الآية
-                        <span class="font-bold text-white">
+                        <span class="font-bold" :class="isDarkTheme ? 'text-white' : 'text-gray-900'">
                             {{ $studentQuestionSelection->question->aya_to }}
+                        </span>
+                        رقم الصفحة
+                        <span class="font-bold" :class="isDarkTheme ? 'text-white' : 'text-gray-900'">
+                            {{ $firstQuranAya->page_number }}
                         </span>
                     </div>
                 </div>
-                <div class="text-md">{{ $studentQuestionSelection->question->riwaya }}</div>
+                <div class="text-md" :class="isDarkTheme ? 'text-white' : 'text-gray-700'">{{ $studentQuestionSelection->question->riwaya }}</div>
             </div>
 
             {{-- Quran Text --}}
             <div class="w-full mb-5">
-                <div class="bg-white/10 border border-indigo-400/40 rounded-2xl p-4 md:p-5">
+                <div class="border rounded-2xl p-4 md:p-5"
+                     :class="isDarkTheme ? 'bg-white/10 border-indigo-400/40' : 'bg-gray-50 border-gray-200'">
 
-                    <div class="font-quran text-white leading-[2.8] text-xl md:text-2xl text-justify">
+                    <div class="font-quran leading-[2.8] text-xl md:text-2xl text-justify"
+                         :class="isDarkTheme ? 'text-white' : 'text-gray-900'">
 
                         @foreach ($quranAyas as $ayah)
                             <span>
@@ -133,9 +127,9 @@
 
                                 <span
                                     class="inline-flex items-center justify-center
-                               w-7 h-7 mx-1 rounded-full
-                               bg-white text-indigo-700
-                               text-xs font-bold align-middle">
+                                           w-7 h-7 mx-1 rounded-full
+                                           text-xs font-bold align-middle"
+                                    :class="isDarkTheme ? 'bg-white text-indigo-700' : 'bg-indigo-700 text-white'">
                                     {{ $ayah->number }}
                                 </span>
                             </span>
@@ -149,12 +143,8 @@
 
             {{-- Current Total Deduction --}}
             <div
-                class="bg-indigo-900/50 border border-indigo-500
-                       px-6 py-4
-                       rounded-2xl
-                       w-full
-                       max-w-xs
-                       text-center">
+                class="border px-6 py-4 rounded-2xl w-full max-w-xs text-center"
+                :class="isDarkTheme ? 'bg-indigo-900/50 border-indigo-500 text-white' : 'bg-indigo-50 border-indigo-200 text-indigo-900'">
 
                 <span class="block text-sm mb-1 opacity-80">
                     إجمالي الخصم الحالي
@@ -166,24 +156,16 @@
 
 
             {{-- Current Stage --}}
-            <div class="mt-3 text-indigo-200 text-xs">
+            <div class="mt-3 text-xs" :class="isDarkTheme ? 'text-indigo-200' : 'text-gray-500'">
                 المرحلة الحالية:
-                <span class="font-bold text-white">
+                <span class="font-bold" :class="isDarkTheme ? 'text-white' : 'text-gray-800'">
                     {{ $stage->title }}
                 </span>
             </div>
 
         </div>
-
-
         {{-- RIGHT SIDE: Evaluation --}}
-        <div
-            class="w-full md:w-3/5
-                   h-full
-                   overflow-y-auto
-                   custom-scroll
-                   bg-gray-100
-                   p-4 md:p-6 lg:p-8">
+        <div class="w-full md:w-3/5 h-full overflow-y-auto custom-scroll bg-gray-100 p-4 md:p-6 lg:p-8">
 
             <form method="POST" action="{{ route('memorization.store') }}">
                 @csrf
@@ -197,25 +179,9 @@
 
                         @foreach ($evaluationElements as $element)
                             <div
-                                class="p-4
-                                       bg-white
-                                       border border-gray-200
-                                       rounded-2xl
-                                       shadow-sm
-                                       flex
-                                       flex-col
-                                       lg:flex-row
-                                       justify-between
-                                       items-center
-                                       gap-4">
-
+                                class="p-4 bg-white border border-gray-200 rounded-2xl shadow-sm flex flex-col lg:flex-row justify-between items-center gap-4">
                                 {{-- Element Info --}}
-                                <div
-                                    class="flex flex-col
-                                           text-center
-                                           lg:text-right
-                                           w-full
-                                           lg:w-1/3">
+                                <div class="flex flex-col text-center lg:text-right w-full lg:w-1/3">
 
                                     <div class="text-gray-900 font-extrabold text-lg">
                                         {{ $element->title }}
@@ -402,7 +368,14 @@
             return {
                 scores: {},
                 firstElementId: null,
+                isDarkTheme: true,
                 init() {
+                    // Load theme preference from localStorage if it exists
+                    const savedTheme = localStorage.getItem('quran_eval_dark_theme');
+                    if (savedTheme !== null) {
+                        this.isDarkTheme = savedTheme === 'true';
+                    }
+
                     elements.forEach((el, index) => {
                         if (oldScores && oldScores.hasOwnProperty(el.id)) {
                             this.scores[el.id] = parseFloat(oldScores[el.id]) * -1;
@@ -411,6 +384,11 @@
                         }
                         if (index === 0) this.firstElementId = el.id;
                     });
+                },
+                toggleBackground() {
+                    this.isDarkTheme = !this.isDarkTheme;
+                    // Save preference to localStorage
+                    localStorage.setItem('quran_eval_dark_theme', this.isDarkTheme);
                 },
                 get totalScore() {
                     let total = Object.values(this.scores).reduce((a, b) => a + parseFloat(b), 0);

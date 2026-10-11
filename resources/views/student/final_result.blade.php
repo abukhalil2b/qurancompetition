@@ -116,7 +116,7 @@
                                     <td class="border px-3 py-2 text-center">{{ $maxScore }}</td>
                                     <td class="border px-3 py-2 text-red-600 text-xs">
                                         @foreach ($evaluations as $ev)
-                                            <span class="inline-block bg-red-50 px-1 rounded ml-1 border border-red-100">
+                                            <span class="inline-block bg-red-50 px-1 rounded ml-1">
                                                 {{ $ev->judge->name ?? 'محكم' }}: -{{ $ev->reduct_point }}
                                             </span>
                                         @endforeach
@@ -171,6 +171,20 @@
                             </tr>
                         </tfoot>
                     </table>
+                    {{-- عرض ملاحظات المحكمين إن وجدت --}}
+@if($selection->judgeNotes && $selection->judgeNotes->count() > 0)
+    <div class="mt-3 bg-amber-50 border border-amber-200 rounded-lg p-3 text-xs text-amber-900">
+        <span class="font-bold block mb-1">ملاحظات المحكمين:</span>
+        <ul class="list-disc list-inside space-y-1">
+            @foreach($selection->judgeNotes as $note)
+                <li>
+                    <span class="font-semibold">{{ $note->judge->name ?? 'محكم' }}:</span>
+                    {{ $note->note }}
+                </li>
+            @endforeach
+        </ul>
+    </div>
+@endif
                 </div>
             </div>
         @endforeach
@@ -224,29 +238,26 @@
     {{-- CSS for Print formatting --}}
     <style>
         @media print {
-            .print\:hidden {
-                display: none !important;
-            }
-
-            body {
-                background: white;
-            }
-
-            .shadow,
-            .shadow-lg {
-                box-shadow: none !important;
-            }
-
-            .bg-indigo-900 {
-                color: black !important;
-                background: none !important;
-                border: 2px solid black;
-            }
-
-            .text-white {
-                color: black !important;
-            }
-        }
+    .print\:hidden {
+        display: none !important;
+    }
+    body {
+        background: white !important;
+        color: black !important;
+        font-size: 12pt;
+    }
+    .bg-indigo-900 {
+        background-color: #f3f4f6 !important;
+        color: #000 !important;
+        border: 2px solid #000 !important;
+    }
+    .border, table, th, td {
+        border-color: #000 !important;
+    }
+    .break-inside-avoid {
+        page-break-inside: avoid;
+    }
+}
     </style>
 </body>
 

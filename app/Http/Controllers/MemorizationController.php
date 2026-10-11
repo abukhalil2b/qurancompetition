@@ -59,6 +59,7 @@ class MemorizationController extends Controller
                 'content',
             ]);
 
+            $firstQuranAya = $quranAyas->first();
         $evaluationElements = EvaluationElement::where('level', $competition->level)->get();
 
         $oldScores = $studentQuestionSelection
@@ -71,6 +72,7 @@ class MemorizationController extends Controller
 
         return view('memorization.start', compact(
             'isJudgeLeader',
+            'firstQuranAya',
             'studentQuestionSelection',
             'evaluationElements',
             'stage',

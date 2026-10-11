@@ -122,6 +122,7 @@ class CompetitionResultController extends Controller
                 'judgeEvaluations.element',
                 'judgeEvaluations.judge',
                 'question',
+        'judgeNotes.judge'
             ])
             ->get();
 

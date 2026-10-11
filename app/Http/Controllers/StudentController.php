@@ -48,7 +48,7 @@ class StudentController extends Controller
             ->whereRelation('committee', 'center_id', $center->id)
             ->where('committee_id', $committee->id)
             ->orderByRaw("CASE WHEN student_status = 'present' THEN 0 ELSE 1 END ASC")
-            ->orderByRaw('present_at IS NULL ASC')
+            ->orderByRaw('CASE WHEN present_at IS NULL THEN 0 ELSE 1 END ASC')
             ->orderBy('present_at', 'ASC')
             ->orderBy('student_status', 'ASC')
             ->get();
@@ -113,7 +113,11 @@ class StudentController extends Controller
             ]);
         }
 
-        $competitions = $query->orderBy('present_at')->get();
+        $competitions = $query->orderByRaw("CASE WHEN student_status = 'present' THEN 0 ELSE 1 END ASC")
+            ->orderByRaw('CASE WHEN present_at IS NULL THEN 0 ELSE 1 END ASC')
+            ->orderBy('present_at', 'ASC')
+            ->orderBy('student_status', 'ASC')
+        ->get();
 
         return view('student.present_index', compact(
             'competitions',

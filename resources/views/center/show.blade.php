@@ -122,7 +122,7 @@
         {{-- Competitors Section & KPI Stats --}}
         @php
             $statusCounts = $competitions->countBy('student_status');
-            $totalCompetitions = $competitions->count();
+            $totalCompetitions = $competitions->filter(fn($c) => $c->student_status !== 'withdraw')->count();
 
             // حسابات المتسابقين المطلوبة
             $maleCount = $competitions->filter(fn($c) => optional($c->student)->gender === 'male')->count();
