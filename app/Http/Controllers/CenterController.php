@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Center;
+use App\Models\Committee;
+use App\Models\Competition;
 use Illuminate\Http\Request;
 
 class CenterController extends Controller
@@ -43,7 +45,15 @@ class CenterController extends Controller
             },
         ]);
 
-        return view('center.show', compact('center'));
+        $committeeIds = Committee::where('center_id',$center->id)->pluck('id');
+
+            $competitions = Competition::with(['student', 'questionset'])
+            ->where('center_id', $center->id)
+            ->whereIn('committee_id', $committeeIds)
+            ->orderBy('present_at')
+            ->get();
+
+        return view('center.show', compact('center','competitions'));
     }
 
     /**

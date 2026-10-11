@@ -25,7 +25,7 @@ class StudentController extends Controller
 
         // 1. Active stage
         $stage = Stage::where('active', 1)->latest('id')->first();
-        
+
         abort_unless($stage, 403, 'لا توجد مرحلة نشطة حالياً.');
 
         // 2. User's active committee for that stage
@@ -47,6 +47,10 @@ class StudentController extends Controller
             ->where('stage_id', $stage->id)
             ->whereRelation('committee', 'center_id', $center->id)
             ->where('committee_id', $committee->id)
+            ->orderByRaw("CASE WHEN student_status = 'present' THEN 0 ELSE 1 END ASC")
+            ->orderByRaw('present_at IS NULL ASC')
+            ->orderBy('present_at', 'ASC')
+            ->orderBy('student_status', 'ASC')
             ->get();
 
         $judges = CommitteeUser::with('user')

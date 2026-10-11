@@ -11,7 +11,7 @@
             'user_type' => 'judge',
             'gender' => 'male',
             'national_id' => '2000',
-            'password' => Hash::make('2000'),
+            'password' => Hash::make('t@Hk66m20'),
         ]);
 
         User::create([
@@ -19,7 +19,7 @@
             'user_type' => 'judge',
             'gender' => 'male',
             'national_id' => '3000',
-            'password' => Hash::make('3000'),
+            'password' => Hash::make('t@Hk66m30'),
         ]);
 
         User::create([
@@ -27,7 +27,7 @@
             'user_type' => 'judge',
             'gender' => 'male',
             'national_id' => '4000',
-            'password' => Hash::make('4000'),
+            'password' => Hash::make('t@Hk66m40'),
         ]);
 
         User::create([
@@ -35,7 +35,7 @@
             'user_type' => 'judge',
             'gender' => 'male',
             'national_id' => '5000',
-            'password' => Hash::make('5000'),
+            'password' => Hash::make('t@Hk66m50'),
         ]);
 
         User::create([
@@ -43,7 +43,7 @@
             'user_type' => 'judge',
             'gender' => 'male',
             'national_id' => '6000',
-            'password' => Hash::make('60@50'),
+            'password' => Hash::make('t@Hk66m60'),
         ]);
 
         User::create([
@@ -51,7 +51,7 @@
             'user_type' => 'judge',
             'gender' => 'male',
             'national_id' => '7000',
-            'password' => Hash::make('70@60'),
+            'password' => Hash::make('t@Hk66m70'),
         ]);
         
         User::create([
@@ -59,7 +59,7 @@
             'user_type' => 'organizer',
             'gender' => 'male',
             'national_id' => '8000',
-            'password' => Hash::make('80@70'),
+            'password' => Hash::make('8000@8000'),
         ]);
 
         User::create([
@@ -67,7 +67,7 @@
             'user_type' => 'organizer',
             'gender' => 'female',
             'national_id' => '9000',
-            'password' => Hash::make('90@80'),
+            'password' => Hash::make('9000@9000'),
         ]);
 
         User::create([
@@ -75,5 +75,5 @@
             'user_type' => 'reviewer',
             'gender' => 'male',
             'national_id' => '10000',
-            'password' => Hash::make('100@90'),
+            'password' => Hash::make('10000@10000'),
         ]);
