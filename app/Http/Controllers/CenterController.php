@@ -45,15 +45,47 @@ class CenterController extends Controller
             },
         ]);
 
-        $committeeIds = Committee::where('center_id', $center->id)->pluck('id');
+        $committeeIds = Committee::where('center_id', $center->id)
+            ->pluck('id');
 
         $competitions = Competition::with(['student', 'questionset'])
             ->where('center_id', $center->id)
             ->whereIn('committee_id', $committeeIds)
+            ->where(function ($query) {
+                $query->whereDate('present_at', today())
+                    ->orWhereNull('present_at');
+            })
             ->orderBy('present_at')
             ->get();
 
-        return view('center.show', compact('center', 'competitions'));
+            $finishedByDate = Competition::where('center_id', $center->id)
+    ->whereIn('committee_id', $committeeIds)
+    ->where('student_status', 'finish_competition')
+    ->whereNotNull('present_at')
+    ->selectRaw('DATE(present_at) as finish_date, COUNT(*) as total')
+    ->groupByRaw('DATE(present_at)')
+    ->orderByDesc('finish_date')
+    ->get();
+
+    $finishedQuery = Competition::where('center_id', $center->id)
+    ->whereIn('committee_id', $committeeIds)
+    ->where('student_status', 'finish_competition');
+
+$finishedTotal = (clone $finishedQuery)->count();
+
+$finishedMales = (clone $finishedQuery)
+    ->whereHas('student', function ($query) {
+        $query->where('gender', 'male');
+    })
+    ->count();
+
+$finishedFemales = (clone $finishedQuery)
+    ->whereHas('student', function ($query) {
+        $query->where('gender', 'female');
+    })
+    ->count();
+
+        return view('center.show', compact('center', 'competitions','finishedByDate','finishedTotal','finishedMales','finishedFemales'));
     }
 
     /**
