@@ -19,68 +19,73 @@ class CenterController extends Controller
     }
 
     public function show(Center $center)
-    {
-        // Committees (with stage), active first, newest first
-        $center->load([
-            'committees' => fn ($q) => $q->with('stage')->orderByDesc('active')->latest('id'),
-        ]);
+{
+    $center->load([
+        'committees' => fn ($q) => $q->with('stage')->orderByDesc('active')->latest('id'),
+    ]);
 
-        // Already loaded above, so no extra query
-        $committeeIds = $center->committees->pluck('id');
+    $committeeIds = $center->committees->pluck('id');
 
-        // Shared base query for this center's competitions
-        $base = fn () => Competition::query()
-            ->where('competitions.center_id', $center->id)
-            ->whereIn('competitions.committee_id', $committeeIds);
+    $base = fn () => Competition::query()
+        ->where('competitions.center_id', $center->id)
+        ->whereIn('competitions.committee_id', $committeeIds);
 
-        // Today's competitors + those who have not attended yet. Withdrawn are excluded.
-        $competitions = $base()
-            ->with('student')
-            ->where('competitions.student_status', '!=', 'withdraw')
-            ->where(fn ($q) => $q
-                ->whereBetween('competitions.present_at', [today()->startOfDay(), today()->endOfDay()])
-                ->orWhereNull('competitions.present_at'))
-            ->orderBy('competitions.present_at')
-            ->get();
+    // جدول متسابقي اليوم + من لم يحضر بعد (بدون المنسحبين)
+    $competitions = $base()
+        ->with('student')
+        ->where('competitions.student_status', '!=', 'withdraw')
+        ->where(fn ($q) => $q
+            ->whereBetween('competitions.present_at', [today()->startOfDay(), today()->endOfDay()])
+            ->orWhereNull('competitions.present_at'))
+        ->orderBy('competitions.present_at')
+        ->get();
 
-            // KPI counts, computed from the same collection the table shows
-        $kpi = [
-            'total' => $competitions->count(),
-            'male' => $competitions->filter(fn ($c) => $c->student?->gender === 'male')->count(),
-            'female' => $competitions->filter(fn ($c) => $c->student?->gender === 'female')->count(),
-            'level1' => $competitions->where('level', 1)->count(),
-            'level2' => $competitions->where('level', 2)->count(),
-            'withdraw' => $base()->where('student_status', 'withdraw')->count()
-        ];
+    // كل الإحصائيات في استعلام واحد
+    $today = today()->toDateString();
 
-        // One query: per-day breakdown, and the overall totals are summed from it
-        $finishedByDate = $base()
-            ->join('students', 'students.id', '=', 'competitions.student_id')
-            ->where('competitions.student_status', 'finish_competition')
-            ->selectRaw("
+    $s = $base()
+        ->join('students', 'students.id', '=', 'competitions.student_id')
+        ->selectRaw("
+            SUM(competitions.student_status != 'withdraw') AS total,
+
+            SUM(competitions.student_status != 'withdraw' AND competitions.level = 1 AND students.gender = 'male')   AS l1_male,
+            SUM(competitions.student_status != 'withdraw' AND competitions.level = 1 AND students.gender = 'female') AS l1_female,
+            SUM(competitions.student_status != 'withdraw' AND competitions.level = 1) AS l1_total,
+
+            SUM(competitions.student_status != 'withdraw' AND competitions.level = 2 AND students.gender = 'male')   AS l2_male,
+            SUM(competitions.student_status != 'withdraw' AND competitions.level = 2 AND students.gender = 'female') AS l2_female,
+            SUM(competitions.student_status != 'withdraw' AND competitions.level = 2) AS l2_total,
+
+            SUM(competitions.student_status = 'withdraw') AS withdraw,
+
+            SUM(competitions.student_status = 'finish_competition' AND students.gender = 'male')   AS finished_male,
+            SUM(competitions.student_status = 'finish_competition' AND students.gender = 'female') AS finished_female,
+            SUM(competitions.student_status = 'finish_competition') AS finished_total,
+
+            SUM(competitions.student_status = 'finish_competition' AND students.gender = 'male'   AND DATE(competitions.present_at) = ?) AS today_male,
+            SUM(competitions.student_status = 'finish_competition' AND students.gender = 'female' AND DATE(competitions.present_at) = ?) AS today_female,
+            SUM(competitions.student_status = 'finish_competition' AND DATE(competitions.present_at) = ?) AS today_total
+        ", [$today, $today, $today])
+        ->first();
+
+    $kpi = collect($s->getAttributes())->map(fn ($v) => (int) $v)->all();
+
+    // التفصيل اليومي للمنتهين (للجدول)
+    $finishedByDate = $base()
+        ->join('students', 'students.id', '=', 'competitions.student_id')
+        ->where('competitions.student_status', 'finish_competition')
+        ->selectRaw("
             DATE(competitions.present_at) AS finish_date,
             COUNT(*) AS total,
             SUM(students.gender = 'male') AS males,
             SUM(students.gender = 'female') AS females
         ")
-            ->groupByRaw('DATE(competitions.present_at)')
-            ->orderByDesc('finish_date')
-            ->get();
+        ->groupByRaw('DATE(competitions.present_at)')
+        ->orderByDesc('finish_date')
+        ->get();
 
-        $finishedTotal = (int) $finishedByDate->sum('total');
-        $finishedMales = (int) $finishedByDate->sum('males');
-        $finishedFemales = (int) $finishedByDate->sum('females');
-
-        return view('center.show', compact(
-            'center',
-            'competitions',
-            'kpi',
-            'finishedByDate',
-            'finishedTotal',
-            'finishedMales',
-            'finishedFemales'
-        ));
-    }
+    return view('center.show', compact('center', 'competitions', 'kpi', 'finishedByDate'));
+}
 
     /*
     |--------------------------------------------------------------------------

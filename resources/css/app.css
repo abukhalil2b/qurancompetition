@@ -6,9 +6,10 @@
     font-family: "Helvetica";
     src: url("../fonts/HelveticaNeueLTW20-Light.woff");
 }
+
 @font-face {
-    font-family: 'UthmanicHafs';
-    src: url('../fonts/UthmanicHafs1Ver18.woff2') format('woff2');
+    font-family: "MeQuran";
+    src: url("../fonts/me-quran.ttf") format("truetype");
     font-weight: normal;
     font-style: normal;
     font-display: swap;
@@ -19,8 +20,12 @@ body {
 }
 
 .font-quran {
-    font-family: 'UthmanicHafs', serif;
+    font-family: "MeQuran", serif;
+    direction: rtl;
+    text-align: right;
+    line-height: 2.4;
 }
+
 [x-cloak] {
             display: none !important;
         }

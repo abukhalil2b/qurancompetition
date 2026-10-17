@@ -140,6 +140,7 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('questionset/destroy/{questionset}', [QuestionsetController::class, 'destroy'])->name('questionset.destroy');
     Route::get('question/create/{questionset}', [QuestionController::class, 'create'])->name('question.create');
     Route::post('question/store/{questionset}', [QuestionController::class, 'store'])->name('question.store');
+    Route::post('question/replicate/{questionset}', [QuestionController::class, 'replicate'])->name('question.replicate');
     Route::get('question/edit/{question}', [QuestionController::class, 'edit'])->name('question.edit');
     Route::put('question/update/{question}', [QuestionController::class, 'update'])->name('question.update');
     Route::delete('question/destroy/{question}', [QuestionController::class, 'destroy'])->name('question.destroy');

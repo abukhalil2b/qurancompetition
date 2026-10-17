@@ -60,136 +60,174 @@
         {{-- Questionsets --}}
         @if ($questionsets->isNotEmpty())
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
-                @foreach ($questionsets as $set)
+{{-- Statistics --}}
+<div class="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
 
-                    <div
-                        class="border rounded-xl shadow-sm overflow-hidden transition
-                               hover:shadow-md
-                               {{ $set->questions_count == 5
-                                    ? 'bg-green-50 border-green-300'
-                                    : 'bg-white border-gray-200' }}"
+    {{-- Total --}}
+    <div class="flex items-center gap-4 rounded-2xl border border-slate-200
+                bg-white p-5 shadow-sm">
+
+        <div class="flex h-12 w-12 shrink-0 items-center justify-center
+                    rounded-xl bg-blue-100 text-blue-700">
+            <i class="fas fa-layer-group text-xl"></i>
+        </div>
+
+        <div>
+            <p class="text-sm font-medium text-slate-500">
+                إجمالي الباقات
+            </p>
+
+            <p class="mt-1 text-2xl font-bold text-slate-800">
+                {{ $totalCount }}
+            </p>
+        </div>
+
+    </div>
+
+    {{-- Not selected --}}
+    <div class="flex items-center gap-4 rounded-2xl border border-amber-200
+                bg-amber-50 p-5 shadow-sm">
+
+        <div class="flex h-12 w-12 shrink-0 items-center justify-center
+                    rounded-xl bg-amber-100 text-amber-700">
+            <i class="fas fa-exclamation-circle text-xl"></i>
+        </div>
+
+        <div>
+            <p class="text-sm font-medium text-amber-800">
+                المتبقي    
+            </p>
+
+            <p class="mt-1 text-2xl font-bold text-amber-900">
+                {{ $notSelectedCount }}
+            </p>
+        </div>
+
+    </div>
+
+</div>
+
+<div class="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
+
+    @foreach ($questionsets as $set)
+
+        <div
+            class="group flex flex-col overflow-hidden rounded-2xl border bg-white
+                   shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-lg border-blue-300 ring-1 ring-blue-100"
+        >
+
+            {{-- Card Header --}}
+            <div class="flex-1 p-5">
+
+                {{-- Status and question count --}}
+                <div class="mb-4 flex items-center justify-between gap-2">
+
+                    <span
+                        class="inline-flex items-center gap-1 rounded-lg px-2.5 py-1
+                               text-sm font-bold tabular-nums bg-blue-50 text-blue-700"
                     >
+                        {{ $set->questions_count }}
+                        <span class="text-xs font-medium">/ 5</span>
+                    </span>
 
-                        {{-- Card Header --}}
-                        <div class="p-5 border-b border-gray-100">
+                </div>
 
-                            <div class="flex items-start justify-between gap-3">
+                {{-- Title --}}
+                <h3 class="text-lg font-bold leading-8 text-slate-800
+                           transition-colors group-hover:text-blue-700">
+                    {{ $set->title }}
+                </h3>
 
-                                <h3 class="text-xl font-bold text-gray-800">
-                                    {{ $set->title }}
-                                </h3>
+                {{-- Level --}}
+                <div class="mt-3 flex items-center gap-2 text-sm text-slate-500">
 
-                                @if ($set->selected)
+                    <i class="fas fa-layer-group text-slate-400"></i>
 
-                                    <span
-                                        class="shrink-0
-                                               bg-green-100 text-green-800
-                                               text-xs font-medium
-                                               px-2.5 py-1
-                                               rounded-full
-                                               inline-flex items-center"
-                                    >
-                                        <i class="fas fa-check ml-1"></i>
-                                        تم اختيارها
-                                    </span>
+                    <span>{{ $level }}</span>
 
-                                @endif
+                </div>
 
-                            </div>
+                {{-- Selection status --}}
+                @if ($set->selected)
 
-                            <div class="mt-3 flex items-center text-sm text-gray-600">
+                    <div class="mt-4 flex items-center gap-2 rounded-lg
+                                border border-blue-100 bg-blue-50 px-3 py-2
+                                text-sm font-medium text-blue-800">
 
-                                <i class="fas fa-layer-group ml-2"></i>
+                        <i class="fas fa-check-circle"></i>
 
-                                <span>
-                                    {{ $level }}
-                                </span>
-
-                            </div>
-
-                        </div>
-
-
-                        {{-- Card Footer --}}
-                        <div
-                            class="bg-gray-50 px-5 py-4
-                                   flex flex-col sm:flex-row
-                                   sm:items-center
-                                   sm:justify-between
-                                   gap-3"
-                        >
-
-                            <div class="flex flex-wrap gap-2">
-
-                                {{-- Show --}}
-                                <a
-                                    href="{{ route('questionset.show', $set) }}"
-                                    class="inline-flex items-center
-                                           px-3 py-2
-                                           bg-blue-500 text-white
-                                           text-sm rounded-lg
-                                           hover:bg-blue-600
-                                           transition"
-                                >
-                                    <i class="fas fa-eye ml-1"></i>
-
-                                    عرض الأسئلة
-                                    ({{ $set->questions_count }})
-
-                                </a>
-
-
-                                {{-- Edit --}}
-                                <a
-                                    href="{{ route('questionset.edit', $set) }}"
-                                    class="inline-flex items-center
-                                           px-3 py-2
-                                           bg-yellow-500 text-white
-                                           text-sm rounded-lg
-                                           hover:bg-yellow-600
-                                           transition"
-                                >
-                                    <i class="fas fa-edit ml-1"></i>
-                                    تعديل
-                                </a>
-
-                            </div>
-
-
-                            {{-- Delete --}}
-                            <form
-                                action="{{ route('questionset.destroy', $set) }}"
-                                method="POST"
-                                onsubmit="return confirm('هل أنت متأكد من حذف هذه الباقة؟');"
-                            >
-
-                                @csrf
-                                @method('DELETE')
-
-                                <button
-                                    type="submit"
-                                    class="inline-flex items-center
-                                           px-3 py-2
-                                           bg-red-600 text-white
-                                           text-sm rounded-lg
-                                           hover:bg-red-700
-                                           transition"
-                                >
-                                    <i class="fas fa-trash ml-1"></i>
-                                    حذف
-                                </button>
-
-                            </form>
-
-                        </div>
+                        <span>تم اختيار هذه الباقة</span>
 
                     </div>
 
-                @endforeach
+                @endif
 
             </div>
+
+            {{-- Card Footer --}}
+            <div class="border-t border-slate-100 bg-slate-50/80 p-4">
+
+                <div class="flex flex-wrap items-center gap-2">
+
+                    {{-- Show --}}
+                    <a
+                        href="{{ route('questionset.show', $set) }}"
+                        class="inline-flex flex-1 items-center justify-center gap-2
+                               whitespace-nowrap rounded-lg bg-blue-600 px-3 py-2.5
+                               text-sm font-semibold text-white
+                               shadow-sm transition hover:bg-blue-700
+                               focus:outline-none focus:ring-2 focus:ring-blue-500
+                               focus:ring-offset-2"
+                    >
+                        إدارة الأسئلة
+                    </a>
+
+                    {{-- Edit --}}
+                    <a
+                        href="{{ route('questionset.edit', $set) }}"
+                        class="inline-flex items-center justify-center gap-2
+                               rounded-lg border border-amber-200 bg-amber-50
+                               px-3 py-2.5 text-sm font-semibold text-amber-800
+                               transition hover:border-amber-300 hover:bg-amber-100
+                               focus:outline-none focus:ring-2 focus:ring-amber-500
+                               focus:ring-offset-2"
+                    >
+                        تعديل
+                    </a>
+
+                    {{-- Delete --}}
+                    <form
+                        action="{{ route('questionset.destroy', $set) }}"
+                        method="POST"
+                        onsubmit="return confirm('هل أنت متأكد من حذف هذه الباقة؟');"
+                    >
+                        @csrf
+                        @method('DELETE')
+
+                        <button
+                            type="submit"
+                            class="inline-flex items-center justify-center gap-2
+                                   rounded-lg border border-red-200 bg-white
+                                   px-3 py-2.5 text-sm font-semibold text-red-600
+                                   transition hover:border-red-300 hover:bg-red-50
+                                   focus:outline-none focus:ring-2 focus:ring-red-500
+                                   focus:ring-offset-2"
+                        >
+                            حذف
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    @endforeach
+
+</div>
 
         @else
 

@@ -114,31 +114,39 @@
             </div>
 
             {{-- Quran Text --}}
-            <div class="w-full mb-5">
-                <div class="border rounded-2xl p-4 md:p-5"
-                     :class="isDarkTheme ? 'bg-white/10 border-indigo-400/40' : 'bg-gray-50 border-gray-200'">
+<div class="w-full mb-5">
+    <div
+        class="border rounded-2xl p-4 md:p-5"
+        :class="isDarkTheme
+            ? 'bg-white/10 border-indigo-400/40'
+            : 'bg-gray-50 border-gray-200'"
+    >
+        <div
+            class="text-2xl leading-[2.6] text-justify"
+            :class="isDarkTheme ? 'text-white' : 'text-gray-800'"
+            style="font-family: 'Amiri', 'Traditional Arabic', serif;"
+        >
+            @foreach ($quranAyas as $ayah)
 
-                    <div class="font-quran leading-[2.8] text-xl md:text-2xl text-justify"
-                         :class="isDarkTheme ? 'text-white' : 'text-gray-900'">
+                <span class="font-quran">
+                    {{ $ayah->content }}
+                </span>
 
-                        @foreach ($quranAyas as $ayah)
-                            <span>
-                                {{ $ayah->content }}
+                <span
+                    class="inline-flex items-center justify-center
+                           w-9 h-9 mx-1
+                           border border-gray-400
+                           rounded-full
+                           text-sm
+                           align-middle"
+                >
+                    {{ $ayah->number }}
+                </span>
 
-                                <span
-                                    class="inline-flex items-center justify-center
-                                           w-7 h-7 mx-1 rounded-full
-                                           text-xs font-bold align-middle"
-                                    :class="isDarkTheme ? 'bg-white text-indigo-700' : 'bg-indigo-700 text-white'">
-                                    {{ $ayah->number }}
-                                </span>
-                            </span>
-                        @endforeach
-
-                    </div>
-
-                </div>
-            </div>
+            @endforeach
+        </div>
+    </div>
+</div>
 
 
             {{-- Current Total Deduction --}}
@@ -368,7 +376,7 @@
             return {
                 scores: {},
                 firstElementId: null,
-                isDarkTheme: true,
+                isDarkTheme: false,
                 init() {
                     // Load theme preference from localStorage if it exists
                     const savedTheme = localStorage.getItem('quran_eval_dark_theme');

@@ -30,14 +30,14 @@
                 <label for="level" class="block mb-1 font-medium">المستوى</label>
                 <select name="level" id="level"
                         class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400">
-                    <option value="حفظ"
-                        {{ old('level', $questionset->level) == 'حفظ' ? 'selected' : '' }}>
-                        حفظ
+                    <option value="1"
+                        {{ old('level', $questionset->level) == '1' ? 'selected' : '' }}>
+                        المستوى 1
                     </option>
 
-                    <option value="حفظ وتفسير"
-                        {{ old('level', $questionset->level) == 'حفظ وتفسير' ? 'selected' : '' }}>
-                        حفظ وتفسير
+                    <option value="2"
+                        {{ old('level', $questionset->level) == '2' ? 'selected' : '' }}>
+                        المستوى 2  
                     </option>
                 </select>
             </div>

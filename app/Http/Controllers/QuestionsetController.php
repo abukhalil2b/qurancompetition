@@ -22,8 +22,16 @@ class QuestionsetController extends Controller
             ->where('level', $levelId)
             ->get();
 
+        $totalCount = $questionsets->count();
+
+        $notSelectedCount = $questionsets
+            ->where('selected', false)
+            ->count();
+
         return view('questionset.index', compact(
             'questionsets',
+            'totalCount',
+            'notSelectedCount',
             'level',
             'levelId'
         ));
@@ -64,15 +72,15 @@ class QuestionsetController extends Controller
     }
 
     public function show(Questionset $questionset)
-{
-    $questions = $questionset->questions()
-        ->with('surat')
-        ->orderBy('quran_surat_id')
-        ->orderBy('aya_from')
-        ->get();
+    {
+        $questions = $questionset->questions()
+            ->with('surat')
+            ->orderBy('quran_surat_id')
+            ->orderBy('aya_from')
+            ->get();
 
-    return view('questionset.show', compact('questionset', 'questions'));
-}
+        return view('questionset.show', compact('questionset', 'questions'));
+    }
 
     public function edit(Questionset $questionset)
     {

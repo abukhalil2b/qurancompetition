@@ -7,11 +7,10 @@ use App\Models\Questionset;
 use App\Models\QuranAya;
 use App\Models\QuranSurat;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class QuestionController extends Controller
 {
-   
-
     public function create(Questionset $questionset)
     {
         $surats = QuranSurat::query()
@@ -45,6 +44,7 @@ class QuestionController extends Controller
      */
     public function store(Request $request, Questionset $questionset)
     {
+
         $validated = $request->validate([
             'riwaya' => [
                 'required',
@@ -118,6 +118,30 @@ class QuestionController extends Controller
         return redirect()
             ->route('questionset.show', $questionset)
             ->with('success', 'تمت إضافة السؤال بنجاح.');
+
+    }
+
+    public function replicate(Request $request, Questionset $questionset)
+    {
+        $newQuestionset = DB::transaction(function () use ($questionset) {
+
+            // نسخ الباقة نفسها مع تعديل العنوان
+            $copy = $questionset->replicate();
+            $copy->title = $questionset->title;
+            $copy->selected = 0;
+            $copy->save();
+
+            // نسخ الأسئلة وربطها بالباقة الجديدة
+            foreach ($questionset->questions as $question) {
+                $copy->questions()->save($question->replicate());
+            }
+
+            return $copy;
+        });
+
+        return redirect()
+            ->route('questionset.show', $newQuestionset)
+            ->with('success', 'تم تكرار الباقة بنجاح.');
     }
 
     /**
