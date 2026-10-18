@@ -31,6 +31,9 @@ class CompetitionController extends Controller
 
     public function update(Request $request, Competition $competition)
     {
+        if(in_array($competition->student_status,['with_committee','waiting_finalization','finish_competition'])){
+            abort(403,'لايمكن التعديل في حالة'.$competition->student_status);
+        }
         $validated = $request->validate([
             'level'=>'required',
             'committee_id' => ['nullable', Rule::exists('committees', 'id')],

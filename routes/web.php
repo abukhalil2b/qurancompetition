@@ -14,6 +14,7 @@ use App\Http\Controllers\QuestionsetController;
 use App\Http\Controllers\ReviewQuestionController;
 use App\Http\Controllers\StageController;
 use App\Http\Controllers\StudentController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 // Route::get('testdashboard', [HomeController::class, 'testDashboard']);
@@ -22,6 +23,8 @@ Route::get('test_login_to_user_account/{user}', [HomeController::class, 'testLog
 
 Route::get('/', [HomeController::class, 'welcome'])->name('welcome');
 Route::middleware(['auth'])->group(function () {
+
+    Route::post('user/update_password/{user}', [UserController::class, 'updatePassword'])->name('user.update_password');
 
     // --- 1. General Dashboard ---
     Route::get('dashboard', [HomeController::class, 'dashboard'])->name('dashboard');

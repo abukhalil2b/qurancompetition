@@ -15,7 +15,7 @@
             </div>
 
             <a href="{{ route('competition.student.index', $competition->center_id) }}"
-               class="text-sm text-gray-600 hover:text-gray-900 inline-flex items-center gap-1">
+                class="text-sm text-gray-600 hover:text-gray-900 inline-flex items-center gap-1">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                 </svg>
@@ -68,94 +68,98 @@
             </dl>
         </div>
 
-        {{-- Editable form --}}
-        <form action="{{ route('competition.student.update', $competition) }}" method="POST"
-              class="bg-white border border-gray-100 rounded-2xl shadow-sm">
-            @csrf
-            @method('PUT')
+        @if (!in_array($competition->student_status, ['with_committee', 'waiting_finalization', 'finish_competition']))
+            {{-- Editable form --}}
+            <form action="{{ route('competition.student.update', $competition) }}" method="POST"
+                class="bg-white border border-gray-100 rounded-2xl shadow-sm">
+                @csrf
+                @method('PUT')
 
-            <div class="p-5 space-y-5">
+                <div class="p-5 space-y-5">
 
-                {{-- Committee (grouped by center) --}}
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">
-                        اللجنة <span class="text-gray-400 font-normal">(يتم تحديث المركز تلقائياً)</span>
-                    </label>
-                    <select name="committee_id" id="committee_id"
+                    {{-- Committee (grouped by center) --}}
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">
+                            اللجنة <span class="text-gray-400 font-normal">(يتم تحديث المركز تلقائياً)</span>
+                        </label>
+                        <select name="committee_id" id="committee_id"
                             class="w-full border-gray-200 rounded-lg p-2.5 focus:border-blue-500 focus:ring-blue-500">
-                        <option value="">— بدون لجنة —</option>
-                        @foreach ($committeesByCenter as $centerTitle => $group)
-                            <optgroup label="{{ $centerTitle }}">
-                                @foreach ($group as $committee)
-                                    <option value="{{ $committee->id }}"
-                                        @selected((int) old('committee_id', $competition->committee_id) === $committee->id)>
-                                        {{ $committee->id }}
-                                        {{ $committee->title }}
-                                        ({{ __($committee->gender) }})
-                                        {{ $committee->active ? '• نشطة' : '• غير نشطة' }}
-                                    </option>
-                                @endforeach
-                            </optgroup>
-                        @endforeach
-                    </select>
+                            <option value="">— بدون لجنة —</option>
+                            @foreach ($committeesByCenter as $centerTitle => $group)
+                                <optgroup label="{{ $centerTitle }}">
+                                    @foreach ($group as $committee)
+                                        <option value="{{ $committee->id }}" @selected((int) old('committee_id', $competition->committee_id) === $committee->id)>
+                                            {{ $committee->id }}
+                                            {{ $committee->title }}
+                                            ({{ __($committee->gender) }})
+                                            {{ $committee->active ? '• نشطة' : '• غير نشطة' }}
+                                        </option>
+                                    @endforeach
+                                </optgroup>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    {{-- Student Status --}}
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">
+                            حالة المتسابق
+                        </label>
+                        <select name="student_status"
+                            class="w-full border-gray-200 rounded-lg p-2.5 focus:border-blue-500 focus:ring-blue-500">
+                            @php
+                                $statuses = [
+                                    'registration' => 'مسجل',
+                                    'present' => 'حاضر',
+                                    'withdraw' => 'منسحب',
+                                ];
+                            @endphp
+                            @foreach ($statuses as $value => $label)
+                                <option value="{{ $value }}" @selected(old('student_status', $competition->student_status) === $value)>
+                                    {{ $label }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">
+                            المستوى
+                        </label>
+                        <select name="level"
+                            class="w-full border-gray-200 rounded-lg p-2.5 focus:border-blue-500 focus:ring-blue-500">
+                            @php
+                                $levels = [
+                                    '1' => 'المستوى الأول',
+                                    '2' => 'المستوى الثاني',
+                                ];
+                            @endphp
+                            @foreach ($levels as $value => $label)
+                                <option value="{{ $value }}" @selected(old('level', $competition->level) === $value)>
+                                    {{ $label }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
                 </div>
 
-                {{-- Student Status --}}
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">
-                        حالة المتسابق
-                    </label>
-                    <select name="student_status"
-                            class="w-full border-gray-200 rounded-lg p-2.5 focus:border-blue-500 focus:ring-blue-500">
-                        @php
-                            $statuses = [
-                                'registration'         => 'مسجل',
-                                'present'              => 'حاضر',
-                                'withdraw'             => 'منسحب',
-                            ];
-                        @endphp
-                        @foreach ($statuses as $value => $label)
-                            <option value="{{ $value }}"
-                                @selected(old('student_status', $competition->student_status) === $value)>
-                                {{ $label }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
-
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">
-                        المستوى  
-                    </label>
-                    <select name="level"
-                            class="w-full border-gray-200 rounded-lg p-2.5 focus:border-blue-500 focus:ring-blue-500">
-                        @php
-                            $levels = [
-                                '1'         => 'المستوى الأول',
-                                '2'              => 'المستوى الثاني',
-                            ];
-                        @endphp
-                        @foreach ($levels as $value => $label)
-                            <option value="{{ $value }}"
-                                @selected(old('level', $competition->level) === $value)>
-                                {{ $label }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
-
-            </div>
-
-            <div class="px-5 py-4 border-t border-gray-100 flex items-center justify-end gap-3">
-                <a href="{{ route('competition.student.index', $competition->center_id) }}"
-                   class="px-5 py-2.5 rounded-xl bg-gray-100 text-gray-700 font-bold hover:bg-gray-200 transition">
-                    إلغاء
-                </a>
-                <button type="submit"
+                <div class="px-5 py-4 border-t border-gray-100 flex items-center justify-end gap-3">
+                    <a href="{{ route('competition.student.index', $competition->center_id) }}"
+                        class="px-5 py-2.5 rounded-xl bg-gray-100 text-gray-700 font-bold hover:bg-gray-200 transition">
+                        إلغاء
+                    </a>
+                    <button type="submit"
                         class="px-6 py-2.5 rounded-xl bg-blue-600 text-white font-bold hover:bg-blue-700 transition shadow-md shadow-blue-100">
-                    حفظ التعديلات
-                </button>
+                        حفظ التعديلات
+                    </button>
+                </div>
+            </form>
+        @else
+            <div class="p-2 bg-red-50 text-red-600 text-center border border-red-600 rounded">
+                المتسابق: {{ __($competition->student_status) }} . لايمكن التعديل
             </div>
-        </form>
+        @endif
+
     </div>
 </x-app-layout>
