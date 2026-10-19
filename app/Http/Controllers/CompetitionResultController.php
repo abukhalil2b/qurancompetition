@@ -156,6 +156,7 @@ class CompetitionResultController extends Controller
         $competition->update([
             'student_status' => 'finish_competition',
             'final_score' => $scores['total'],
+            'finished_at'=>now()
         ]);
 
         return redirect()->back()->with('success', 'تم اعتماد النتيجة النهائية.');

@@ -19,11 +19,12 @@ return new class extends Migration
             $table->foreignId('committee_id')->nullable()->constrained()->cascadeOnDelete();
             $table->foreignId('student_id')->constrained()->cascadeOnDelete();
             $table->tinyInteger('position')->default(1);
-            $table->boolean('level')->default(1);
+            $table->tinyInteger('level')->default(1);
             $table->bigInteger('questionset_id')->unsigned()->nullable();
             $table->enum('student_status', ['registration', 'present', 'with_committee', 'withdraw', 'waiting_finalization', 'finish_competition'])->default('registration');
             // التسجيل في المسابقة -  تسجيل الحضور - مع اللجنة من أجل التقييم
             $table->timestamp('present_at')->nullable()->index();
+            $table->timestamp('finished_at')->nullable()->index();
             $table->decimal('final_score', 6, 2)->nullable()->index();
             $table->timestamps();
         });

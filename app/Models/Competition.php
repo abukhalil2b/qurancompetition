@@ -6,40 +6,40 @@ use Illuminate\Database\Eloquent\Model;
 
 class Competition extends Model
 {
-   protected $guarded = [];
+    protected $guarded = [];
 
-   protected $casts = [
-    'present_at' => 'datetime'
-];
+    protected $casts = [
+        'present_at' => 'datetime',
+        'finished_at' => 'datetime',
+    ];
 
-   public function studentQuestionSelections()
-   {
-      return $this->hasMany(StudentQuestionSelection::class);
-   }
+    public function studentQuestionSelections()
+    {
+        return $this->hasMany(StudentQuestionSelection::class);
+    }
 
-   public function student()
-   {
-      return $this->belongsTo(Student::class);
-   }
+    public function student()
+    {
+        return $this->belongsTo(Student::class);
+    }
 
-   public function center()
-   {
-      return $this->belongsTo(Center::class);
-   }
+    public function center()
+    {
+        return $this->belongsTo(Center::class);
+    }
 
-   public function stage()
-   {
-      return $this->belongsTo(Stage::class);
-   }
+    public function stage()
+    {
+        return $this->belongsTo(Stage::class);
+    }
 
-   public function committee()
-   {
-      return $this->belongsTo(Committee::class);
-   }
+    public function committee()
+    {
+        return $this->belongsTo(Committee::class);
+    }
 
-   public function questionset()
-   {
-      return $this->belongsTo(Questionset::class, 'questionset_id');
-   }
-
+    public function questionset()
+    {
+        return $this->belongsTo(Questionset::class, 'questionset_id');
+    }
 }
