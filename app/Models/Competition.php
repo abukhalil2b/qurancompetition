@@ -10,6 +10,7 @@ class Competition extends Model
 
     protected $casts = [
         'present_at' => 'datetime',
+        'with_committee_at' => 'datetime',
         'finished_at' => 'datetime',
     ];
 

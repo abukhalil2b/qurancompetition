@@ -4,39 +4,33 @@ namespace App\Http\Controllers;
 
 use App\Models\CommitteeUser;
 use App\Models\Competition;
-use App\Models\JudgeEvaluation;
-use App\Models\QuranAya;
-use App\Models\QuranSurat;
 use App\Models\Stage;
 use App\Models\User;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class HomeController extends Controller
 {
+    public function testDashboard()
+    {
 
+        $users = User::all();
 
-  	public function testDashboard()
-	{
+        return view('test_dashboard', compact('users'));
+    }
 
-		$users = User::all();
+    public function testLoginToUserAccount(Request $request, User $user)
+    {
+        Auth::login($user);
 
-		return view('test_dashboard', compact('users'));
-	}
+        $request->session()->regenerate();
 
-    	public function testLoginToUserAccount(Request $request, User $user)
-	{
-		Auth::login($user);
-
-		$request->session()->regenerate();
-
-		return redirect()->route('dashboard');
-	}
+        return redirect()->route('dashboard');
+    }
 
     public function welcome()
     {
-   
+
         // return view('report');
         return view('welcome');
     }
@@ -46,18 +40,22 @@ class HomeController extends Controller
 
         $activeStage = Stage::where('active', 1)->first();
 
-        if (!$activeStage) {
+        if (! $activeStage) {
             abort(404);
         }
 
         $loggedUser = auth()->user();
+
+        if ($loggedUser->user_type == 'organizer') {
+            return redirect()->route('student.attendance_index');
+        }
 
         if ($loggedUser->user_type == 'judge') {
 
             // dashboard for judge
             $committeeUser = CommitteeUser::where('user_id', $loggedUser->id)->first();
 
-            if (!$committeeUser) {
+            if (! $committeeUser) {
                 abort(403, 'يجب أن يرتبط المستخم بلجنة معينة. التواصل مع الدعم الفني');
             }
 
@@ -70,14 +68,12 @@ class HomeController extends Controller
 
             $committeeUser = CommitteeUser::where('stage_id', $activeStage->id)->where('user_id', $loggedUser->id)->first();
 
-            if (!$committeeUser) {
+            if (! $committeeUser) {
                 abort(403, 'يجب أن يرتبط المستخم بلجنة معينة. التواصل مع الدعم الفني');
             }
 
-
             return view('commite_dashboard', compact('activeStage'));
         }
-
 
         return view('dashboard', compact('activeStage'));
     }

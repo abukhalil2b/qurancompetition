@@ -19,7 +19,7 @@ use Illuminate\Support\Facades\Route;
 
 // Route::get('testdashboard', [HomeController::class, 'testDashboard']);
 
-Route::get('test_login_to_user_account/{user}', [HomeController::class, 'testLoginToUserAccount'])->name('test_login_to_user_account')->where('user', '[0-9]+');
+// Route::get('test_login_to_user_account/{user}', [HomeController::class, 'testLoginToUserAccount'])->name('test_login_to_user_account')->where('user', '[0-9]+');
 
 Route::get('/', [HomeController::class, 'welcome'])->name('welcome');
 Route::middleware(['auth'])->group(function () {
@@ -109,6 +109,9 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('center/show/{center}', [CenterController::class, 'show'])
         ->name('center.show');
+
+    Route::get('center/statistic/{center}', [CenterController::class, 'statistic'])
+        ->name('center.statistic');
 });
 
 Route::middleware(['auth'])->group(function () {

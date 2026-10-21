@@ -60,7 +60,17 @@ class StudentController extends Controller
             })
             ->get();
 
+        $stats = [
+            'total' => $competitions->count(),
+            'withdrawn' => $competitions->where('student_status', 'withdraw')->count(),
+            'active' => $competitions->where('student_status', '!=', 'withdraw')->count(),
+            'registered' => $competitions->where('student_status', 'registration')->count(),
+            'present' => $competitions->whereIn('student_status', ['present', 'with_committee', 'waiting_finalization', 'finish_competition'])->count(),
+            'finished' => $competitions->whereIn('student_status', ['waiting_finalization', 'finish_competition'])->count(),
+        ];
+
         return view('student.attendance_index', compact(
+            'stats',
             'stage',
             'center',
             'committee',
@@ -117,7 +127,7 @@ class StudentController extends Controller
             ->orderByRaw('CASE WHEN present_at IS NULL THEN 0 ELSE 1 END ASC')
             ->orderBy('present_at', 'ASC')
             ->orderBy('student_status', 'ASC')
-        ->get();
+            ->get();
 
         return view('student.present_index', compact(
             'competitions',
@@ -264,6 +274,7 @@ class StudentController extends Controller
                 $competition->update([
                     'questionset_id' => $freshQuestionset->id,
                     'student_status' => 'with_committee',
+                    'with_committee_at' => now(),
                 ]);
 
                 $questions = Question::where('questionset_id', $freshQuestionset->id)
