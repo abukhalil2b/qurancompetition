@@ -78,121 +78,135 @@
                 </div>
             </section>
 
-            {{-- ---------- جدول المتسابقين ---------- --}}
-            <div class="bg-white rounded-2xl ring-1 ring-slate-200/70 shadow-sm overflow-hidden">
-                <div class="px-6 py-4 bg-slate-50/70 border-b border-slate-200/80 flex flex-wrap items-center justify-between gap-3">
-                    <div>
-                        <h3 class="font-bold text-slate-900 text-base">أسماء المتسابقين</h3>
-                        <p class="text-xs text-slate-500 mt-0.5">
-                            حاضرو اليوم + المسجلون الذين لم يحضروا بعد (دون المنسحبين)
-                        </p>
-                    </div>
-                    <span class="inline-flex items-center px-3 py-1 rounded-lg bg-teal-50 text-teal-700 text-xs font-bold ring-1 ring-inset ring-teal-600/20">
-                        العدد في القائمة: {{ number_format($competitions->count()) }}
-                    </span>
-                </div>
+  {{-- ---------- جدول المتسابقين (عرض رأسي للأوقات دون تمرير أفقي) ---------- --}}
+<div class="bg-white rounded-2xl ring-1 ring-slate-200/70 shadow-sm overflow-hidden">
+    <div class="px-6 py-4 bg-slate-50/70 border-b border-slate-200/80 flex flex-wrap items-center justify-between gap-3">
+        <div>
+            <h3 class="font-bold text-slate-900 text-base">أسماء المتسابقين</h3>
+            <p class="text-xs text-slate-500 mt-0.5">
+                حاضرو اليوم + المسجلون الذين لم يحضروا بعد (دون المنسحبين)
+            </p>
+        </div>
+        <span class="inline-flex items-center px-3 py-1 rounded-lg bg-teal-50 text-teal-700 text-xs font-bold ring-1 ring-inset ring-teal-600/20">
+            العدد في القائمة: {{ number_format($competitions->count()) }}
+        </span>
+    </div>
 
-                <div class="overflow-x-auto">
-                    <table class="w-full text-right border-collapse">
-                        <thead class="bg-slate-50/50 border-b border-slate-200/80 text-xs font-semibold text-slate-500 tracking-wider">
-                            <tr>
-                                <th class="px-6 py-3.5 w-12 text-center">#</th>
-                                <th class="px-6 py-3.5">بيانات المتسابق</th>
-                                <th class="px-6 py-3.5 text-center">اللجنة</th>
-                                <th class="px-6 py-3.5 text-center">المستوى</th>
-                                <th class="px-6 py-3.5 text-center">الحالة</th>
-                                <th class="px-6 py-3.5 text-center">وقت الحضور</th>
-                                <th class="px-6 py-3.5 text-center">وقت البداية</th>
-                                <th class="px-6 py-3.5 text-center">وقت الإنهاء</th>
-                                <th class="px-6 py-3.5 text-center">الإجراءات</th>
-                            </tr>
-                        </thead>
+    <div class="overflow-x-auto">
+        <table class="w-full text-right border-collapse">
+            <thead class="bg-slate-50/50 border-b border-slate-200/80 text-xs font-semibold text-slate-500 tracking-wider">
+                <tr>
+                    <th class="px-4 py-3.5 w-12 text-center">#</th>
+                    <th class="px-5 py-3.5">بيانات المتسابق</th>
+                    <th class="px-4 py-3.5 text-center">اللجنة</th>
+                    <th class="px-4 py-3.5 text-center">المستوى</th>
+                    <th class="px-4 py-3.5 text-center">الحالة</th>
+                    <th class="px-5 py-3.5 min-w-[210px]">المسار الزمني (حضور / بداية / إنهاء)</th>
+                    <th class="px-4 py-3.5 text-center w-28">الإجراءات</th>
+                </tr>
+            </thead>
 
-                        <tbody class="divide-y divide-slate-100 text-sm">
-                            @forelse ($competitions as $competition)
-                                @php $student = $competition->student; @endphp
-                                <tr class="hover:bg-slate-50/80 transition-colors">
-                                    <td class="px-6 py-4 text-center text-slate-400 font-mono text-xs">
-                                        {{ $loop->iteration }}
-                                    </td>
+            <tbody class="divide-y divide-slate-100 text-sm">
+                @forelse ($competitions as $competition)
+                    @php $student = $competition->student; @endphp
+                    <tr class="hover:bg-slate-50/80 transition-colors">
+                        {{-- # --}}
+                        <td class="px-4 py-4 text-center text-slate-400 font-mono text-xs">
+                            {{ $loop->iteration }}
+                        </td>
 
-                                    <td class="px-6 py-4">
-                                        <div class="flex flex-col">
-                                            <span class="font-bold text-slate-900 text-base mb-1">
-                                                {{ $student?->name ?? 'غير معروف' }}
-                                            </span>
-                                            <div class="text-xs text-slate-500 flex flex-wrap items-center gap-x-2 gap-y-1">
-                                                <span class="inline-flex items-center gap-1">
-                                                    <span class="text-slate-400">النوع:</span>
-                                                    <span class="font-medium text-slate-700">{{ $student?->gender ? __($student->gender) : '—' }}</span>
-                                                </span>
-                                                <span class="text-slate-300">•</span>
-                                                <span class="inline-flex items-center gap-1">
-                                                    <span class="text-slate-400">الرقم المدني:</span>
-                                                    <span class="font-mono font-medium text-slate-700">{{ $student?->national_id ?? '—' }}</span>
-                                                </span>
-                                                @if (!empty($student?->nationality))
-                                                    <span class="text-slate-300">•</span>
-                                                    <span class="inline-flex items-center gap-1">
-                                                        <span class="text-slate-400">الجنسية:</span>
-                                                        <span class="font-medium text-slate-700">{{ $student->nationality }}</span>
-                                                    </span>
-                                                @endif
-                                            </div>
-                                        </div>
-                                    </td>
+                        {{-- بيانات المتسابق --}}
+                        <td class="px-5 py-4">
+                            <div class="flex flex-col">
+                                <span class="font-bold text-slate-900 text-base mb-1">
+                                    {{ $student?->name ?? 'غير معروف' }}
+                                </span>
+                                <div class="text-xs text-slate-500 flex flex-wrap items-center gap-x-2 gap-y-1">
+                                    <span class="inline-flex items-center gap-1">
+                                        <span class="text-slate-400">النوع:</span>
+                                        <span class="font-medium text-slate-700">{{ $student?->gender ? __($student->gender) : '—' }}</span>
+                                    </span>
+                                    <span class="text-slate-300">•</span>
+                                    <span class="inline-flex items-center gap-1">
+                                        <span class="text-slate-400">الرقم المدني:</span>
+                                        <span class="font-mono font-medium text-slate-700">{{ $student?->national_id ?? '—' }}</span>
+                                    </span>
+                                   
+                                </div>
+                            </div>
+                        </td>
 
-                                    <td class="px-6 py-4 text-center text-xs font-semibold text-slate-700">
-                                        {{ $competition->committee?->title ?? '—' }}
-                                    </td>
+                        {{-- اللجنة --}}
+                        <td class="px-4 py-4 text-center text-xs font-semibold text-slate-700 whitespace-nowrap">
+                            {{ $competition->committee?->title ?? '—' }}
+                        </td>
 
-                                    <td class="px-6 py-4 text-center whitespace-nowrap">
-                                        <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200">
-                                            المستوى {{ $competition->level }}
-                                        </span>
-                                    </td>
+                        {{-- المستوى --}}
+                        <td class="px-4 py-4 text-center whitespace-nowrap">
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200">
+                                المستوى {{ $competition->level }}
+                            </span>
+                        </td>
 
-                                    <td class="px-6 py-4 text-center whitespace-nowrap">
-                                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold {{ $statusStyles[$competition->student_status] ?? 'bg-slate-100 text-slate-600' }}">
-                                            {{ __($competition->student_status) }}
-                                        </span>
-                                    </td>
+                        {{-- الحالة --}}
+                        <td class="px-4 py-4 text-center whitespace-nowrap">
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold {{ $statusStyles[$competition->student_status] ?? 'bg-slate-100 text-slate-600' }}">
+                                {{ __($competition->student_status) }}
+                            </span>
+                        </td>
 
-                                    <td class="px-6 py-4 text-center text-slate-500 font-mono text-xs whitespace-nowrap" dir="ltr">
-                                        {{ $competition->present_at?->format('H:i') ?? '—' }}
-                                    </td>
+                        {{-- الأوقات رأسياً (div / div / div) مع التاريخ والوقت كاملاً --}}
+                        <td class="px-5 py-3">
+                            <div class="flex flex-col gap-1.5 bg-slate-50/80 p-2.5 rounded-xl border border-slate-200/70 text-[11px] font-mono">
+                                {{-- 1. وقت الحضور --}}
+                                <div class="flex items-center justify-between gap-3">
+                                    <span class="font-sans font-semibold text-slate-500 text-[10px]">حضور:</span>
+                                    <span class="font-bold text-slate-700" dir="ltr">
+                                        {{ $competition->present_at?->format('Y-m-d H:i') ?? '—' }}
+                                    </span>
+                                </div>
 
-                                    <td class="px-6 py-4 text-center text-slate-600 font-mono text-xs whitespace-nowrap" dir="ltr">
+                                {{-- 2. وقت البداية مع اللجنة --}}
+                                <div class="flex items-center justify-between gap-3 pt-1 border-t border-slate-200/60">
+                                    <span class="font-sans font-semibold text-blue-700 text-[10px]">البداية:</span>
+                                    <span class="font-bold text-blue-800" dir="ltr">
                                         {{ $competition->with_committee_at?->format('Y-m-d H:i') ?? '—' }}
-                                    </td>
+                                    </span>
+                                </div>
 
-                                    <td class="px-6 py-4 text-center text-slate-600 font-mono text-xs whitespace-nowrap" dir="ltr">
+                                {{-- 3. وقت الإنهاء --}}
+                                <div class="flex items-center justify-between gap-3 pt-1 border-t border-slate-200/60">
+                                    <span class="font-sans font-semibold text-emerald-700 text-[10px]">الإنهاء:</span>
+                                    <span class="font-bold text-emerald-800" dir="ltr">
                                         {{ $competition->finished_at?->format('Y-m-d H:i') ?? '—' }}
-                                    </td>
+                                    </span>
+                                </div>
+                            </div>
+                        </td>
 
-                                    <td class="px-6 py-4 text-center whitespace-nowrap">
-                                        @if ($isAdmin)
-                                            <a href="{{ route('result.show', $competition->id) }}"
-                                               class="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 hover:border-slate-400 text-xs font-bold rounded-lg shadow-sm transition-all">
-                                                عرض النتيجة
-                                            </a>
-                                        @else
-                                            <span class="text-xs text-slate-400">—</span>
-                                        @endif
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="8" class="px-6 py-12 text-center">
-                                        <p class="text-sm font-semibold text-slate-600">لا توجد سجلات حضور حالياً</p>
-                                    </td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
+                        {{-- الإجراءات --}}
+                        <td class="px-4 py-4 text-center whitespace-nowrap">
+                            @if ($isAdmin)
+                                <a href="{{ route('result.show', $competition->id) }}"
+                                   class="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 hover:border-slate-400 text-xs font-bold rounded-lg shadow-sm transition-all">
+                                    عرض النتيجة
+                                </a>
+                            @else
+                                <span class="text-xs text-slate-400">—</span>
+                            @endif
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="7" class="px-6 py-12 text-center">
+                            <p class="text-sm font-semibold text-slate-600">لا توجد سجلات حضور حالياً</p>
+                        </td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+</div>
         </div>
     </div>
 </x-app-layout>
