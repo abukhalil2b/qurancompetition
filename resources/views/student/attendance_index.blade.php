@@ -133,30 +133,30 @@
 
             {{-- Statistics Grid --}}
             @if(isset($stats))
-            <div class="grid grid-cols-3 md:grid-cols-6 gap-2 mb-6">
-                <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex flex-col items-center justify-center text-center">
-                    <span class="text-gray-500 text-sm font-semibold mb-1">إجمالي المتسابقين</span>
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 mb-6">
+                <div class="bg-white p-3.5 rounded-xl border border-gray-200 shadow-sm flex flex-col items-center justify-center text-center">
+                    <span class="text-gray-500 text-xs font-semibold mb-1">إجمالي المتسابقين</span>
                     <span class="text-2xl font-bold text-gray-800">{{ $stats['total'] }}</span>
                 </div>
-                <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex flex-col items-center justify-center text-center">
-                    <span class="text-gray-500 text-sm font-semibold mb-1">النشطون</span>
-                    <span class="text-2xl font-bold text-blue-600">{{ $stats['active'] }}</span>
-                </div>
-                <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex flex-col items-center justify-center text-center">
-                    <span class="text-gray-500 text-sm font-semibold mb-1">بانتظار الحضور</span>
+                <div class="bg-white p-3.5 rounded-xl border border-gray-200 shadow-sm flex flex-col items-center justify-center text-center">
+                    <span class="text-gray-500 text-xs font-semibold mb-1">بانتظار الحضور</span>
                     <span class="text-2xl font-bold text-orange-500">{{ $stats['registered'] }}</span>
                 </div>
-                <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex flex-col items-center justify-center text-center">
-                    <span class="text-gray-500 text-sm font-semibold mb-1">حضروا للمقر</span>
-                    <span class="text-2xl font-bold text-green-600">{{ $stats['present'] }}</span>
+                <div class="bg-white p-3.5 rounded-xl border border-gray-200 shadow-sm flex flex-col items-center justify-center text-center">
+                    <span class="text-gray-500 text-xs font-semibold mb-1">في صالة الانتظار</span>
+                    <span class="text-2xl font-bold text-green-600">{{ $stats['in_hall'] }}</span>
                 </div>
-                <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex flex-col items-center justify-center text-center">
-                    <span class="text-gray-500 text-sm font-semibold mb-1">المنسحبون</span>
+                <div class="bg-white p-3.5 rounded-xl border border-gray-200 shadow-sm flex flex-col items-center justify-center text-center ring-2 ring-blue-100">
+                    <span class="text-blue-700 text-xs font-bold mb-1">مع اللجنة حالياً</span>
+                    <span class="text-2xl font-bold text-blue-600">{{ $stats['with_committee'] }}</span>
+                </div>
+                <div class="bg-white p-3.5 rounded-xl border border-gray-200 shadow-sm flex flex-col items-center justify-center text-center">
+                    <span class="text-gray-500 text-xs font-semibold mb-1">أنهوا المسابقة</span>
+                    <span class="text-2xl font-bold text-emerald-600">{{ $stats['finished'] }}</span>
+                </div>
+                <div class="bg-white p-3.5 rounded-xl border border-gray-200 shadow-sm flex flex-col items-center justify-center text-center">
+                    <span class="text-gray-500 text-xs font-semibold mb-1">المنسحبون</span>
                     <span class="text-2xl font-bold text-red-500">{{ $stats['withdrawn'] }}</span>
-                </div>
-                <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex flex-col items-center justify-center text-center">
-                    <span class="text-gray-500 text-sm font-semibold mb-1">أنهو</span>
-                    <span class="text-2xl font-bold text-red-500">{{ $stats['finished'] }}</span>
                 </div>
             </div>
             @endif
@@ -186,7 +186,7 @@
                                 <th class="px-5 py-4">المستوى</th>
                                 <th class="px-5 py-4">اللجنة</th>
                                 <th class="px-5 py-4">الحالة</th>
-                                <th class="px-5 py-4 text-center">وقت الحضور</th>
+                                <th class="px-5 py-4 text-center min-w-[180px]">المسار الزمني</th>
                                 <th class="px-5 py-4">الإجراء</th>
                             </tr>
                         </thead>
@@ -229,21 +229,45 @@
                                         </span>
                                     </td>
 
-                                    <td class="px-5 py-4 text-center" dir="ltr">
-                                        @if ($competition->present_at)
-                                            <div class="font-bold text-gray-800">{{ $competition->present_at->format('h:i A') }}</div>
-                                            <div class="text-[11px] text-gray-400 mt-0.5 font-medium">
-                                                {{ $competition->present_at->diffForHumans() }}
-                                            </div>
-                                        @else
-                                            <span class="text-gray-300 font-bold">—</span>
-                                        @endif
-                                    </td>
+                                  <td class="px-5 py-3 text-center">
+    @if ($competition->present_at)
+        <div class="inline-flex flex-col gap-1 text-xs text-right bg-gray-50 p-2 rounded-lg border border-gray-200/80 min-w-[160px]">
+            {{-- 1. وقت تسجيل الحضور --}}
+            <div class="flex items-center justify-between gap-2 font-mono">
+                <span class="text-[11px] text-gray-500 font-sans font-medium">حضور:</span>
+                <span class="font-bold text-gray-700" dir="ltr">
+                    {{ $competition->present_at->format('h:i A') }}
+                </span>
+            </div>
+
+            {{-- 2. وقت الدخول للجنة --}}
+            <div class="flex items-center justify-between gap-2 font-mono pt-1 border-t border-gray-200">
+                <span class="text-[11px] text-blue-700 font-sans font-medium">مع اللجنة:</span>
+                @if ($competition->with_committee_at)
+                    <span class="font-bold text-blue-800" dir="ltr">
+                        {{ $competition->with_committee_at->format('h:i A') }}
+                    </span>
+                @else
+                    <span class="text-gray-400 font-sans text-[11px]">بانتظار النداء</span>
+                @endif
+            </div>
+
+            {{-- 3. مدة الانتظار الفعلية (إذا دخل للجنة) --}}
+            @if ($competition->with_committee_at)
+                <div class="text-[10px] text-gray-400 text-center font-sans mt-0.5">
+                    انتظر {{ $competition->present_at->diffInMinutes($competition->with_committee_at) }} دقيقة
+                </div>
+            @endif
+        </div>
+    @else
+        <span class="text-gray-300 font-bold text-sm">—</span>
+    @endif
+</td>
 
                                     <td class="px-5 py-4">
                                         @if ($competition->student_status == 'registration')
                                             <a href="{{ route('student.show', $competition->id) }}"
-                                                class="g-btn inline-flex items-center h-10 px-6 rounded-lg bg-blue-600 text-white text-sm font-bold hover:bg-blue-700 shadow-sm">
+                                                class="g-btn inline-flex items-center h-10 px-4 rounded-lg bg-blue-600 text-white text-[10px] font-bold hover:bg-blue-700 shadow-sm">
                                                 تسجيل حضور
                                             </a>
                                         @else

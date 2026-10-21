@@ -61,12 +61,13 @@ class StudentController extends Controller
             ->get();
 
         $stats = [
-            'total' => $competitions->count(),
-            'withdrawn' => $competitions->where('student_status', 'withdraw')->count(),
-            'active' => $competitions->where('student_status', '!=', 'withdraw')->count(),
-            'registered' => $competitions->where('student_status', 'registration')->count(),
-            'present' => $competitions->whereIn('student_status', ['present', 'with_committee', 'waiting_finalization', 'finish_competition'])->count(),
-            'finished' => $competitions->whereIn('student_status', ['waiting_finalization', 'finish_competition'])->count(),
+            'total'          => $competitions->count(),
+            'withdrawn'      => $competitions->where('student_status', 'withdraw')->count(),
+            'active'         => $competitions->where('student_status', '!=', 'withdraw')->count(),
+            'registered'     => $competitions->where('student_status', 'registration')->count(),
+            'in_hall'        => $competitions->where('student_status', 'present')->count(), // بانتظار الدخول للجنة
+            'with_committee' => $competitions->where('student_status', 'with_committee')->count(), // مع اللجنة حالياً
+            'finished'       => $competitions->whereIn('student_status', ['waiting_finalization', 'finish_competition'])->count(),
         ];
 
         return view('student.attendance_index', compact(
