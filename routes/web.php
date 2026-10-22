@@ -7,6 +7,7 @@ use App\Http\Controllers\CompetitionResultController;
 use App\Http\Controllers\DetailedResultController;
 use App\Http\Controllers\EvaluationElementController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\StatisticController;
 use App\Http\Controllers\JudgeController;
 use App\Http\Controllers\MemorizationController;
 use App\Http\Controllers\QuestionController;
@@ -23,7 +24,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'welcome'])->name('welcome');
 
-Route::get('statistic_dashboard', [HomeController::class, 'statisticDashboard'])->name('statistic_dashboard');
+Route::get('statistic_dashboard', [StatisticController::class, 'statisticDashboard'])->name('statistic_dashboard');
 
 Route::middleware(['auth'])->group(function () {
 
