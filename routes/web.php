@@ -22,6 +22,9 @@ use Illuminate\Support\Facades\Route;
 // Route::get('test_login_to_user_account/{user}', [HomeController::class, 'testLoginToUserAccount'])->name('test_login_to_user_account')->where('user', '[0-9]+');
 
 Route::get('/', [HomeController::class, 'welcome'])->name('welcome');
+
+Route::get('statistic_dashboard', [HomeController::class, 'statisticDashboard'])->name('statistic_dashboard');
+
 Route::middleware(['auth'])->group(function () {
 
     Route::post('user/update_password/{user}', [UserController::class, 'updatePassword'])->name('user.update_password');

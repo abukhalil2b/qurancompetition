@@ -6,7 +6,19 @@ use Illuminate\Database\Eloquent\Model;
 
 class Competition extends Model
 {
-    protected $guarded = [];
+    protected $fillable = [
+        'center_id',
+        'stage_id',
+        'committee_id',
+        'student_id',
+        'level',
+        'questionset_id',
+        'student_status',
+        'present_at',
+        'with_committee_at',
+        'finished_at',
+        'final_score',
+    ];
 
     protected $casts = [
         'present_at' => 'datetime',

@@ -82,10 +82,10 @@ class CenterController extends Controller
             ->join('students', 'students.id', '=', 'competitions.student_id');
 
         // =====================================================================
-// 1. الإحصائيات العامة
-// =====================================================================
-$s = $withStudents()
-    ->selectRaw("
+        // 1. الإحصائيات العامة
+        // =====================================================================
+        $s = $withStudents()
+            ->selectRaw("
         COUNT(*) AS total_all,
         SUM(competitions.student_status != 'withdraw') AS total,
         SUM(competitions.student_status != 'withdraw' AND students.gender = 'male')   AS male,
@@ -129,7 +129,7 @@ $s = $withStudents()
         SUM(competitions.student_status = 'finish_competition' AND competitions.final_score IS NULL) AS dq_finished_no_score,
         SUM(competitions.student_status != 'finish_competition' AND competitions.final_score IS NOT NULL) AS dq_score_not_finished
     ", [$todayStart, $todayEnd, $todayStart, $todayEnd, $todayStart, $todayEnd])
-    ->first();
+            ->first();
 
         $kpi = collect($s->getAttributes())->map(fn ($v) => (int) round((float) $v))->all();
 

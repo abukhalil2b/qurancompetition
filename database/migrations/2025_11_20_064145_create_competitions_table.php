@@ -18,7 +18,6 @@ return new class extends Migration
             $table->bigInteger('stage_id');
             $table->foreignId('committee_id')->nullable()->constrained()->cascadeOnDelete();
             $table->foreignId('student_id')->constrained()->cascadeOnDelete();
-            $table->tinyInteger('position')->default(1);
             $table->tinyInteger('level')->default(1);
             $table->bigInteger('questionset_id')->unsigned()->nullable();
             $table->enum('student_status', ['registration', 'present', 'with_committee', 'withdraw', 'waiting_finalization', 'finish_competition'])->default('registration');

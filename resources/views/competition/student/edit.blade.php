@@ -58,10 +58,6 @@
                     <dd class="font-semibold text-slate-800">{{ $competition->level }}</dd>
                 </div>
                 <div>
-                    <dt class="text-slate-500">الترتيب</dt>
-                    <dd class="font-semibold text-slate-800">{{ $competition->position }}</dd>
-                </div>
-                <div>
                     <dt class="text-slate-500">الدرجة النهائية</dt>
                     <dd class="font-semibold text-slate-800">{{ $competition->final_score ?? '—' }}</dd>
                 </div>

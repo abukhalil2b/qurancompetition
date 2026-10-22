@@ -101,7 +101,6 @@ class CompetitionController extends Controller
                 'student_id',
                 'committee_id',
                 'level',
-                'position',
                 'student_status',
             ]);
 
@@ -129,7 +128,7 @@ class CompetitionController extends Controller
             ->where('stage_id', $stage->id)
             ->where('committee_id', $committee->id)
             ->orderBy('id')
-            ->get(['id', 'student_id', 'committee_id', 'level', 'position', 'student_status']);
+            ->get(['id', 'student_id', 'committee_id', 'level', 'student_status']);
 
 
         return view('competition.student.print', compact(
