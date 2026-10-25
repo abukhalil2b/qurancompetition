@@ -3,13 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Center;
-use App\Models\CommitteeUser;
 use App\Models\Competition;
-use App\Models\Stage;
-use App\Models\User;
-use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Auth;
 
 class StatisticController extends Controller
 {
@@ -40,6 +35,8 @@ class StatisticController extends Controller
             SUM(competitions.student_status = 'finish_competition' AND students.gender = 'male') AS finished_male,
             SUM(competitions.student_status = 'finish_competition' AND students.gender = 'female') AS finished_female,
             
+            SUM(competitions.present_at IS NOT NULL AND competitions.student_status != 'withdraw') AS attended_total,
+            
             AVG(CASE WHEN competitions.student_status = 'finish_competition'
                 AND competitions.with_committee_at IS NOT NULL AND competitions.finished_at IS NOT NULL
                 THEN TIMESTAMPDIFF(MINUTE, competitions.with_committee_at, competitions.finished_at) END) AS avg_test_minutes,
@@ -66,9 +63,40 @@ class StatisticController extends Controller
 
             return (int) round((float) $value);
         })->all();
-        
+
         $kpi['completion_rate'] = $kpi['total'] > 0 ? round($kpi['finished_total'] / $kpi['total'] * 100, 1) : 0;
         $kpi['withdraw_rate'] = $kpi['total_all'] > 0 ? round($kpi['withdraw'] / $kpi['total_all'] * 100, 1) : 0;
+        $kpi['attendance_rate'] = $kpi['total'] > 0 ? round($kpi['attended_total'] / $kpi['total'] * 100, 1) : 0;
+        $kpi['remaining_total'] = max(0, $kpi['total'] - $kpi['finished_total']);
+        $kpi['estimated_remaining_hours'] = round(($kpi['remaining_total'] * ($kpi['avg_test_minutes'] ?? 20)) / 60, 1);
+
+        // الارتباط الإحصائي بين المدة والنسبة المئوية للدرجة لتفادي اختلاف المقاييس بين المستويات
+        $finishedWithTime = $withStudents()
+            ->where('competitions.student_status', 'finish_competition')
+            ->whereNotNull('competitions.final_score')
+            ->whereNotNull('competitions.with_committee_at')
+            ->whereNotNull('competitions.finished_at')
+            ->selectRaw("
+                competitions.level,
+                competitions.final_score,
+                TIMESTAMPDIFF(MINUTE, competitions.with_committee_at, competitions.finished_at) AS duration
+            ")
+            ->get();
+
+        $correlationTimeScore = null;
+        if ($finishedWithTime->count() > 2) {
+            $pctScores = [];
+            $durations = [];
+
+            foreach ($finishedWithTime as $row) {
+                $maxScore = $levels[$row->level]['max'] ?? 100;
+                $pctScores[] = ((float) $row->final_score / $maxScore) * 100;
+                $durations[] = (float) $row->duration;
+            }
+
+            $correlationTimeScore = $this->calculateCorrelation($durations, $pctScores);
+        }
+        $kpi['correlation_time_score'] = $correlationTimeScore;
 
         $scoreRows = $withStudents()
             ->where('competitions.student_status', '!=', 'withdraw')
@@ -92,64 +120,38 @@ class StatisticController extends Controller
             $meta = $levels[$level];
             $scores = $rows->pluck('score');
             $max = $meta['max'];
+            $n = $scores->count();
 
-            if ($level === 1) {
-                $ranges = [
-                    ['label' => 'أقل من 60% (أقل من 72)', 'min' => null, 'max' => 72, 'tone' => 'rose'],
-                    ['label' => '60% – أقل من 70% (72–أقل من 84)', 'min' => 72, 'max' => 84, 'tone' => 'amber'],
-                    ['label' => '70% – أقل من 80% (84–أقل من 96)', 'min' => 84, 'max' => 96, 'tone' => 'sky'],
-                    ['label' => '80% – أقل من 90% (96–أقل من 108)', 'min' => 96, 'max' => 108, 'tone' => 'teal'],
-                    ['label' => 'من 108 إلى أقل من 110 درجة', 'min' => 108, 'max' => 110, 'tone' => 'sky'],
-                    ['label' => 'من 110 إلى 120 درجة', 'min' => 110, 'max' => 120, 'inclusive_max' => true, 'tone' => 'emerald'],
+            $ranges = [
+                ['label' => 'أقل من 60%',       'from' => null, 'to' => 0.60, 'tone' => 'rose'],
+                ['label' => '60% – أقل من 70%', 'from' => 0.60, 'to' => 0.70, 'tone' => 'amber'],
+                ['label' => '70% – أقل من 80%', 'from' => 0.70, 'to' => 0.80, 'tone' => 'sky'],
+                ['label' => '80% – أقل من 90%', 'from' => 0.80, 'to' => 0.90, 'tone' => 'teal'],
+                ['label' => '90% – 100%',       'from' => 0.90, 'to' => 1.00, 'tone' => 'emerald', 'inclusive_max' => true],
+            ];
+
+            $bins = collect($ranges)->map(function ($range) use ($scores, $max, $n) {
+                $lower = $range['from'] === null ? null : $max * $range['from'];
+                $upper = $range['to'] === null ? null : $max * $range['to'];
+
+                $count = $scores->filter(function ($score) use ($lower, $upper, $range) {
+                    $aboveMin = $lower === null || $score >= $lower;
+                    $belowMax = $upper === null || (
+                        isset($range['inclusive_max']) && $range['inclusive_max']
+                            ? $score <= $upper
+                            : $score < $upper
+                    );
+
+                    return $aboveMin && $belowMax;
+                })->count();
+
+                return [
+                    'label' => $range['label'],
+                    'count' => $count,
+                    'tone' => $range['tone'],
+                    'pct' => $n ? round(($count / $n) * 100, 1) : 0,
                 ];
-
-                $bins = collect($ranges)->map(function ($range) use ($scores) {
-                    $count = $scores->filter(function ($score) use ($range) {
-                        $aboveMin = !array_key_exists('min', $range) || $range['min'] === null
-                            || (isset($range['min_exclusive']) && $range['min_exclusive']
-                                ? $score > $range['min']
-                                : $score >= $range['min']);
-                        $belowMax = !array_key_exists('max', $range) || $range['max'] === null
-                            || (isset($range['inclusive_max']) && $range['inclusive_max']
-                                ? $score <= $range['max']
-                                : $score < $range['max']);
-
-                        return $aboveMin && $belowMax;
-                    })->count();
-
-                    return [
-                        'label' => $range['label'],
-                        'count' => $count,
-                        'tone' => $range['tone'],
-                        'pct' => $scores->count() ? round($count / $scores->count() * 100, 1) : 0,
-                    ];
-                })->all();
-            } else {
-                $ranges = [
-                    ['label' => 'أقل من 60%', 'from' => null, 'to' => .60, 'tone' => 'rose'],
-                    ['label' => '60% – أقل من 70%', 'from' => .60, 'to' => .70, 'tone' => 'amber'],
-                    ['label' => '70% – أقل من 80%', 'from' => .70, 'to' => .80, 'tone' => 'sky'],
-                    ['label' => '80% – أقل من 90%', 'from' => .80, 'to' => .90, 'tone' => 'teal'],
-                    ['label' => '90% – أقل من 100%', 'from' => .90, 'to' => 1.00, 'tone' => 'emerald'],
-                ];
-
-                $bins = collect($ranges)->map(function ($range) use ($scores, $max) {
-                    $lower = $range['from'] === null ? null : $max * $range['from'];
-                    $upper = $range['to'] === null ? null : $max * $range['to'];
-                    
-                    $count = $scores->filter(fn ($score) =>
-                        ($lower === null || $score >= $lower) &&
-                        ($upper === null || $score < $upper)
-                    )->count();
-
-                    return [
-                        'label' => $range['label'],
-                        'count' => $count,
-                        'tone' => $range['tone'],
-                        'pct' => $scores->count() ? round($count / $scores->count() * 100, 1) : 0,
-                    ];
-                })->all();
-            }
+            })->all();
 
             return [
                 'level' => $level,
@@ -160,7 +162,7 @@ class StatisticController extends Controller
                 'female' => $female,
                 'attended' => $attended,
                 'finished' => $finished,
-                'finished_width' => $total > 0 ? round($finished / $total * 100, 1) : 0,
+                'finished_width' => $total > 0 ? round(($finished / $total) * 100, 1) : 0,
                 'scores' => $this->describeScores($scores, $max),
                 'avg_male' => $avgOf($rows->where('gender', 'male')->pluck('score')),
                 'avg_female' => $avgOf($rows->where('gender', 'female')->pluck('score')),
@@ -184,6 +186,7 @@ class StatisticController extends Controller
 
         $levelStats = collect($levels)->map(function ($meta, $level) use ($scoreRows, $levelCounts, $buildLevelStats) {
             $c = $levelCounts[$level] ?? null;
+
             return $buildLevelStats(
                 (int) $level,
                 $scoreRows->where('level', (int) $level),
@@ -255,7 +258,7 @@ class StatisticController extends Controller
                 'withdraw' => (int) ($summary->withdraw ?? 0),
                 'attended' => (int) ($summary->attended ?? 0),
                 'finished' => (int) ($summary->finished ?? 0),
-                'completion_rate' => ($summary && $summary->total > 0) ? round($summary->finished / $summary->total * 100, 1) : 0,
+                'completion_rate' => ($summary && $summary->total > 0) ? round(($summary->finished / $summary->total) * 100, 1) : 0,
                 'levels' => $levelSections,
             ];
         })->values();
@@ -286,8 +289,8 @@ class StatisticController extends Controller
             'level_1' => (int) $i->level_1,
             'level_2' => (int) $i->level_2,
             'label' => $this->contestantsLabel((int) $i->total),
-            'width' => round((int) $i->total / $dailyMax * 100),
-            'pct' => (int) $kpi['finished_total'] > 0 ? round((int) $i->total / $kpi['finished_total'] * 100, 1) : 0,
+            'width' => round(((int) $i->total / $dailyMax) * 100),
+            'pct' => (int) $kpi['finished_total'] > 0 ? round(((int) $i->total / $kpi['finished_total']) * 100, 1) : 0,
         ]);
 
         return view('statistic_dashboard', compact(
@@ -298,30 +301,47 @@ class StatisticController extends Controller
         ));
     }
 
-
     private function describeScores($scores, $maxMark = 100): array
     {
         $n = $scores->count();
 
         if ($n === 0) {
             return [
-                'count' => 0, 'max' => null, 'min' => null, 'avg' => null,
-                'avg_pct' => null, 'median' => null, 'std' => null,
+                'count' => 0, 'max' => null, 'min' => null, 'range' => null,
+                'avg' => null, 'avg_pct' => null, 'median' => null, 'std' => null,
+                'q1' => null, 'q3' => null, 'iqr' => null, 'cv' => null, 'skewness' => null,
             ];
         }
 
-        $avg = $scores->avg();
+        $sorted = $scores->sort()->values();
+        $avg = (float) $scores->avg();
+        $median = (float) $scores->median();
+
+        $std = $n > 1
+            ? round(sqrt($scores->sum(fn ($v) => ($v - $avg) ** 2) / ($n - 1)), 2)
+            : 0;
+
+        $q1 = $this->getPercentile($sorted, 0.25);
+        $q3 = $this->getPercentile($sorted, 0.75);
+        $iqr = round($q3 - $q1, 2);
+
+        $cv = $avg > 0 ? round(($std / $avg) * 100, 1) : 0;
+        $skewness = ($std > 0) ? round((3 * ($avg - $median)) / $std, 2) : 0;
 
         return [
             'count' => $n,
             'max' => round($scores->max(), 2),
             'min' => round($scores->min(), 2),
+            'range' => round($scores->max() - $scores->min(), 2),
             'avg' => round($avg, 2),
-            'avg_pct' => $maxMark > 0 ? round($avg / $maxMark * 100, 1) : null,
-            'median' => round($scores->median(), 2),
-            'std' => $n > 1
-                ? round(sqrt($scores->sum(fn ($value) => ($value - $avg) ** 2) / ($n - 1)), 2)
-                : null,
+            'avg_pct' => $maxMark > 0 ? round(($avg / $maxMark) * 100, 1) : null,
+            'median' => round($median, 2),
+            'std' => $std,
+            'q1' => round($q1, 2),
+            'q3' => round($q3, 2),
+            'iqr' => $iqr,
+            'cv' => $cv,
+            'skewness' => $skewness,
         ];
     }
 
@@ -333,5 +353,50 @@ class StatisticController extends Controller
             $n >= 3 && $n <= 10 => 'متسابقين',
             default => 'متسابقًا',
         };
+    }
+
+    private function getPercentile($sortedCollection, float $percentile): float
+    {
+        $count = $sortedCollection->count();
+        if ($count === 0) {
+            return 0.0;
+        }
+
+        $index = ($count - 1) * $percentile;
+        $floor = (int) floor($index);
+        $ceil = (int) ceil($index);
+
+        if ($floor === $ceil) {
+            return (float) $sortedCollection[$floor];
+        }
+
+        return (float) ($sortedCollection[$floor] + ($index - $floor) * ($sortedCollection[$ceil] - $sortedCollection[$floor]));
+    }
+
+    private function calculateCorrelation(array $x, array $y): ?float
+    {
+        $n = count($x);
+        if ($n !== count($y) || $n < 2) {
+            return null;
+        }
+
+        $meanX = array_sum($x) / $n;
+        $meanY = array_sum($y) / $n;
+
+        $num = 0.0;
+        $denX = 0.0;
+        $denY = 0.0;
+
+        for ($i = 0; $i < $n; $i++) {
+            $dx = $x[$i] - $meanX;
+            $dy = $y[$i] - $meanY;
+            $num += $dx * $dy;
+            $denX += $dx * $dx;
+            $denY += $dy * $dy;
+        }
+
+        $denom = sqrt($denX * $denY);
+
+        return $denom == 0 ? 0.0 : round($num / $denom, 2);
     }
 }
