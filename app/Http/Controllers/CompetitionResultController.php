@@ -4,9 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Exports\CompetitionResultsExport;
 use App\Models\Center;
-use App\Models\Stage;
 use App\Models\Committee;
-use App\Models\Competition; // Ensure this import is correct
+use App\Models\Competition;
+use App\Models\Stage; // Ensure this import is correct
 use App\Models\StudentQuestionSelection;
 use App\Services\ScoreCalculator;
 use Illuminate\Http\Request;
@@ -37,6 +37,7 @@ class CompetitionResultController extends Controller
         }
 
         $competitions = Competition::with(['student', 'questionset', 'center'])
+            ->where('stage_id', $stage->id)
             ->when($request->filled('center_id'), function ($query) use ($request) {
                 $query->where('center_id', $request->center_id);
             })
@@ -54,7 +55,7 @@ class CompetitionResultController extends Controller
 
         $centers = Center::all();
 
-        return view('finished_student_list', compact('competitions', 'centers'));
+        return view('finished_student_list', compact('competitions', 'centers', 'stage'));
     }
 
     /**
@@ -129,7 +130,7 @@ class CompetitionResultController extends Controller
                 'judgeEvaluations.element',
                 'judgeEvaluations.judge',
                 'question',
-        'judgeNotes.judge'
+                'judgeNotes.judge',
             ])
             ->get();
 
@@ -163,7 +164,7 @@ class CompetitionResultController extends Controller
         $competition->update([
             'student_status' => 'finish_competition',
             'final_score' => $scores['total'],
-            'finished_at'=>now()
+            'finished_at' => now(),
         ]);
 
         return redirect()->back()->with('success', 'تم اعتماد النتيجة النهائية.');

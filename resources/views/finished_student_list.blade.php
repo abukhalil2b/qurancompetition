@@ -2,8 +2,8 @@
     <div class="container mx-auto py-8 px-4" dir="rtl">
 
         <div class="text-center mb-6">
-            <h1 class="text-2xl font-bold mb-2">
-                قائمة المتسابقين الذين أتموا المسابقة وتم اعتماد نتائجهم
+            <h1 class="text-xl font-bold mb-2">
+                قائمة المتسابقين الذين أتموا المسابقة وتم اعتماد نتائجهم ({{ $stage->title }})
             </h1>
             <p class="text-gray-600">
                 التاريخ: {{ now()->format('Y/m/d') }}
