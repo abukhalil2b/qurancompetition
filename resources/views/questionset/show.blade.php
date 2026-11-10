@@ -88,31 +88,51 @@
                                         </td>
 
                                         {{-- Surat + Ayas --}}
-                                        <td class="py-4 px-6">
-                                            <div class="flex flex-col gap-2">
-                                                <div class="flex items-center gap-2">
-                                                    <span class="font-bold text-lg text-emerald-900">
-                                                        سورة {{ $question->surat?->title ?? '—' }}
-                                                    </span>
+                                       {{-- Surat + Ayas --}}
+<td class="py-4 px-6">
+    @php
+        $startSurat = $question->surat;
+        $endSurat = $question->suratTo ?? $question->surat;
+    @endphp
 
-                                                    @if ($question->surat)
-                                                        <span
-                                                            class="text-xs bg-emerald-100 text-emerald-700 px-2 py-1 rounded-full">
-                                                            رقم {{ $question->surat->number }}
-                                                        </span>
-                                                    @endif
-                                                </div>
+    <div class="flex flex-col gap-2">
 
-                                                <div class="text-gray-700">
-                                                    من الآية
-                                                    <span
-                                                        class="font-bold text-emerald-700">{{ $question->aya_from }}</span>
-                                                    إلى الآية
-                                                    <span
-                                                        class="font-bold text-emerald-700">{{ $question->aya_to }}</span>
-                                                </div>
-                                            </div>
-                                        </td>
+        {{-- Starting Surah --}}
+        <div class="flex items-center gap-2 flex-wrap">
+            <span class="font-bold text-lg text-emerald-900">
+                سورة {{ $startSurat?->title ?? '—' }}
+            </span>
+        </div>
+
+        {{-- Ayah Range --}}
+        <div class="text-gray-700">
+            من الآية
+            <span class="font-bold text-emerald-700">
+                {{ $question->aya_from }}
+            </span>
+        </div>
+
+        {{-- Ending Surah --}}
+        @if ($startSurat?->id !== $endSurat?->id)
+            <div class="flex items-center gap-2 flex-wrap">
+                <span class="text-gray-500 text-sm">إلى سورة</span>
+
+                <span class="font-bold text-lg text-emerald-900">
+                    {{ $endSurat?->title ?? '—' }}
+                </span>
+            </div>
+        @endif
+
+        {{-- Ending Ayah --}}
+        <div class="text-gray-700">
+            إلى الآية
+            <span class="font-bold text-emerald-700">
+                {{ $question->aya_to }}
+            </span>
+        </div>
+
+    </div>
+</td>
 
                                         {{-- Details --}}
                                         <td class="py-4 px-6">

@@ -116,7 +116,7 @@
         <div
             class="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-6 sm:px-6 lg:px-8 sm:flex-row sm:items-center sm:justify-between">
             <div>
-                <p class="text-sm font-medium text-slate-400 uppercase tracking-widest">مسابقة مؤسسة الشيخ مستهيل
+                <p class="text-sm font-medium text-slate-400  tracking-widest">مسابقة مؤسسة الشيخ مستهيل
                     للقرآن الكريم وقراءاته</p>
                 <h1 class="mt-1 text-2xl font-bold sm:text-3xl">المؤشرات العامة للمسابقة</h1>
                 <p class="mt-2 text-sm text-slate-400 flex items-center gap-2">
@@ -170,7 +170,7 @@
                 </article>
 
                 <article class="data-card p-5">
-                    <p class="text-sm font-medium text-slate-500">العينة الفعالة</p>
+                    <p class="text-sm font-medium text-slate-500">العدد الفعلي</p>
                     <p class="tabular mt-2 text-3xl font-bold text-slate-900">{{ $n($kpi['total']) }}</p>
                     <div class="mt-2 flex items-center justify-between text-xs text-slate-500">
                         <span>ذكور: <span
@@ -218,17 +218,17 @@
 
                     <div class="grid grid-cols-3 gap-4 border-t border-slate-100 pt-4">
                         <div>
-                            <p class="text-xs text-slate-500 uppercase tracking-wider">المتوسط </p>
+                            <p class="text-xs text-slate-500 tracking-wider">المتوسط </p>
                             <p class="tabular mt-1 text-2xl font-bold text-slate-800">
                                 {{ $mins($kpi['avg_test_minutes']) }}</p>
                         </div>
                         <div>
-                            <p class="text-xs text-slate-500 uppercase tracking-wider">الحد الأدنى </p>
+                            <p class="text-xs text-slate-500 tracking-wider">الحد الأدنى </p>
                             <p class="tabular mt-1 text-2xl font-bold text-slate-800">
                                 {{ $mins($kpi['min_test_minutes']) }}</p>
                         </div>
                         <div>
-                            <p class="text-xs text-slate-500 uppercase tracking-wider">الحد الأعلى </p>
+                            <p class="text-xs text-slate-500 tracking-wider">الحد الأعلى </p>
                             <p class="tabular mt-1 text-2xl font-bold text-slate-800">
                                 {{ $mins($kpi['max_test_minutes']) }}</p>
                         </div>
@@ -245,7 +245,7 @@
                     </h3>
                     <p class="mt-1 text-xs text-slate-500">من التسجيل المبدئي وحتى الدخول الفعلي للجنة.</p>
                     <div class="mt-5 border-t border-slate-100 pt-4">
-                        <p class="text-xs text-slate-500 uppercase tracking-wider">متوسط الانتظار</p>
+                        <p class="text-xs text-slate-500 tracking-wider">متوسط الانتظار</p>
                         <p class="tabular mt-1 text-3xl font-bold text-slate-800">{{ $mins($kpi['avg_wait_minutes']) }}
                         </p>
                     </div>
@@ -253,10 +253,10 @@
             </div>
         </section>
 
-        {{-- التوزيع الإحصائي حسب المستويات --}}
+{{-- التوزيع الإحصائي حسب المستويات --}}
         <section>
             <div class="mb-4">
-                <h2 class="text-lg font-bold text-slate-800">التوزيع الإحصائي للدرجات في جميع المراكز </h2>
+                <h2 class="text-lg font-bold text-slate-800">التوزيع الإحصائي للدرجات في جميع المراكز</h2>
             </div>
             <div class="grid gap-5 xl:grid-cols-2">
                 @foreach ($levelStats as $lv)
@@ -265,13 +265,38 @@
                         <div class="flex flex-wrap items-start justify-between gap-4 border-b border-slate-100 pb-5">
                             <div>
                                 <h3 class="text-lg font-bold text-slate-800">{{ $lv['title'] }}</h3>
-                                <p class="mt-1 text-sm text-slate-500">العدد: {{ $n($sc['count']) }} (الدرجة العظمى:
-                                    {{ $lv['max'] }})</p>
+                                <p class="mt-1 text-sm text-slate-500">تم رصد درجات: <span class="font-semibold text-slate-700 tabular">{{ $n($sc['count']) }}</span> (الدرجة من: {{ $lv['max'] }})</p>
+                                
+                                {{-- تفصيل أعداد الذكور والإناث للمستوى --}}
+                                <div class="mt-2.5 flex items-center gap-3 text-xs text-slate-600 bg-slate-50 px-3 py-1.5 rounded-md border border-slate-100 w-fit">
+                                    <span class="flex items-center gap-1.5">
+                                        <span class="h-2 w-2 rounded-full bg-blue-500"></span>
+                                        الذكور: <strong class="tabular text-slate-800">{{ $n($lv['male']) }}</strong>
+                                    </span>
+                                    <span class="text-slate-300">|</span>
+                                    <span class="flex items-center gap-1.5">
+                                        <span class="h-2 w-2 rounded-full bg-pink-500"></span>
+                                        الإناث: <strong class="tabular text-slate-800">{{ $n($lv['female']) }}</strong>
+                                    </span>
+                                    <span class="text-slate-300">|</span>
+                                    <span class="text-slate-500">
+                                        الإجمالي: <strong class="tabular text-slate-800">{{ $n($lv['total']) }}</strong>
+                                    </span>
+                                </div>
                             </div>
-                            <div class="text-left bg-slate-50 px-4 py-2 rounded-lg border border-slate-100">
-                                <p> عدد المنجزين:{{ $lv['total'] }}</p>
-                                <p class="text-xs text-slate-500 uppercase tracking-wider mb-1">نسبة الإنجاز</p>
-                                <p class="tabular text-xl font-bold text-slate-800">{{ $lv['finished_width'] }}%</p>
+
+                            {{-- بطاقة نسبة الإنجاز والمنجزين فعلياً --}}
+                            <div class="text-left bg-slate-50 px-4 py-2.5 rounded-lg border border-slate-100 min-w-[120px]">
+                                <div class="flex items-baseline justify-between gap-2 mb-1">
+                                    <span class="text-xs text-slate-500">نسبة الإنجاز</span>
+                                    <span class="tabular text-lg font-bold text-slate-900">{{ $lv['finished_width'] }}%</span>
+                                </div>
+                                <div class="progress h-1.5 w-full overflow-hidden rounded-full bg-slate-200 mb-1.5">
+                                    <div class="h-full rounded-full bg-indigo-600 transition-all" style="width: {{ $lv['finished_width'] }}%"></div>
+                                </div>
+                                <p class="text-[11px] text-slate-500 text-right">
+                                    أنجز: <span class="tabular font-semibold text-slate-700">{{ $n($lv['finished']) }}</span> من <span class="tabular text-slate-700">{{ $n($lv['total']) }}</span>
+                                </p>
                             </div>
                         </div>
 
@@ -297,31 +322,27 @@
                                 @endforeach
                             </div>
 
-                            <div
-                                class="mt-4 flex items-center gap-4 text-sm text-slate-600 bg-slate-50 px-3 py-2 rounded-md">
-                                <span>متوسط الذكور: <span
-                                        class="font-bold tabular text-slate-800">{{ $lv['avg_male'] ?? '—' }}</span></span>
+                            <div class="mt-4 flex items-center justify-between text-sm text-slate-600 bg-slate-50 px-3.5 py-2 rounded-md border border-slate-100">
+                                <span>متوسط درجات الذكور: <span class="font-bold tabular text-slate-800">{{ $lv['avg_male'] ?? '—' }}</span></span>
                                 <span class="text-slate-300">|</span>
-                                <span>متوسط الإناث: <span
-                                        class="font-bold tabular text-slate-800">{{ $lv['avg_female'] ?? '—' }}</span></span>
+                                <span>متوسط درجات الإناث: <span class="font-bold tabular text-slate-800">{{ $lv['avg_female'] ?? '—' }}</span></span>
                             </div>
                         @else
                             <p class="mt-4 text-sm text-slate-500 italic">لا توجد بيانات مسجلة حتى الآن.</p>
                         @endif
 
-                        <h4 class="mt-6 mb-3 text-sm font-semibold text-slate-700">التكرارات الإحصائية </h4>
+                        <h4 class="mt-6 mb-3 text-sm font-semibold text-slate-700">التكرارات الإحصائية</h4>
                         <div class="space-y-3">
                             @foreach ($lv['bins'] as $bin)
                                 <div class="grid grid-cols-[160px_1fr_60px] items-center gap-3 text-sm">
-                                    <span class="text-slate-600 truncate text-xs"
-                                        title="{{ $bin['label'] }}">{{ $bin['label'] }}</span>
+                                    <span class="text-slate-600 truncate text-xs" title="{{ $bin['label'] }}">{{ $bin['label'] }}</span>
                                     <div class="progress h-2 w-full overflow-hidden rounded-full bg-slate-100">
-                                        <div class="h-full rounded-full {{ $tones[$bin['tone']] }} transition-all"
-                                            style="width: {{ $bin['pct'] }}%"></div>
+                                        <div class="h-full rounded-full {{ $tones[$bin['tone']] }} transition-all" style="width: {{ $bin['pct'] }}%"></div>
                                     </div>
-                                    <span
-                                        class="tabular text-left text-xs font-medium text-slate-700">{{ $n($bin['count']) }}
-                                        <span class="text-slate-400">({{ $bin['pct'] }}%)</span></span>
+                                    <span class="tabular text-left text-xs font-medium text-slate-700">
+                                        {{ $n($bin['count']) }}
+                                        <span class="text-slate-400">({{ $bin['pct'] }}%)</span>
+                                    </span>
                                 </div>
                             @endforeach
                         </div>
@@ -351,12 +372,12 @@
                         </div>
                         <div class="flex gap-4 text-center">
                             <div>
-                                <p class="text-xs text-slate-500 uppercase">الحضور</p>
+                                <p class="text-xs text-slate-500 ">الحضور</p>
                                 <p class="tabular mt-1 text-xl font-bold text-slate-800">{{ $n($center['attended']) }}
                                 </p>
                             </div>
                             <div class="border-r border-slate-200 pr-4">
-                                <p class="text-xs text-slate-500 uppercase">المنسحبون</p>
+                                <p class="text-xs text-slate-500 ">المنسحبون</p>
                                 <p class="tabular mt-1 text-xl font-bold text-slate-800">{{ $n($center['withdraw']) }}
                                 </p>
                             </div>
@@ -383,11 +404,11 @@
                                 @if ($sc['count'] > 0)
                                     <div class="grid grid-cols-2 gap-3 mb-4">
                                         <div class="bg-white border border-slate-100 rounded p-2">
-                                            <p class="text-[10px] text-slate-500 uppercase">المتوسط</p>
+                                            <p class="text-[10px] text-slate-500 ">المتوسط</p>
                                             <p class="tabular font-bold text-slate-800">{{ $sc['avg'] }}</p>
                                         </div>
                                         <div class="bg-white border border-slate-100 rounded p-2">
-                                            <p class="text-[10px] text-slate-500 uppercase">متوسط النسبة</p>
+                                            <p class="text-[10px] text-slate-500 ">متوسط النسبة</p>
                                             <p class="tabular font-bold text-slate-800">{{ $sc['avg_pct'] }}%</p>
                                         </div>
                                     </div>
@@ -525,6 +546,114 @@
                         </div>
                     @endif
                 @endforeach
+            </div>
+        </section>
+
+        {{-- قسم التحليل الإحصائي التنفيذي الموجه للمسؤول المباشر --}}
+        <section class="avoid-break space-y-6">
+            <div class="border-r-4 border-indigo-600 pr-3">
+                <h2 class="text-xl font-bold text-slate-900">التقرير والتحليل الإحصائي التنفيذي</h2>
+                <p class="text-xs text-slate-500 mt-1">قراءة تحليلية شاملة لمؤشرات الأداء التشغيلي والمستوى التحصيلي للمتسابقين</p>
+            </div>
+
+            {{-- 1. كفاءة العمليات والتدفق التشغيلي --}}
+            <div class="data-card p-6">
+                <h3 class="text-base font-bold text-slate-800 mb-3 flex items-center gap-2">
+                    <span
+                        class="flex h-6 w-6 items-center justify-center rounded-full bg-indigo-100 text-xs font-bold text-indigo-700">1</span>
+                    المؤشرات التشغيلية وسير الاختبارات
+                </h3>
+                <div class="grid gap-4 md:grid-cols-3 text-sm text-slate-600 leading-relaxed">
+                    <div class="bg-slate-50 rounded-lg p-4 border border-slate-100">
+                        <p class="font-semibold text-slate-800 mb-1">معدلات الإنجاز والاستقرار</p>
+                        بلغ إجمالي المسجلين 302 متسابق، مع عينة فعلية قدرها 283 بعد استبعاد حالات الانسحاب البالغة 19 حالة
+                        (6.3%)، مما يمثل نسبة التزام مرتفعة وتراجعاً محدوداً في حالات الانسحاب[cite: 1]. أتم التقييم بنجاح 177
+                        متسابقاً بمعدل إنجاز عام وصل إلى 62.5%[cite: 1].
+                    </div>
+                    <div class="bg-slate-50 rounded-lg p-4 border border-slate-100">
+                        <p class="font-semibold text-slate-800 mb-1">إدارة الوقت وأداء اللجان</p>
+                        بلغ متوسط التقييم الفعلي أمام اللجان 24.3 دقيقة للمتسابق، مع تسجيل حد أدنى 13 دقيقة وحد أقصى 32
+                        دقيقة، وهو ما يؤكد التزام اللجان بهامش تقييم زمني منضبط ومتقارب بين مختلف المتسابقين دون تفاوت غير
+                        مبرر[cite: 1].
+                    </div>
+                    <div class="bg-slate-50 rounded-lg p-4 border border-slate-100">
+                        <p class="font-semibold text-slate-800 mb-1">كفاءة تدفق الانتظار</p>
+                        سجل متوسط زمن الانتظار العام 47.5 دقيقة من الاستقبال وحتى دخول اللجنة[cite: 1]؛ وهو معدل مقبول لوجستياً مع
+                        ضرورة وضع تنظيم لجدولة وصول المتسابقين لتقليص فترة المكوث في قاعات الانتظار في الفترات القادمة.
+                    </div>
+                </div>
+            </div>
+
+            {{-- 2. تحليل التحصيل العلمي والدرجات --}}
+            <div class="data-card p-6">
+                <h3 class="text-base font-bold text-slate-800 mb-3 flex items-center gap-2">
+                    <span
+                        class="flex h-6 w-6 items-center justify-center rounded-full bg-indigo-100 text-xs font-bold text-indigo-700">2</span>
+                    التحليل الإحصائي لمستوى الدرجات والتفوق
+                </h3>
+                <div class="grid gap-4 md:grid-cols-2 text-sm text-slate-600 leading-relaxed">
+                    <div class="border border-slate-100 rounded-lg p-4">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="font-bold text-slate-800">المستوى الأول (الدرجة من: 120)</span>
+                            <span class="text-xs bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded font-semibold">أداء
+                                ممتاز</span>
+                        </div>
+                        <ul class="space-y-1.5 list-disc list-inside text-xs">
+                            <li><strong>متوسط الأداء العام:</strong> بلغ متوسط الدرجات 106.42 درجة (أي ما يعادل 88.7%) مع
+                                وسيط 110.75، ما يعكس انزياح النتائج بشكل قوي نحو فئات الدرجات العليا[cite: 1, 2].</li>
+                            <li><strong>التجانس وتشتت الدرجات:</strong> سجل الانحراف قيمة منخفضة (10.2)، مع انعدام تام لأي
+                                نتائج دون 70%، وحصول 85.3% من المتسابقين على تقدير (جيد جداً وممتاز)، وهو دليل قطعي على
+                                الاستعداد العالي والجاهزية الفائقة للمشاركين في هذا المستوى[cite: 1].</li>
+                            <li><strong>المقارنة الفئوية:</strong> أظهرت الإناث تفوقاً ملحوظاً بمتوسط 110.33 درجة مقارنة
+                                بمتوسط الذكور البالغ 104.28 درجة[cite: 1].</li>
+                        </ul>
+                    </div>
+
+                    <div class="border border-slate-100 rounded-lg p-4">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="font-bold text-slate-800">المستوى الثاني (الدرجة من: 100)</span>
+                            <span class="text-xs bg-sky-100 text-sky-800 px-2 py-0.5 rounded font-semibold">تباين تحصيلي
+                                أوسع</span>
+                        </div>
+                        <ul class="space-y-1.5 list-disc list-inside text-xs">
+                            <li><strong>متوسط الأداء العام:</strong> بلغ المتوسط 83.05 درجة مع وسيط قدره 88.75 درجة، وحصول
+                                46.2% من المتسابقين على الفئة العليا (90% – 100%)[cite: 1].</li>
+                            <li><strong>التشتت والتباين:</strong> ارتفعت قيمة الانحراف لتصل إلى 16.41 درجة، مترافقة مع ظهور
+                                حالات دون 60% بنسبة (9.1%)، وهو ما يكشف تبايناً واضحاً في مستويات الإتقان والحفظ بالمقارنة
+                                مع المستوى الأول[cite: 1].</li>
+                            <li><strong>المقارنة الفئوية:</strong> واصلت الإناث تحقيق الصدارة التحصيلية بمتوسط 87.46 درجة
+                                مقابل 79.66 درجة للذكور[cite: 1].</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            {{-- 3. الموقف الميداني للمراكز والتوصيات --}}
+            <div class="data-card p-6">
+                <h3 class="text-base font-bold text-slate-800 mb-3 flex items-center gap-2">
+                    <span
+                        class="flex h-6 w-6 items-center justify-center rounded-full bg-indigo-100 text-xs font-bold text-indigo-700">3</span>
+                    الموقف التنفيذي للمراكز والتوصيات المقترحة
+                </h3>
+                <div class="space-y-3 text-sm text-slate-700 leading-relaxed">
+                    <div class="flex items-start gap-2">
+                        <span class="text-emerald-600 font-bold mt-0.5">•</span>
+                        <p><strong>مركز جامع السلطان قابوس الأكبر بولاية بوشر:</strong> أظهر كفاءة تشغيلية متقدمة ونسبة
+                            إنجاز قياسية بلغت 81.3% (إنهاء 91 من أصل 112 متسابقاً) مع استقرار نوعي في جودة الدرجات لجميع
+                            الفئات[cite: 2].</p>
+                    </div>
+                    <div class="flex items-start gap-2">
+                        <span class="text-amber-600 font-bold mt-0.5">•</span>
+                        <p><strong>مركز جامع السلطان قابوس بولاية إبراء:</strong> سجلت البيانات عدم بدء التقييم الميداني
+                            (نسبة الإنجاز 0% مع تسجيل حضور 0 من أصل 32 متسابقاً)، مما يوضح أنه لم يُدشّن تشغيلياً بعد أو أن
+                            النتائج بانتظار المزامنة والرفع على النظام[cite: 2].</p>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-slate-100 flex flex-wrap gap-2 text-xs">
+                        <span class="font-bold text-slate-800 self-center">التوصية المباشرة:</span>
+                        <span class="bg-indigo-50 text-indigo-700 px-3 py-1 rounded-md font-medium">1. تطبيق نظام مواعيد مسبقة مجدولة لتقليص زمن الانتظار (47.5 دقيقة).</span>
+                        <span class="bg-indigo-50 text-indigo-700 px-3 py-1 rounded-md font-medium">2. متابعة الموقف التشغيلي لمركز ولاية إبراء لبدء إدخال الدرجات.</span>
+                    </div>
+                </div>
             </div>
         </section>
 

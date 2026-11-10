@@ -20,11 +20,15 @@ class JudgeController extends Controller
 
     public function show(User $user)
     {
+        $stage = Stage::whereActive(1)->first();
+
         // load committees linked to the user
         $user->load('committees');
 
         // all committees from all centers
-        $committees = Committee::with('center')->get();
+        $committees = Committee::with('center')
+            ->where('stage_id', $stage->id)
+            ->get();
 
         return view('user.show', compact('user', 'committees'));
     }

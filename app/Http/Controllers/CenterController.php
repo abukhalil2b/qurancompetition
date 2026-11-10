@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Center;
-use App\Models\Committee;
+use App\Models\Stage;
 use App\Models\Competition;
 use Carbon\Carbon;
 
@@ -11,9 +11,16 @@ class CenterController extends Controller
 {
     public function index()
     {
-        $centers = Center::withCount('committees')->latest('id')->get();
+        $stage = Stage::whereActive(1)->first();
+        
+        $centers = Center::withCount('committees')
+        ->whereHas('committees',function($query) use($stage){
+            $query->where('committees.stage_id',$stage->id);
+        })
+        ->latest('id')
+        ->get();
 
-        return view('center.index', compact('centers'));
+        return view('center.index', compact('centers','stage'));
     }
 
     /**

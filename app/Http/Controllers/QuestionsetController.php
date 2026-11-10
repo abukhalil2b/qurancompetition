@@ -3,12 +3,21 @@
 namespace App\Http\Controllers;
 
 use App\Models\Questionset;
+use App\Models\Stage;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class QuestionsetController extends Controller
 {
     public function index($id = 1)
     {
+
+        $stage = Stage::whereActive(1)->latest('id')->first();
+
+        if (! $stage) {
+            abort(403, 'لابد من تفعيل المرحلة في النظام');
+        }
+
         $levels = [
             1 => 'المستوى الأول',
             2 => 'المستوى الثاني',
@@ -20,6 +29,7 @@ class QuestionsetController extends Controller
 
         $questionsets = Questionset::withCount('questions')
             ->where('level', $levelId)
+            ->where('stage_id', $stage->id)
             ->get();
 
         $totalCount = $questionsets->count();
@@ -33,12 +43,19 @@ class QuestionsetController extends Controller
             'totalCount',
             'notSelectedCount',
             'level',
+            'stage',
             'levelId'
         ));
     }
 
     public function create($level)
     {
+        $stage = Stage::whereActive(1)->latest('id')->first();
+
+        if (! $stage) {
+            abort(403, 'لابد من تفعيل المرحلة في النظام');
+        }
+
         $levels = [
             1 => 'المستوى الأول',
             2 => 'المستوى الثاني',
@@ -50,12 +67,19 @@ class QuestionsetController extends Controller
 
         return view('questionset.create', compact(
             'level',
-            'levelId'
+            'levelId',
+            'stage'
         ));
     }
 
     public function store(Request $request)
     {
+        $stage = Stage::whereActive(1)->latest('id')->first();
+
+        if (! $stage) {
+            abort(403, 'لابد من تفعيل المرحلة في النظام');
+        }
+
         $request->validate([
             'title' => 'required|string|max:255',
             'level' => 'required|in:1,2',
@@ -64,6 +88,7 @@ class QuestionsetController extends Controller
         Questionset::create([
             'title' => $request->title,
             'level' => $request->level,
+            'stage_id' => $stage->id,
         ]);
 
         return redirect()
@@ -74,9 +99,11 @@ class QuestionsetController extends Controller
     public function show(Questionset $questionset)
     {
         $questions = $questionset->questions()
-            ->with('surat')
-            ->orderBy('quran_surat_id')
-            ->orderBy('aya_from')
+            ->with(['surat', 'suratTo'])
+            ->join('quran_surats', 'questions.quran_surat_id', '=', 'quran_surats.id')
+            ->orderBy('quran_surats.number')
+            ->orderBy('questions.aya_from')
+            ->select('questions.*')
             ->get();
 
         return view('questionset.show', compact('questionset', 'questions'));
@@ -128,7 +155,10 @@ class QuestionsetController extends Controller
 
     public function destroy(Questionset $questionset)
     {
-        $questionset->delete();
+        DB::transaction(function () use ($questionset) {
+            $questionset->questions()->delete();
+            $questionset->delete();
+        });
 
         return back()->with('success', 'تم حذف باقة الأسئلة');
     }

@@ -11,35 +11,32 @@ use Illuminate\Http\Request;
 
 class CommitteeController extends Controller
 {
-public function index()
-{
-    $stage = Stage::whereActive(true)->latest('id')->first();
+    public function index()
+    {
+        $stage = Stage::whereActive(true)
+            ->latest('id')
+            ->first();
 
-    if (! $stage) {
-        abort(403, 'لم يتم تحديد مرحلة التصفيات');
+        if (! $stage) {
+            abort(403, 'لم يتم تحديد مرحلة التصفيات');
+        }
+
+        $committees = Committee::with(['center', 'users'])
+            ->where('stage_id', $stage->id)
+            ->get()
+            ->groupBy('center_id');
+
+        // Count competitions (students) per center for the badge
+        $centerStudentCounts = Competition::query()
+            ->where('stage_id', $stage->id)
+            ->selectRaw('center_id, COUNT(*) as total')
+            ->groupBy('center_id')
+            ->pluck('total', 'center_id');
+
+        $centers = Center::orderBy('title')->get();
+
+        return view('committee.index', compact('committees', 'centers', 'stage', 'centerStudentCounts'));
     }
-
-    $committees = Committee::with(['center', 'users'])
-        ->where('stage_id', $stage->id)
-        ->get()
-        ->groupBy('center_id');
-
-    // Count competitions (students) per center for the badge
-    $centerStudentCounts = Competition::query()
-        ->where('stage_id', $stage->id)
-        ->selectRaw('center_id, COUNT(*) as total')
-        ->groupBy('center_id')
-        ->pluck('total', 'center_id');
-
-    $centers = Center::orderBy('title')->get();
-
-    return view('committee.index', compact(
-        'committees',
-        'centers',
-        'stage',
-        'centerStudentCounts'
-    ));
-}
 
     public function store(Request $request)
     {
@@ -48,8 +45,15 @@ public function index()
             'title' => 'required|string|max:255',
             'center_id' => 'required|exists:centers,id',
         ]);
+        
+        $stage = Stage::latest('id')->first();
+
+        if (! $stage) {
+            abort(404, 'لم يتم انشاء التصفيات في النظام');
+        }
 
         Committee::create([
+            'stage_id' => $stage->id,
             'title' => $validated['title'],
             'center_id' => $validated['center_id'],
             'gender' => $validated['gender'],

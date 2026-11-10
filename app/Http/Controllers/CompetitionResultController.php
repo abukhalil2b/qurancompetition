@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Exports\CompetitionResultsExport;
 use App\Models\Center;
+use App\Models\Stage;
 use App\Models\Committee;
 use App\Models\Competition; // Ensure this import is correct
 use App\Models\StudentQuestionSelection;
@@ -20,6 +21,12 @@ class CompetitionResultController extends Controller
 
         if (! in_array($user->user_type, ['admin'])) {
             abort(403, 'غير مصرح دخول هذه الصفحة');
+        }
+
+        $stage = Stage::whereActive(1)->latest('id')->first();
+
+        if (! $stage) {
+            abort(403, 'لابد من تفعيل المرحلة في النظام');
         }
 
         // Handle Excel export with dynamic filename

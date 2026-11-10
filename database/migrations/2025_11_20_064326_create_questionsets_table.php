@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('title');
             $table->boolean('level')->default(1);
             $table->boolean('selected')->default(false);
+            $table->bigInteger('stage_id');
         });
     }
 

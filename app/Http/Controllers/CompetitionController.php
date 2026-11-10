@@ -31,11 +31,11 @@ class CompetitionController extends Controller
 
     public function update(Request $request, Competition $competition)
     {
-        if(in_array($competition->student_status,['with_committee','waiting_finalization','finish_competition'])){
-            abort(403,'لايمكن التعديل في حالة'.$competition->student_status);
+        if (in_array($competition->student_status, ['with_committee', 'waiting_finalization', 'finish_competition'])) {
+            abort(403, 'لايمكن التعديل في حالة'.$competition->student_status);
         }
         $validated = $request->validate([
-            'level'=>'required',
+            'level' => 'required',
             'committee_id' => ['nullable', Rule::exists('committees', 'id')],
             'student_status' => [
                 'required',
@@ -92,9 +92,10 @@ class CompetitionController extends Controller
         $competitions = Competition::with([
             'student:id,name,phone',
             'committee:id,title',
+            'stage:id,title',
         ])
             ->where('center_id', $center->id)
-            ->where('stage_id', $stage->id)
+            ->where('competitions.stage_id', $stage->id)
             ->orderBy('id')
             ->get([
                 'id',
@@ -104,7 +105,9 @@ class CompetitionController extends Controller
                 'student_status',
             ]);
 
-        $committees = Committee::where('center_id', $center->id)->get();
+        $committees = Committee::where('center_id', $center->id)
+            ->where('stage_id', $stage->id)
+            ->get();
 
         return view('competition.student.index', compact(
             'committees',
@@ -129,7 +132,6 @@ class CompetitionController extends Controller
             ->where('committee_id', $committee->id)
             ->orderBy('id')
             ->get(['id', 'student_id', 'committee_id', 'level', 'student_status']);
-
 
         return view('competition.student.print', compact(
             'center',

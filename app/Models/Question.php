@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Question extends Model
 {
     public $timestamps = false;
+
     protected $guarded = [];
 
     public function questionset()
@@ -33,4 +34,8 @@ class Question extends Model
         );
     }
 
+    public function suratTo()
+    {
+        return $this->belongsTo(QuranSurat::class, 'quran_surat_to_id');
+    }
 }

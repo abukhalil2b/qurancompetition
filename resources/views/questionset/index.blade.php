@@ -7,8 +7,8 @@
 
             <div class="flex items-center gap-4">
 
-                <h1 class="text-2xl md:text-3xl font-bold text-gray-800">
-                    باقات الأسئلة
+                <h1 class="text-xl md:text-3xl font-bold text-gray-800">
+                    باقات الأسئلة - {{ $stage->title }}
                 </h1>
 
                 <span

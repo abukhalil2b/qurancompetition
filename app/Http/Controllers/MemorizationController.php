@@ -17,9 +17,6 @@ use Illuminate\Support\Facades\DB;
 
 class MemorizationController extends Controller
 {
-    /**
-     * Show the grading form for a specific memorization question.
-     */
     public function start($student_question_selection_id)
     {
         $judge = auth()->user();
@@ -29,37 +26,88 @@ class MemorizationController extends Controller
             ->first();
 
         if (! $stage) {
-            abort(403, 'لم يتم تعين المرحلة');
+            abort(403, 'لم يتم تعيين المرحلة');
         }
 
         $studentQuestionSelection = StudentQuestionSelection::with([
             'competition',
-            'question',
+            'question.surat',
+            'question.suratTo',
             'judgeEvaluations' => fn ($q) => $q->where('judge_id', $judge->id),
             'judgeNotes' => fn ($q) => $q->where('judge_id', $judge->id),
         ])->findOrFail($student_question_selection_id);
 
-        $competition = Competition::findOrFail($studentQuestionSelection->competition_id);
-        
+        $competition = $studentQuestionSelection->competition;
+
         $isJudgeLeader = $judge->isCommitteeLeader($competition->committee_id);
 
         $question = $studentQuestionSelection->question;
 
+        // سورة البداية والنهاية
+        $startSurat = $question->surat;
+        $endSurat = $question->suratTo ?? $startSurat;
+
+        if (! $startSurat || ! $endSurat) {
+            abort(404, 'بيانات السورة غير مكتملة');
+        }
+
+        // جلب جميع الآيات بين السورتين المحددتين
         $quranAyas = QuranAya::query()
-            ->where('quran_surat_id', $question->quran_surat_id)
-            ->whereBetween('number', [
-                $question->aya_from,
-                $question->aya_to,
+            ->join('quran_surats', 'quran_ayas.quran_surat_id', '=', 'quran_surats.id')
+            ->whereBetween('quran_surats.number', [
+                $startSurat->number,
+                $endSurat->number,
             ])
-            ->orderBy('number')
+            ->where(function ($query) use ($startSurat, $endSurat, $question) {
+
+                // Case 1: Both Ayahs are in the same Surah
+                if ($startSurat->id === $endSurat->id) {
+
+                    $query->where('quran_ayas.quran_surat_id', $startSurat->id)
+                        ->whereBetween('quran_ayas.number', [
+                            $question->aya_from,
+                            $question->aya_to,
+                        ]);
+
+                } else {
+
+                    // Starting Surah: from aya_from to the end
+                    $query->where(function ($q) use ($startSurat, $question) {
+                        $q->where('quran_ayas.quran_surat_id', $startSurat->id)
+                            ->where('quran_ayas.number', '>=', $question->aya_from);
+                    });
+
+                    // Intermediate Surahs: all Ayahs
+                    $query->orWhere(function ($q) use ($startSurat, $endSurat) {
+                        $q->where('quran_surats.number', '>', $startSurat->number)
+                            ->where('quran_surats.number', '<', $endSurat->number);
+                    });
+
+                    // Ending Surah: from the beginning to aya_to
+                    $query->orWhere(function ($q) use ($endSurat, $question) {
+                        $q->where('quran_ayas.quran_surat_id', $endSurat->id)
+                            ->where('quran_ayas.number', '<=', $question->aya_to);
+                    });
+                }
+            })
+            ->orderBy('quran_surats.number')
+            ->orderBy('quran_ayas.number')
             ->get([
-                'id',
-                'number',
-                'page_number',
-                'content',
+                'quran_ayas.id',
+                'quran_ayas.quran_surat_id',
+                'quran_ayas.number',
+                'quran_ayas.page_number',
+                'quran_ayas.content',
+                'quran_surats.title as surat_title',
+                'quran_surats.number as surat_number',
             ]);
 
-            $firstQuranAya = $quranAyas->first();
+        $firstQuranAya = $quranAyas->first();
+
+        if ($quranAyas->isEmpty()) {
+            abort(404, 'لم يتم العثور على آيات السؤال');
+        }
+
         $evaluationElements = EvaluationElement::where('level', $competition->level)->get();
 
         $oldScores = $studentQuestionSelection
@@ -78,13 +126,12 @@ class MemorizationController extends Controller
             'stage',
             'oldScores',
             'oldNote',
-            'quranAyas'
+            'quranAyas',
+            'startSurat',
+            'endSurat'
         ));
     }
 
-    /**
-     * Save the scores for a single question.
-     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -97,8 +144,8 @@ class MemorizationController extends Controller
 
         $judge = Auth::user();
 
-        if($judge->user_type !='judge'){
-            abort(403,'حسابك غير مصرح له بالتقييم');
+        if ($judge->user_type != 'judge') {
+            abort(403, 'حسابك غير مصرح له بالتقييم');
         }
 
         $selection = StudentQuestionSelection::findOrFail($validated['student_question_selection_id']);
@@ -111,7 +158,7 @@ class MemorizationController extends Controller
             ->exists();
 
         if (! $isJudge) {
-            abort(403,'أنت لست محكم');
+            abort(403, 'أنت لست محكم');
         }
 
         DB::transaction(function () use ($validated, $selection, $judge, $competition) {

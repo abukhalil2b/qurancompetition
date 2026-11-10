@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('juz',10);//[الاول، الثاني]
             $table->integer('quran_surat_id',10);
             $table->smallInteger('aya_from');
+            $table->smallInteger('quran_surat_to_id');
             $table->smallInteger('aya_to');
         });
     }

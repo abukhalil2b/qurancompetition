@@ -49,105 +49,96 @@
 
                 </div>
 
-                {{-- Surat --}}
-                <div class="bg-gray-50 rounded-xl p-4">
 
-                    <div class="text-sm text-gray-500 mb-1">
-                        السورة
-                    </div>
 
-                    <div class="font-semibold text-gray-800">
+                {{-- Surat range --}}
+<div class="bg-gray-50 rounded-xl p-4 sm:col-span-2">
 
-                        {{ $question->surat->number }}
+    <div class="text-sm text-gray-500 mb-2">
+        نطاق السور والآيات
+    </div>
 
-                        -
+    <div class="font-semibold text-gray-800">
 
-                        {{ $question->surat->title }}
+        من سورة {{ $question->surat->title }}
+        ({{ $question->aya_from }})
 
-                    </div>
+        <span class="text-indigo-600 mx-2">إلى</span>
 
-                </div>
+        سورة {{ ($question->suratTo ?? $question->surat)->title }}
+        ({{ $question->aya_to }})
 
-                {{-- Aya range --}}
-                <div class="bg-gray-50 rounded-xl p-4">
+    </div>
 
-                    <div class="text-sm text-gray-500 mb-1">
-                        الآيات
-                    </div>
-
-                    <div class="font-semibold text-gray-800">
-
-                        {{ $question->aya_from }}
-
-                        -
-
-                        {{ $question->aya_to }}
-
-                    </div>
-
-                </div>
+</div>
             </div>
         </div>
 
-        {{-- Quran --}}
-        <div class="bg-white rounded-2xl shadow-sm overflow-hidden">
+     {{-- Quran --}}
+<div class="bg-white rounded-2xl shadow-sm overflow-hidden">
 
+    @foreach ($ayas as $suratAyas)
 
-            {{-- Quran Header --}}
-            <div class="px-6 py-5 border-b border-gray-100 text-center">
+        @php
+            $firstAya = $suratAyas->first();
+            $lastAya = $suratAyas->last();
+        @endphp
 
-                <div class="text-sm text-gray-500 mb-2">
-                    سورة
-                </div>
+        {{-- Surah Header --}}
+        <div class="px-6 py-5 border-b border-gray-100 text-center
+                    {{ !$loop->first ? 'border-t' : '' }}">
 
-                <h2 class="text-2xl font-bold text-gray-800">
-                    {{ $question->surat->title }}
-                </h2>
-
-                <div class="text-sm text-gray-500 mt-2">
-
-                    الآيات
-                    {{ $question->aya_from }}
-                    -
-                    {{ $question->aya_to }}
-
-                </div>
-
+            <div class="text-sm text-gray-500 mb-2">
+                سورة
             </div>
 
+            <h2 class="text-2xl font-bold text-gray-800">
+                {{ $firstAya->surat_title }}
+            </h2>
 
-            {{-- Quran Text --}}
-            <div class="p-6 sm:p-8">
+            <div class="text-sm text-gray-500 mt-2">
+                الآيات
+                {{ $firstAya->number }}
+                -
+                {{ $lastAya->number }}
+            </div>
 
-                <div
-                    class="text-2xl leading-[2.6] text-gray-800 text-justify"
-                    style="font-family: 'Amiri', 'Traditional Arabic', serif;"
-                >
+        </div>
 
-                    @foreach ($ayas as $aya)
+        {{-- Quran Text --}}
+        <div class="p-6 sm:p-8">
 
-                        <span class="font-quran">
-                            {{ $aya->content }}
-                        </span>
+            <div
+                class="text-2xl leading-[2.6] text-gray-800 text-justify"
+                style="font-family: 'Amiri', 'Traditional Arabic', serif;"
+            >
 
-                        <span
-                            class="inline-flex items-center justify-center
-                                   w-9 h-9 mx-1
-                                   border border-gray-400
-                                   rounded-full
-                                   text-sm
-                                   align-middle"
-                        >
-                            {{ $aya->number }}
-                        </span>
+                @foreach ($suratAyas as $aya)
 
-                    @endforeach
+                    <span class="font-quran">
+                        {{ $aya->content }}
+                    </span>
 
-                </div>
+                    <span
+                        class="inline-flex items-center justify-center
+                               w-9 h-9 mx-1
+                               border border-gray-400
+                               rounded-full
+                               text-sm
+                               align-middle"
+                    >
+                        {{ $aya->number }}
+                    </span>
+
+                @endforeach
 
             </div>
 
         </div>
+
+    @endforeach
+
+</div>
 
         {{-- Back --}}
         <div class="mt-6">

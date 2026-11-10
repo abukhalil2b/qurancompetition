@@ -101,36 +101,59 @@
 
                     </div>
 
-                    {{-- Surat --}}
+                    {{-- Starting Surat --}}
                     <div>
-
                         <label for="quran_surat_id" class="block text-gray-700 font-medium mb-2">
-                            السورة
+                            من سورة
                         </label>
 
-                        <select name="quran_surat_id" id="quran_surat_id" x-model="selectedSurat" @change="loadAyas()"
+                        <select name="quran_surat_id" id="quran_surat_id" x-model="selectedSurat"
+                            @change="loadAyas('from')"
                             class="w-full border border-gray-300 rounded-lg px-4 py-3
-                               focus:outline-none focus:border-green-500
-                               focus:ring-1 focus:ring-green-500"
+               focus:outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500"
                             required>
-
-                            <option value="">
-                                اختر السورة
-                            </option>
+                            <option value="">اختر السورة</option>
 
                             @foreach ($surats as $surat)
                                 <option value="{{ $surat->id }}">
                                     {{ $surat->number }} - {{ $surat->title }}
                                 </option>
                             @endforeach
-
                         </select>
 
+                        @error('quran_surat_id')
+                            <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    {{-- Ending Surat --}}
+                    <div>
+                        <label for="quran_surat_to_id" class="block text-gray-700 font-medium mb-2">
+                            إلى سورة
+                        </label>
+
+                        <select name="quran_surat_to_id" id="quran_surat_to_id" x-model="selectedSuratTo"
+                            @change="loadAyas('to')" :disabled="!selectedSurat"
+                            class="w-full border border-gray-300 rounded-lg px-4 py-3
+               disabled:bg-gray-100 disabled:text-gray-400
+               focus:outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500"
+                            required>
+                            <option value="">اختر السورة</option>
+
+                            <template x-for="surat in availableEndSurats" :key="surat.id">
+                                <option :value="String(surat.id)" x-text="surat.number + ' - ' + surat.title">
+                                </option>
+                            </template>
+                        </select>
+
+                        @error('quran_surat_to_id')
+                            <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                        @enderror
                     </div>
 
 
                     {{-- Loading --}}
-                    <template x-if="loading">
+                    <template x-if="loadingFrom || loadingTo">
 
                         <div class="flex items-center gap-2 text-gray-500 text-sm">
 
@@ -148,71 +171,61 @@
                     </template>
 
                     <div class="flex gap-1">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
 
-                        {{-- From Aya --}}
-                        <div>
+                            {{-- Starting Ayah --}}
+                            <div>
+                                <label for="aya_from" class="block text-gray-700 font-medium mb-2">
+                                    من الآية
+                                </label>
 
-                            <label for="aya_from" class="block text-gray-700 font-medium mb-2">
-                                من الآية
-                            </label>
+                                <select name="aya_from" id="aya_from" x-model="selectedAyaFrom"
+                                    @change="validateAyaRange()" :disabled="loadingFrom || !selectedSurat"
+                                    class="w-full border border-gray-300 rounded-lg px-4 py-3
+                   disabled:bg-gray-100 disabled:text-gray-400"
+                                    required>
+                                    <option value="">اختر الآية</option>
 
-                            <select name="aya_from" id="aya_from" x-model="selectedAyaFrom"
-                                @change="validateAyaRange()" :disabled="loading || !selectedSurat"
-                                class="w-full border border-gray-300 rounded-lg px-4 py-3
-                               disabled:bg-gray-100 disabled:text-gray-400
-                               focus:outline-none focus:border-green-500
-                               focus:ring-1 focus:ring-green-500"
-                                required>
+                                    <template x-for="aya in ayasFrom" :key="aya.id">
+                                        <option :value="String(aya.number)" x-text="'الآية ' + aya.number">
+                                        </option>
+                                    </template>
+                                </select>
 
-                                <option value="">
-                                    اختر الآية
-                                </option>
+                                @error('aya_from')
+                                    <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                                @enderror
+                            </div>
 
-                                <template x-for="aya in ayas" :key="aya.id">
+                            {{-- Ending Ayah --}}
+                            <div>
+                                <label for="aya_to" class="block text-gray-700 font-medium mb-2">
+                                    إلى الآية
+                                </label>
 
-                                    <option :value="aya.number" x-text="'الآية ' + aya.number"></option>
+                                <select name="aya_to" id="aya_to" x-model="selectedAyaTo"
+                                    :disabled="loadingTo || !selectedSuratTo || !selectedAyaFrom"
+                                    class="w-full border border-gray-300 rounded-lg px-4 py-3
+                   disabled:bg-gray-100 disabled:text-gray-400"
+                                    required>
+                                    <option value="">اختر الآية</option>
 
-                                </template>
+                                    <template x-for="aya in availableToAyas" :key="aya.id">
+                                        <option :value="String(aya.number)" x-text="'الآية ' + aya.number">
+                                        </option>
+                                    </template>
+                                </select>
 
-                            </select>
-
-                        </div>
-
-
-                        {{-- To Aya --}}
-                        <div>
-
-                            <label for="aya_to" class="block text-gray-700 font-medium mb-2">
-                                إلى الآية
-                            </label>
-
-                            <select name="aya_to" id="aya_to" x-model="selectedAyaTo"
-                                :disabled="loading || !selectedSurat || !selectedAyaFrom"
-                                class="w-full border border-gray-300 rounded-lg px-4 py-3
-                               disabled:bg-gray-100 disabled:text-gray-400
-                               focus:outline-none focus:border-green-500
-                               focus:ring-1 focus:ring-green-500"
-                                required>
-
-                                <option value="">
-                                    اختر الآية
-                                </option>
-
-                                <template x-for="aya in availableToAyas" :key="aya.id">
-
-                                    <option :value="aya.number" x-text="'الآية ' + aya.number"></option>
-
-                                </template>
-
-                            </select>
+                                @error('aya_to')
+                                    <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                                @enderror
+                            </div>
 
                         </div>
-
                     </div>
 
                     {{-- Selected Quran Preview --}}
-                    <template x-if="selectedAyaFrom && selectedAyaTo">
-
+                    <template x-if="selectedAyaFrom && selectedAyaTo && selectedSurat && selectedSuratTo">
                         <div class="bg-emerald-50 border border-emerald-100 rounded-xl p-4">
 
                             <div class="text-sm text-emerald-700 font-medium mb-2">
@@ -220,22 +233,23 @@
                             </div>
 
                             <div class="text-gray-700">
+                                من سورة
+                                <strong x-text="suratName(selectedSurat)"></strong>
 
-                                من الآية
-                                <span class="font-bold" x-text="selectedAyaFrom"></span>
+                                الآية
+                                <strong x-text="selectedAyaFrom"></strong>
 
-                                إلى الآية
+                                <span class="mx-2 text-emerald-600">إلى</span>
 
-                                <span class="font-bold" x-text="selectedAyaTo"></span>
+                                سورة
+                                <strong x-text="suratName(selectedSuratTo)"></strong>
 
+                                الآية
+                                <strong x-text="selectedAyaTo"></strong>
                             </div>
 
                         </div>
-
                     </template>
-
-
-
 
                     {{-- Actions --}}
                     <div class="flex gap-3 justify-end pt-4 border-t border-gray-100">
@@ -247,12 +261,20 @@
                         </a>
 
 
-                        <button type="submit" :disabled="loading || !selectedAyaFrom || !selectedAyaTo"
+                        <button type="submit"
+                            :disabled="loadingFrom ||
+                                loadingTo ||
+                                !selectedSurat ||
+                                !selectedSuratTo ||
+                                !selectedAyaFrom ||
+                                !selectedAyaTo"
                             class="px-6 py-2.5 bg-green-600 text-white
-                               rounded-lg hover:bg-green-700
-                               disabled:bg-gray-300 disabled:cursor-not-allowed
-                               transition-colors font-medium">
+           rounded-lg hover:bg-green-700
+           disabled:bg-gray-300 disabled:cursor-not-allowed
+           transition-colors font-medium">
+
                             إضافة السؤال
+
                         </button>
 
                     </div>
@@ -264,100 +286,171 @@
         </div>
 
     </div>
-
-
     <script>
         function questionForm() {
             return {
+                surats: @js(
+    $surats
+        ->map(
+            fn($surat) => [
+                'id' => (string) $surat->id,
+                'number' => $surat->number,
+                'title' => $surat->title,
+            ],
+        )
+        ->values(),
+),
 
                 selectedSurat: @js(old('quran_surat_id', '')),
+                selectedSuratTo: @js(old('quran_surat_to_id', '')),
 
                 selectedAyaFrom: @js(old('aya_from', '')),
-
                 selectedAyaTo: @js(old('aya_to', '')),
 
-                ayas: [],
+                ayasFrom: [],
+                ayasTo: [],
 
-                loading: false,
+                loadingFrom: false,
+                loadingTo: false,
 
+                async init() {
+                    // Restore previously selected values after validation errors.
+                    if (this.selectedSurat) {
+                        await this.loadAyas('from', false);
+                    }
 
-                async loadAyas() {
+                    if (this.selectedSuratTo) {
+                        await this.loadAyas('to', false);
+                    }
+                },
 
-                    this.selectedAyaFrom = '';
-                    this.selectedAyaTo = '';
-                    this.ayas = [];
-
+                get availableEndSurats() {
                     if (!this.selectedSurat) {
-                        return;
+                        return [];
                     }
 
-                    this.loading = true;
+                    const start = this.surats.find(
+                        surat => surat.id === String(this.selectedSurat)
+                    );
 
-                    try {
-
-                        const url = @json(route('quran.surats.ayas', [
-                                'quranSurat' => '__SURAT__',
-                            ])).replace(
-                            '__SURAT__',
-                            this.selectedSurat
-                        );
-
-
-                        const response = await fetch(url);
-
-
-                        if (!response.ok) {
-                            throw new Error(
-                                'Failed to load ayas'
-                            );
-                        }
-
-
-                        this.ayas = await response.json();
-
-                    } catch (error) {
-
-                        console.error(error);
-
-                    } finally {
-
-                        this.loading = false;
-
+                    if (!start) {
+                        return [];
                     }
+
+                    return this.surats.filter(
+                        surat => surat.number >= start.number
+                    );
                 },
-
-
-                validateAyaRange() {
-
-                    if (!this.selectedAyaFrom) {
-                        this.selectedAyaTo = '';
-                        return;
-                    }
-
-                    if (
-                        this.selectedAyaTo &&
-                        Number(this.selectedAyaTo) <
-                        Number(this.selectedAyaFrom)
-                    ) {
-                        this.selectedAyaTo = '';
-                    }
-                },
-
 
                 get availableToAyas() {
-
                     if (!this.selectedAyaFrom) {
                         return [];
                     }
 
-                    return this.ayas.filter(
-                        aya =>
-                        Number(aya.number) >=
-                        Number(this.selectedAyaFrom)
-                    );
-                }
+                    // Same Surah: ending Ayah cannot be before starting Ayah.
+                    if (this.selectedSurat === this.selectedSuratTo) {
+                        return this.ayasTo.filter(
+                            aya => Number(aya.number) >= Number(this.selectedAyaFrom)
+                        );
+                    }
 
-            }
+                    // Different Surahs: all Ayahs in ending Surah are available.
+                    return this.ayasTo;
+                },
+
+                suratName(id) {
+                    const surat = this.surats.find(
+                        surat => surat.id === String(id)
+                    );
+
+                    return surat ? surat.title : '';
+                },
+
+                async loadAyas(type, reset = true) {
+                    const isFrom = type === 'from';
+
+                    const suratId = isFrom ?
+                        this.selectedSurat :
+                        this.selectedSuratTo;
+
+                    if (reset) {
+                        if (isFrom) {
+                            this.selectedAyaFrom = '';
+                        } else {
+                            this.selectedAyaTo = '';
+                        }
+                    }
+
+                    if (!suratId) {
+                        if (isFrom) {
+                            this.ayasFrom = [];
+                        } else {
+                            this.ayasTo = [];
+                        }
+
+                        return;
+                    }
+
+                    if (isFrom) {
+                        this.loadingFrom = true;
+                    } else {
+                        this.loadingTo = true;
+                    }
+
+                    try {
+                        const url = @json(route('quran.surats.ayas', [
+                                'quranSurat' => '__SURAT__',
+                            ])).replace('__SURAT__', suratId);
+
+                        const response = await fetch(url, {
+                            headers: {
+                                'Accept': 'application/json',
+                            },
+                        });
+
+                        if (!response.ok) {
+                            throw new Error('Failed to load ayas');
+                        }
+
+                        const data = await response.json();
+
+                        if (isFrom) {
+                            this.ayasFrom = data;
+                        } else {
+                            this.ayasTo = data;
+                        }
+
+                    } catch (error) {
+                        console.error(error);
+
+                        if (isFrom) {
+                            this.ayasFrom = [];
+                        } else {
+                            this.ayasTo = [];
+                        }
+
+                        alert('تعذر تحميل الآيات. يرجى المحاولة مرة أخرى.');
+
+                    } finally {
+                        if (isFrom) {
+                            this.loadingFrom = false;
+                        } else {
+                            this.loadingTo = false;
+                        }
+                    }
+                },
+
+                validateAyaRange() {
+                    if (
+                        this.selectedSurat === this.selectedSuratTo &&
+                        this.selectedAyaFrom &&
+                        this.selectedAyaTo &&
+                        Number(this.selectedAyaTo) < Number(this.selectedAyaFrom)
+                    ) {
+                        this.selectedAyaTo = '';
+                    }
+                },
+            };
         }
     </script>
 

@@ -44,13 +44,8 @@ class QuestionController extends Controller
      */
     public function store(Request $request, Questionset $questionset)
     {
-
         $validated = $request->validate([
-            'riwaya' => [
-                'required',
-                'string',
-                'max:50',
-            ],
+            'riwaya' => ['required', 'string', 'max:50'],
 
             'quran_surat_id' => [
                 'required',
@@ -58,40 +53,57 @@ class QuestionController extends Controller
                 'exists:quran_surats,id',
             ],
 
-            'juz' => [
+            'quran_surat_to_id' => [
                 'required',
                 'integer',
-                'between:1,30',
+                'exists:quran_surats,id',
             ],
 
-            'aya_from' => [
-                'required',
-                'integer',
-                'min:1',
-            ],
+            'juz' => ['required', 'integer', 'between:1,30'],
 
-            'aya_to' => [
-                'required',
-                'integer',
-                'gte:aya_from',
-            ],
+            'aya_from' => ['required', 'integer', 'min:1'],
+            'aya_to' => ['required', 'integer', 'min:1'],
         ]);
 
-        /*
-         * Make sure the starting ayah exists
-         * in the selected surat.
-         */
+        $startSurat = QuranSurat::findOrFail(
+            $validated['quran_surat_id']
+        );
+
+        $endSurat = QuranSurat::findOrFail(
+            $validated['quran_surat_to_id']
+        );
+
+        // Ending Surah must not precede starting Surah.
+        if ($endSurat->number < $startSurat->number) {
+            return back()
+                ->withErrors([
+                    'quran_surat_to_id' => 'يجب أن تكون السورة الأخيرة بعد السورة الأولى أو مساوية لها.',
+                ])
+                ->withInput();
+        }
+
+        // When both Surahs are the same, the ending Ayah
+        // must not precede the starting Ayah.
+        if (
+            $startSurat->id === $endSurat->id &&
+            $validated['aya_to'] < $validated['aya_from']
+        ) {
+            return back()
+                ->withErrors([
+                    'aya_to' => 'يجب أن تكون الآية الأخيرة أكبر من أو مساوية للآية الأولى.',
+                ])
+                ->withInput();
+        }
+
+        // Validate starting Ayah.
         $fromExists = QuranAya::query()
-            ->where('quran_surat_id', $validated['quran_surat_id'])
+            ->where('quran_surat_id', $startSurat->id)
             ->where('number', $validated['aya_from'])
             ->exists();
 
-        /*
-         * Make sure the ending ayah exists
-         * in the selected surat.
-         */
+        // Validate ending Ayah.
         $toExists = QuranAya::query()
-            ->where('quran_surat_id', $validated['quran_surat_id'])
+            ->where('quran_surat_id', $endSurat->id)
             ->where('number', $validated['aya_to'])
             ->exists();
 
@@ -103,13 +115,10 @@ class QuestionController extends Controller
                 ->withInput();
         }
 
-        /*
-         * Create the question through the
-         * Questionset relationship.
-         */
         $questionset->questions()->create([
-            'quran_surat_id' => $validated['quran_surat_id'],
             'riwaya' => $validated['riwaya'],
+            'quran_surat_id' => $startSurat->id,
+            'quran_surat_to_id' => $endSurat->id,
             'juz' => $validated['juz'],
             'aya_from' => $validated['aya_from'],
             'aya_to' => $validated['aya_to'],
@@ -118,7 +127,6 @@ class QuestionController extends Controller
         return redirect()
             ->route('questionset.show', $questionset)
             ->with('success', 'تمت إضافة السؤال بنجاح.');
-
     }
 
     public function replicate(Request $request, Questionset $questionset)
@@ -144,33 +152,56 @@ class QuestionController extends Controller
             ->with('success', 'تم تكرار الباقة بنجاح.');
     }
 
-    /**
-     * Show a question.
-     */
     public function show(Question $question)
     {
         $question->load([
             'questionset',
             'surat',
+            'suratTo',
         ]);
 
-        /*
-         * Get all ayas belonging to the
-         * question's range.
-         */
+        $endSurat = $question->suratTo ?? $question->surat;
+
         $ayas = QuranAya::query()
-            ->where('quran_surat_id', $question->quran_surat_id)
-            ->whereBetween('number', [
-                $question->aya_from,
-                $question->aya_to,
+            ->join('quran_surats', 'quran_surats.id', '=', 'quran_ayas.quran_surat_id')
+
+            ->whereBetween('quran_surats.number', [
+                $question->surat->number,
+                $endSurat->number,
             ])
-            ->orderBy('number')
+
+            // Starting Surah: begin at aya_from.
+            ->where(function ($query) use ($question) {
+                $query->where('quran_surats.number', '>', $question->surat->number)
+                    ->orWhere(function ($sub) use ($question) {
+                        $sub->where('quran_surats.number', $question->surat->number)
+                            ->where('quran_ayas.number', '>=', $question->aya_from);
+                    });
+            })
+
+            // Ending Surah: stop at aya_to.
+            ->where(function ($query) use ($question, $endSurat) {
+                $query->where('quran_surats.number', '<', $endSurat->number)
+                    ->orWhere(function ($sub) use ($question, $endSurat) {
+                        $sub->where('quran_surats.number', $endSurat->number)
+                            ->where('quran_ayas.number', '<=', $question->aya_to);
+                    });
+            })
+
+            ->orderBy('quran_surats.number')
+            ->orderBy('quran_ayas.number')
+
             ->get([
-                'id',
-                'number',
-                'page_number',
-                'content',
-            ]);
+                'quran_ayas.id',
+                'quran_ayas.quran_surat_id',
+                'quran_ayas.number',
+                'quran_ayas.page_number',
+                'quran_ayas.content',
+                'quran_surats.title as surat_title',
+                'quran_surats.number as surat_number',
+            ])
+
+            ->groupBy('quran_surat_id');
 
         return view('question.show', compact(
             'question',
@@ -182,102 +213,116 @@ class QuestionController extends Controller
      * Show edit question form.
      */
     public function edit(Question $question)
-    {
-        $question->load('questionset');
+{
+    $question->load([
+        'questionset',
+        'surat',
+        'suratTo',
+    ]);
 
-        $surats = QuranSurat::query()
-            ->orderBy('number')
-            ->get([
-                'id',
-                'number',
-                'title',
-            ]);
+    $surats = QuranSurat::query()
+        ->orderBy('number')
+        ->get([
+            'id',
+            'number',
+            'title',
+        ]);
 
-        $juzs = range(1, 30);
+    $juzs = range(1, 30);
 
-        return view('question.edit', compact(
-            'question',
-            'surats',
-            'juzs'
-        ));
-    }
+    return view('question.edit', compact(
+        'question',
+        'surats',
+        'juzs'
+    ));
+}
 
     /**
      * Update an existing question.
      */
     public function update(Request $request, Question $question)
-    {
-        $validated = $request->validate([
-            'riwaya' => [
-                'required',
-                'string',
-                'max:50',
-            ],
+{
+    $validated = $request->validate([
+        'riwaya' => ['required', 'string', 'max:50'],
 
-            'quran_surat_id' => [
-                'required',
-                'integer',
-                'exists:quran_surats,id',
-            ],
+        'quran_surat_id' => [
+            'required',
+            'integer',
+            'exists:quran_surats,id',
+        ],
 
-            'juz' => [
-                'required',
-                'integer',
-                'between:1,30',
-            ],
+        'quran_surat_to_id' => [
+            'required',
+            'integer',
+            'exists:quran_surats,id',
+        ],
 
-            'aya_from' => [
-                'required',
-                'integer',
-                'min:1',
-            ],
+        'juz' => ['required', 'integer', 'between:1,30'],
 
-            'aya_to' => [
-                'required',
-                'integer',
-                'gte:aya_from',
-            ],
-        ]);
+        'aya_from' => ['required', 'integer', 'min:1'],
+        'aya_to' => ['required', 'integer', 'min:1'],
+    ]);
 
-        /*
-         * Make sure the starting ayah exists
-         * in the selected surat.
-         */
-        $fromExists = QuranAya::query()
-            ->where('quran_surat_id', $validated['quran_surat_id'])
-            ->where('number', $validated['aya_from'])
-            ->exists();
+    $startSurat = QuranSurat::findOrFail(
+        $validated['quran_surat_id']
+    );
 
-        /*
-         * Make sure the ending ayah exists
-         * in the selected surat.
-         */
-        $toExists = QuranAya::query()
-            ->where('quran_surat_id', $validated['quran_surat_id'])
-            ->where('number', $validated['aya_to'])
-            ->exists();
+    $endSurat = QuranSurat::findOrFail(
+        $validated['quran_surat_to_id']
+    );
 
-        if (! $fromExists || ! $toExists) {
-            return back()
-                ->withErrors([
-                    'aya_from' => 'نطاق الآيات المحدد غير صحيح.',
-                ])
-                ->withInput();
-        }
-
-        /*
-         * Update the question.
-         */
-        $question->update([
-            'quran_surat_id' => $validated['quran_surat_id'],
-            'riwaya' => $validated['riwaya'],
-            'juz' => $validated['juz'],
-            'aya_from' => $validated['aya_from'],
-            'aya_to' => $validated['aya_to'],
-        ]);
-
-        return redirect()
-            ->route('questionset.show', $question->questionset_id)
-            ->with('success', 'تم تحديث السؤال بنجاح.');
+    // Ensure the ending Surah is not before the starting Surah.
+    if ($endSurat->number < $startSurat->number) {
+        return back()
+            ->withErrors([
+                'quran_surat_to_id' => 'يجب أن تكون السورة الأخيرة بعد السورة الأولى أو مساوية لها.',
+            ])
+            ->withInput();
     }
+
+    // If both Surahs are identical, validate the Ayah order.
+    if (
+        $startSurat->id === $endSurat->id &&
+        $validated['aya_to'] < $validated['aya_from']
+    ) {
+        return back()
+            ->withErrors([
+                'aya_to' => 'يجب أن تكون الآية الأخيرة أكبر من أو مساوية للآية الأولى.',
+            ])
+            ->withInput();
+    }
+
+    // Validate starting Ayah.
+    $fromExists = QuranAya::query()
+        ->where('quran_surat_id', $startSurat->id)
+        ->where('number', $validated['aya_from'])
+        ->exists();
+
+    // Validate ending Ayah.
+    $toExists = QuranAya::query()
+        ->where('quran_surat_id', $endSurat->id)
+        ->where('number', $validated['aya_to'])
+        ->exists();
+
+    if (! $fromExists || ! $toExists) {
+        return back()
+            ->withErrors([
+                'aya_from' => 'نطاق الآيات المحدد غير صحيح.',
+            ])
+            ->withInput();
+    }
+
+    $question->update([
+        'riwaya' => $validated['riwaya'],
+        'quran_surat_id' => $startSurat->id,
+        'quran_surat_to_id' => $endSurat->id,
+        'juz' => $validated['juz'],
+        'aya_from' => $validated['aya_from'],
+        'aya_to' => $validated['aya_to'],
+    ]);
+
+    return redirect()
+        ->route('questionset.show', $question->questionset_id)
+        ->with('success', 'تم تحديث السؤال بنجاح.');
+}
 }

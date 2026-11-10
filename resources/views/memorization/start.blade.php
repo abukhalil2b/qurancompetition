@@ -73,14 +73,15 @@
 <body class="antialiased overflow-hidden">
     <div class="h-screen flex flex-col md:flex-row" x-data="evaluationPage({{ $evaluationElements }}, {{ $oldScores->toJson() }})">
         {{-- LEFT SIDE: Question / Quran --}}
-        <div :class="isDarkTheme ? 'bg-[#161526] text-white' : 'bg-white text-gray-900'" 
-             class="w-full md:w-2/5 p-4 md:p-6 flex flex-col overflow-y-auto justify-start items-center text-center shadow-2xl z-10 transition-colors duration-300">
+        <div :class="isDarkTheme ? 'bg-[#161526] text-white' : 'bg-white text-gray-900'"
+            class="w-full md:w-2/5 p-4 md:p-6 flex flex-col overflow-y-auto justify-start items-center text-center shadow-2xl z-10 transition-colors duration-300">
 
             {{-- Background Toggle Button --}}
             <div class="w-full flex justify-end mb-2">
-                <button type="button" @click="toggleBackground()" 
-                        class="px-3 py-1 text-xs font-bold rounded-lg border transition"
-                        :class="isDarkTheme ? 'border-indigo-400/40 text-indigo-200 hover:bg-white/10' : 'border-gray-300 text-gray-700 hover:bg-gray-100'">
+                <button type="button" @click="toggleBackground()"
+                    class="px-3 py-1 text-xs font-bold rounded-lg border transition"
+                    :class="isDarkTheme ? 'border-indigo-400/40 text-indigo-200 hover:bg-white/10' :
+                        'border-gray-300 text-gray-700 hover:bg-gray-100'">
                     تغيير لون الخلفية
                 </button>
             </div>
@@ -88,71 +89,102 @@
             {{-- Question Header --}}
             <div class="w-full mb-4">
                 <div class="border h-11 px-6 flex items-center justify-center rounded-xl font-black text-lg mx-auto mb-3 shadow-inner w-fit"
-                     :class="isDarkTheme ? 'bg-indigo-900/50 border-indigo-500 text-white' : 'bg-indigo-50 border-indigo-200 text-indigo-900'">
+                    :class="isDarkTheme ? 'bg-indigo-900/50 border-indigo-500 text-white' :
+                        'bg-indigo-50 border-indigo-200 text-indigo-900'">
                     السؤال: {{ $studentQuestionSelection->position }}
                 </div>
                 <h2 class="text-xl md:text-2xl font-bold leading-relaxed">
-                    {{ $studentQuestionSelection->question->surat->title }}
+                    سورة {{ $startSurat->title }}
                 </h2>
-                <div class="flex gap-2 justify-center items-center">
-                    <div class="mt-1 text-sm" :class="isDarkTheme ? 'text-indigo-200' : 'text-gray-600'">
-                        من الآية
-                        <span class="font-bold" :class="isDarkTheme ? 'text-white' : 'text-gray-900'">
-                            {{ $studentQuestionSelection->question->aya_from }}
-                        </span>
+
+                <div class="mt-2 text-sm leading-loose" :class="isDarkTheme ? 'text-indigo-200' : 'text-gray-600'">
+
+                    من الآية
+                    <span class="font-bold" :class="isDarkTheme ? 'text-white' : 'text-gray-900'">
+                        {{ $studentQuestionSelection->question->aya_from }}
+                    </span>
+
+                    @if ($startSurat->id !== $endSurat->id)
                         إلى الآية
                         <span class="font-bold" :class="isDarkTheme ? 'text-white' : 'text-gray-900'">
                             {{ $studentQuestionSelection->question->aya_to }}
                         </span>
-                        رقم الصفحة
+                        من سورة {{ $endSurat->title }}
+                    @else
+                        إلى الآية
                         <span class="font-bold" :class="isDarkTheme ? 'text-white' : 'text-gray-900'">
-                            {{ $firstQuranAya->page_number }}
+                            {{ $studentQuestionSelection->question->aya_to }}
+                        </span>
+                    @endif
+
+                    <div class="mt-1">
+                        رقم الصفحة:
+                        <span class="font-bold" :class="isDarkTheme ? 'text-white' : 'text-gray-900'">
+                            {{ $firstQuranAya?->page_number ?? '—' }}
                         </span>
                     </div>
                 </div>
-                <div class="text-md" :class="isDarkTheme ? 'text-white' : 'text-gray-700'">{{ $studentQuestionSelection->question->riwaya }}</div>
+                <div class="text-md" :class="isDarkTheme ? 'text-white' : 'text-gray-700'">
+                    {{ $studentQuestionSelection->question->riwaya }}</div>
             </div>
 
             {{-- Quran Text --}}
-<div class="w-full mb-5">
-    <div
-        class="border rounded-2xl p-4 md:p-5"
-        :class="isDarkTheme
-            ? 'bg-white/10 border-indigo-400/40'
-            : 'bg-gray-50 border-gray-200'"
-    >
+            <div class="w-full mb-5">
+                <div class="border rounded-2xl p-4 md:p-5"
+                    :class="isDarkTheme
+                        ?
+                        'bg-white/10 border-indigo-400/40' :
+                        'bg-gray-50 border-gray-200'">
+                    <div class="text-2xl leading-[2.6] text-justify"
+                        :class="isDarkTheme ? 'text-white' : 'text-gray-800'"
+                        style="font-family: 'Amiri', 'Traditional Arabic', serif;">
+                        @php
+    $previousSuratId = null;
+@endphp
+
+@foreach ($quranAyas as $ayah)
+
+    {{-- Display Surah heading when the Surah changes --}}
+    @if ($previousSuratId !== $ayah->quran_surat_id)
         <div
-            class="text-2xl leading-[2.6] text-justify"
-            :class="isDarkTheme ? 'text-white' : 'text-gray-800'"
-            style="font-family: 'Amiri', 'Traditional Arabic', serif;"
+            class="w-full text-center my-5 py-3 rounded-xl border font-bold text-lg"
+            :class="isDarkTheme
+                ? 'bg-indigo-900/60 border-indigo-400/40 text-white'
+                : 'bg-emerald-100 border-emerald-200 text-emerald-900'"
         >
-            @foreach ($quranAyas as $ayah)
-
-                <span class="font-quran">
-                    {{ $ayah->content }}
-                </span>
-
-                <span
-                    class="inline-flex items-center justify-center
-                           w-9 h-9 mx-1
-                           border border-gray-400
-                           rounded-full
-                           text-sm
-                           align-middle"
-                >
-                    {{ $ayah->number }}
-                </span>
-
-            @endforeach
+            سورة {{ $ayah->surat_title }}
         </div>
-    </div>
-</div>
+
+        @php
+            $previousSuratId = $ayah->quran_surat_id;
+        @endphp
+    @endif
+
+    <span class="font-quran">
+        {{ $ayah->content }}
+    </span>
+
+    <span
+        class="inline-flex items-center justify-center
+               w-9 h-9 mx-1
+               border border-gray-400
+               rounded-full
+               text-sm
+               align-middle"
+    >
+        {{ $ayah->number }}
+    </span>
+
+@endforeach
+                    </div>
+                </div>
+            </div>
 
 
             {{-- Current Total Deduction --}}
-            <div
-                class="border px-6 py-4 rounded-2xl w-full max-w-xs text-center"
-                :class="isDarkTheme ? 'bg-indigo-900/50 border-indigo-500 text-white' : 'bg-indigo-50 border-indigo-200 text-indigo-900'">
+            <div class="border px-6 py-4 rounded-2xl w-full max-w-xs text-center"
+                :class="isDarkTheme ? 'bg-indigo-900/50 border-indigo-500 text-white' :
+                    'bg-indigo-50 border-indigo-200 text-indigo-900'">
 
                 <span class="block text-sm mb-1 opacity-80">
                     إجمالي الخصم الحالي
