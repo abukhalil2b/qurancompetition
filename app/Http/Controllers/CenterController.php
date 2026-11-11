@@ -68,6 +68,12 @@ class CenterController extends Controller
      */
     public function statistic(Center $center)
     {
+        $stage = Stage::whereActive(1)->latest('id')->first();
+
+        if (! $stage) {
+            abort(403, 'لابد من تفعيل المرحلة في النظام');
+        }
+        
         $center->load([
             'committees' => fn ($q) => $q->with('stage')->orderByDesc('active')->latest('id'),
         ]);
@@ -82,6 +88,7 @@ class CenterController extends Controller
         ];
 
         $base = fn () => Competition::query()
+            ->where('competitions.stage_id', $stage->id)
             ->where('competitions.center_id', $center->id)
             ->whereIn('competitions.committee_id', $committeeIds);
 

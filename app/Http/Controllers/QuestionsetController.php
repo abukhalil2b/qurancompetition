@@ -146,7 +146,14 @@ class QuestionsetController extends Controller
 
     public function print()
     {
+        $stage = Stage::whereActive(1)->latest('id')->first();
+
+        if (! $stage) {
+            abort(403, 'لابد من تفعيل المرحلة في النظام');
+        }
+
         $questionsets = Questionset::with('questions')
+            ->where('stage_id', $stage->id)
             ->has('questions')
             ->get();
 

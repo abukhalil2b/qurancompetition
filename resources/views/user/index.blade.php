@@ -2,7 +2,7 @@
     <div class="p-4 md:p-6" dir="rtl">
 
         <h1 class="text-xl font-bold mb-6 text-gray-800">
-            قائمة مستخدمي النظام
+            قائمة مستخدمي النظام - {{ $stage->title }}
         </h1>
 
         {{-- Mobile --}}

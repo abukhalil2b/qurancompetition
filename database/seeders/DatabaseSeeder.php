@@ -17,7 +17,7 @@ User::create([
             'user_type' => 'admin',
             'gender' => 'male',
             'national_id' => '9117',
-            'password' => Hash::make('alBi@1747'),
+            'password' => Hash::make('F@iu20'),
         ]);
 
         User::create([

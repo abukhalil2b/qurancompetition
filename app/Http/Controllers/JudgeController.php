@@ -11,16 +11,28 @@ class JudgeController extends Controller
 {
     public function index()
     {
+         $stage = Stage::whereActive(1)->latest('id')->first();
+
+        if (! $stage) {
+            abort(403, 'لابد من تفعيل المرحلة في النظام');
+        }
+
         $users = User::with([
-            'committees.stage',
+            'committees' => fn ($query) => $query
+                ->where('committees.stage_id', $stage->id)
+                ->with('stage'),
         ])->get();
 
-        return view('user.index', compact('users'));
+        return view('user.index', compact('users', 'stage'));
     }
 
     public function show(User $user)
     {
-        $stage = Stage::whereActive(1)->first();
+        $stage = Stage::whereActive(1)->latest('id')->first();
+
+        if (! $stage) {
+            abort(403, 'لابد من تفعيل المرحلة في النظام');
+        }
 
         // load committees linked to the user
         $user->load('committees');

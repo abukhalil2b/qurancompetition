@@ -4,18 +4,25 @@ namespace App\Http\Controllers;
 
 use App\Models\Center;
 use App\Models\Competition;
+use App\Models\Stage;
 use Illuminate\Support\Carbon;
 
 class StatisticController extends Controller
 {
     public function statisticDashboard()
     {
+        $stage = Stage::whereActive(1)->latest('id')->first();
+
+        if (! $stage) {
+            abort(403, 'لابد من تفعيل المرحلة في النظام');
+        }
         $levels = [
             1 => ['title' => 'المستوى الأول', 'max' => 120],
             2 => ['title' => 'المستوى الثاني', 'max' => 100],
         ];
 
         $base = fn () => Competition::query()
+        ->where('competitions.stage_id',$stage->id)
             ->whereNotNull('competitions.committee_id');
 
         $withStudents = fn () => $base()

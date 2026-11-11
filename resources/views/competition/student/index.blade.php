@@ -7,8 +7,15 @@
 
             <div>
                 <div class="flex items-center gap-2 text-sm text-slate-500 mb-1">
-                    <a href="{{ route('committee.index') }}" class="hover:text-black font-bold text-xl transition">
-                        اللجان
+
+                    <a href="{{ route('committee.index') }}"
+                        class="inline-flex items-center gap-1.5 rounded-md border border-gray-300
+          bg-white px-3 py-1.5 text-xs font-medium text-gray-700
+          hover:bg-gray-50 hover:text-black transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                        </svg>
+                        العودة إلى اللجان
                     </a>
 
 
@@ -32,12 +39,35 @@
         <form method="POST" action="{{ route('competition.student.store', $center->id) }}" x-data="{
             selected: [],
             allIds: {{ Js::from($unregisteredStudents->pluck('id')->values()) }},
+            allStudents: {{ Js::from(
+                $unregisteredStudents->map(
+                        fn($student) => [
+                            'id' => $student->id,
+                            'name' => mb_strtolower($student->name),
+                        ],
+                    )->values(),
+            ) }},
+        
+            studentSearch: '',
+            showUnregisteredStudents: false,
+        
+            filteredIds() {
+                const term = this.studentSearch.trim().toLowerCase();
+        
+                return this.allStudents
+                    .filter(student => student.name.includes(term))
+                    .map(student => student.id);
+            },
         
             toggleAll() {
-                if (this.selected.length === this.allIds.length) {
-                    this.selected = [];
+                const ids = this.filteredIds();
+                const allSelected = ids.length > 0 &&
+                    ids.every(id => this.selected.includes(id));
+        
+                if (allSelected) {
+                    this.selected = this.selected.filter(id => !ids.includes(id));
                 } else {
-                    this.selected = [...this.allIds];
+                    this.selected = [...new Set([...this.selected, ...ids])];
                 }
             },
         
@@ -48,8 +78,29 @@
 
             @csrf
 
-            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                       <div class="mt-3" x-show="showUnregisteredStudents" x-cloak>
+                        <div class="relative max-w-md">
+                            <svg class="absolute right-3 top-1/2 -translate-y-1/2
+                    w-4 h-4 text-gray-400"
+                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <circle cx="11" cy="11" r="7" stroke-width="2" />
+                                <path stroke-linecap="round" stroke-width="2" d="m16 16 4 4" />
+                            </svg>
 
+                            <input type="search" x-model="studentSearch" placeholder="ابحث عن اسم المتسابق..."
+                                class="w-full rounded-md border border-gray-300 bg-white
+                   py-2 pr-9 pl-3 text-sm text-gray-800
+                   placeholder:text-gray-400
+                   focus:border-gray-500 focus:ring-1 focus:ring-gray-400" />
+                        </div>
+
+                        <p class="mt-1.5 text-xs text-gray-500">
+                            نتائج البحث:
+                            <span x-text="filteredIds().length"></span>
+                            من {{ $unregisteredStudents->count() }} متسابق
+                        </p>
+                    </div>
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
                 {{-- Section header --}}
                 <div
                     class="px-6 py-4 bg-slate-50 border-b border-slate-200
@@ -64,6 +115,18 @@
                             اختر المتسابقون الذين تريد تسجيلهم في {{ $stage->title }}.
                         </p>
                     </div>
+
+
+                    <button type="button" @click="showUnregisteredStudents = !showUnregisteredStudents"
+                        class="inline-flex items-center gap-1.5 rounded-md border border-gray-300
+           bg-white px-3 py-1.5 text-xs font-medium text-gray-800
+           hover:bg-gray-50 hover:border-gray-400
+           transition-colors duration-150">
+
+                        <span x-text="showUnregisteredStudents ? 'إخفاء الطلاب' : 'عرض الطلاب'"></span>
+
+                    </button>
+
 
                     @if ($unregisteredStudents->isNotEmpty())
                         <button type="button" @click="toggleAll()"
@@ -85,6 +148,8 @@
 
                 @if ($unregisteredStudents->isEmpty())
 
+         
+
                     <div class="px-6 py-12 text-center">
 
                         <svg class="w-12 h-12 mx-auto text-emerald-500 mb-3" fill="none" stroke="currentColor"
@@ -103,36 +168,30 @@
                     </div>
                 @else
                     {{-- Students --}}
-                    <div class="divide-y divide-slate-100">
+                    <div class="divide-y divide-slate-100" x-show="showUnregisteredStudents">
 
                         @foreach ($unregisteredStudents as $student)
-                            <label
+                            <label data-name="{{ mb_strtolower($student->name) }}"
+                                x-show="!studentSearch.trim() ||
+            $el.dataset.name.includes(studentSearch.trim().toLowerCase())"
                                 class="flex items-center gap-4 px-6 py-4 cursor-pointer
-                                       hover:bg-slate-50 transition">
-
+           hover:bg-slate-50 transition">
                                 <input type="checkbox" name="student_ids[]" value="{{ $student->id }}"
                                     x-model="selected"
                                     class="w-5 h-5 rounded border-slate-300
-                                           text-blue-600 focus:ring-blue-500">
+               text-gray-800 focus:ring-gray-500">
 
                                 <div class="flex-1 min-w-0">
-
                                     <div class="font-semibold text-slate-800">
                                         {{ $student->name }}
                                     </div>
-
-                                    <div class="text-xs text-slate-500 mt-1">
-                                        رقم المتسابق: {{ $student->id }}
-                                    </div>
-
                                 </div>
 
                                 <span
                                     class="text-xs px-2.5 py-1 rounded-full
-                                             bg-slate-100 text-slate-600">
+                 bg-slate-100 text-slate-600">
                                     المستوى {{ $student->level }}
                                 </span>
-
                             </label>
                         @endforeach
 
@@ -196,7 +255,8 @@
                 </p>
 
                 @foreach ($committees as $committee)
-                    <a class="bg-blue-200 text-blue-800 rounded text-xs px-1 m-2" href="{{ route('competition.student.print', ['center' => $center, 'committee' => $committee]) }}">
+                    <a class="bg-blue-200 text-blue-800 rounded text-xs px-1 m-2"
+                        href="{{ route('competition.student.print', ['center' => $center, 'committee' => $committee]) }}">
                         طباعة بيانات المتسابقين {{ $committee->title }}
                     </a>
                 @endforeach
