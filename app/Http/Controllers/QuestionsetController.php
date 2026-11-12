@@ -162,6 +162,11 @@ class QuestionsetController extends Controller
 
     public function destroy(Questionset $questionset)
     {
+        
+        if($questionset->selected){
+            abort(403,'لايمكن حذف باقة قد تم اختيارها');
+        }
+
         DB::transaction(function () use ($questionset) {
             $questionset->questions()->delete();
             $questionset->delete();

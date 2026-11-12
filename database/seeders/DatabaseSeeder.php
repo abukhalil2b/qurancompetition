@@ -12,7 +12,7 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-User::create([
+        User::create([
             'name' => 'الدعم الفني',
             'user_type' => 'admin',
             'gender' => 'male',
@@ -67,7 +67,7 @@ User::create([
             'national_id' => '7000',
             'password' => Hash::make('t@Hk66m70'),
         ]);
-        
+
         User::create([
             'name' => 'المنظم ذكور ',
             'user_type' => 'organizer',
@@ -85,12 +85,12 @@ User::create([
         ]);
 
         User::create([
-            'name' => 'مراجع الأسئلة',
-            'user_type' => 'reviewer',
+            'name' => 'إدارة الأسئلة',
+            'user_type' => 'question_admin',
             'gender' => 'male',
-            'national_id' => '10000',
-            'password' => Hash::make('10000@10000'),
+            'national_id' => '12000',
+            'password' => Hash::make('12000@12000'),
         ]);
-       
+
     }
 }

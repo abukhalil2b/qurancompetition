@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Center;
 use App\Models\Committee;
 use App\Models\CommitteeUser;
 use App\Models\Competition;
@@ -229,12 +228,7 @@ class StudentController extends Controller
         // ---------------------------------------------------------------------
         // Authorization
         // ---------------------------------------------------------------------
-        abort_unless(
-            $user->user_type === 'admin'
-                || $user->isCommitteeLeader($competition->committee_id),
-            403,
-            'اختيار الباقة متاح لرئيس اللجنة فقط.'
-        );
+        abort_unless($user->user_type === 'admin'|| $user->isCommitteeLeader($competition->committee_id),403,'اختيار الباقة متاح لرئيس اللجنة فقط.');
 
         // ---------------------------------------------------------------------
         // Basic guards

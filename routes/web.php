@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdminStudentController;
 use App\Http\Controllers\CenterController;
 use App\Http\Controllers\CommitteeController;
 use App\Http\Controllers\CompetitionController;
@@ -12,7 +13,6 @@ use App\Http\Controllers\JudgeController;
 use App\Http\Controllers\MemorizationController;
 use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\QuestionsetController;
-use App\Http\Controllers\ReviewQuestionController;
 use App\Http\Controllers\StageController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\UserController;
@@ -58,19 +58,46 @@ Route::middleware(['auth'])->group(function () {
 });
 
 Route::middleware(['auth'])->group(function () {
+    Route::get('admin/student/female_attendance_index', [AdminStudentController::class, 'femaleAttendanceIndex'])
+        ->name('admin.student.female_attendance_index');
+
+});
+
+Route::middleware(['auth'])->group(function () {
     // Students
-    Route::get('student/attendance_index', [StudentController::class, 'attendanceeIndex'])->name('student.attendance_index');
-    Route::get('student/present_index', [StudentController::class, 'presentIndex'])->name('student.present_index');
-    Route::get('student/choose_questionset/{competition}', [StudentController::class, 'chooseQuestionset'])->name('student.choose_questionset');
-    Route::get('student/save_questionset/{competition}/{questionset}', [StudentController::class, 'saveQuestionset'])->name('student.save_questionset');
-    Route::get('student/index', [StudentController::class, 'index'])->name('student.index');
-    Route::get('student/create', [StudentController::class, 'create'])->name('student.create');
-    Route::post('student/store', [StudentController::class, 'store'])->name('student.store');
+    Route::get('student/attendance_index', [StudentController::class, 'attendanceeIndex'])
+    ->name('student.attendance_index');
+
+    Route::get('student/present_index', [StudentController::class, 'presentIndex'])
+    ->name('student.present_index');
+
+    Route::get('student/choose_questionset/{competition}', [StudentController::class, 'chooseQuestionset'])
+    ->name('student.choose_questionset');
+
+    Route::get('student/save_questionset/{competition}/{questionset}', [StudentController::class, 'saveQuestionset'])
+    ->name('student.save_questionset');
+
+    Route::get('student/index', [StudentController::class, 'index'])
+    ->name('student.index');
+
+    Route::get('student/create', [StudentController::class, 'create'])
+    ->name('student.create');
+
+    Route::post('student/store', [StudentController::class, 'store'])
+    ->name('student.store');
+
     Route::get('student/show/{competition}', [StudentController::class, 'show'])
         ->name('student.show');
-    Route::get('student/edit/{student}', [StudentController::class, 'edit'])->name('student.edit');
-    Route::put('student/update/{student}', [StudentController::class, 'update'])->name('student.update');
-    Route::delete('student/destroy/{student}', [StudentController::class, 'destroy'])->name('student.destroy');
+
+    Route::get('student/edit/{student}', [StudentController::class, 'edit'])
+    ->name('student.edit');
+
+    Route::put('student/update/{student}', [StudentController::class, 'update'])
+    ->name('student.update');
+
+    Route::delete('student/destroy/{student}', [StudentController::class, 'destroy'])
+    ->name('student.destroy');
+
 });
 
 Route::middleware(['auth'])->group(function () {
@@ -159,11 +186,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('quran/surats/{quranSurat}/ayas', [QuestionController::class, 'ayas'])->name('quran.surats.ayas');
 });
 
-Route::middleware(['auth'])->group(function () {
-    Route::get('review/question/index', [ReviewQuestionController::class, 'reviewQuestionIndex'])->name('review.question.index');
-    Route::get('review/question/show/{question}', [ReviewQuestionController::class, 'reviewQuestionShow'])->name('review.question.show');
-
-});
 
 Route::middleware(['auth'])->group(function () {
     Route::get('stage/index', [StageController::class, 'index'])

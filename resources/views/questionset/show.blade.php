@@ -19,8 +19,8 @@
                         class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-emerald-600 to-green-600 text-white font-medium rounded-xl hover:from-emerald-700 hover:to-green-700 transition-all duration-200 shadow-md hover:shadow-lg">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                        </svg> 
-                        إضافة سؤال جديد 
+                        </svg>
+                        إضافة سؤال جديد
                     </a>
                 </div>
             </div>
@@ -88,51 +88,51 @@
                                         </td>
 
                                         {{-- Surat + Ayas --}}
-                                       {{-- Surat + Ayas --}}
-<td class="py-4 px-6">
-    @php
-        $startSurat = $question->surat;
-        $endSurat = $question->suratTo ?? $question->surat;
-    @endphp
+                                        {{-- Surat + Ayas --}}
+                                        <td class="py-4 px-6">
+                                            @php
+                                                $startSurat = $question->surat;
+                                                $endSurat = $question->suratTo ?? $question->surat;
+                                            @endphp
 
-    <div class="flex flex-col gap-2">
+                                            <div class="flex flex-col gap-2">
 
-        {{-- Starting Surah --}}
-        <div class="flex items-center gap-2 flex-wrap">
-            <span class="font-bold text-lg text-emerald-900">
-                سورة {{ $startSurat?->title ?? '—' }}
-            </span>
-        </div>
+                                                {{-- Starting Surah --}}
+                                                <div class="flex items-center gap-2 flex-wrap">
+                                                    <span class="font-bold text-lg text-emerald-900">
+                                                        سورة {{ $startSurat?->title ?? '—' }}
+                                                    </span>
+                                                </div>
 
-        {{-- Ayah Range --}}
-        <div class="text-gray-700">
-            من الآية
-            <span class="font-bold text-emerald-700">
-                {{ $question->aya_from }}
-            </span>
-        </div>
+                                                {{-- Ayah Range --}}
+                                                <div class="text-gray-700">
+                                                    من الآية
+                                                    <span class="font-bold text-emerald-700">
+                                                        {{ $question->aya_from }}
+                                                    </span>
+                                                </div>
 
-        {{-- Ending Surah --}}
-        @if ($startSurat?->id !== $endSurat?->id)
-            <div class="flex items-center gap-2 flex-wrap">
-                <span class="text-gray-500 text-sm">إلى سورة</span>
+                                                {{-- Ending Surah --}}
+                                                @if ($startSurat?->id !== $endSurat?->id)
+                                                    <div class="flex items-center gap-2 flex-wrap">
+                                                        <span class="text-gray-500 text-sm">إلى سورة</span>
 
-                <span class="font-bold text-lg text-emerald-900">
-                    {{ $endSurat?->title ?? '—' }}
-                </span>
-            </div>
-        @endif
+                                                        <span class="font-bold text-lg text-emerald-900">
+                                                            {{ $endSurat?->title ?? '—' }}
+                                                        </span>
+                                                    </div>
+                                                @endif
 
-        {{-- Ending Ayah --}}
-        <div class="text-gray-700">
-            إلى الآية
-            <span class="font-bold text-emerald-700">
-                {{ $question->aya_to }}
-            </span>
-        </div>
+                                                {{-- Ending Ayah --}}
+                                                <div class="text-gray-700">
+                                                    إلى الآية
+                                                    <span class="font-bold text-emerald-700">
+                                                        {{ $question->aya_to }}
+                                                    </span>
+                                                </div>
 
-    </div>
-</td>
+                                            </div>
+                                        </td>
 
                                         {{-- Details --}}
                                         <td class="py-4 px-6">
@@ -187,18 +187,20 @@
                                                 <form action="{{ route('question.destroy', $question) }}"
                                                     method="POST"
                                                     onsubmit="return confirm('هل أنت متأكد من حذف هذا السؤال؟');">
+
                                                     @csrf
                                                     @method('DELETE')
+
                                                     <button type="submit"
-                                                        class="inline-flex items-center gap-1 px-4 py-2
-                                                               bg-red-100 text-red-800 rounded-lg
-                                                               hover:bg-red-200 transition-colors duration-200 font-medium">
+                                                        class="inline-flex items-center gap-1 px-3 py-1.5 bg-red-100 text-red-800 rounded-lg hover:bg-red-200 transition-colors duration-200 text-sm font-medium">
+
                                                         <svg class="w-4 h-4" fill="none" stroke="currentColor"
                                                             viewBox="0 0 24 24">
                                                             <path stroke-linecap="round" stroke-linejoin="round"
                                                                 stroke-width="2"
                                                                 d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                                         </svg>
+
                                                         حذف
                                                     </button>
                                                 </form>
@@ -213,13 +215,14 @@
                 </div>
             @endif
 
-             <form action="{{ route('question.replicate', $questionset) }}" method="POST" class="mt-5 inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-emerald-600 to-green-600 text-white font-medium rounded-xl hover:from-emerald-700 hover:to-green-700 transition-all duration-200 shadow-md hover:shadow-lg">
-                       @csrf 
+            <form action="{{ route('question.replicate', $questionset) }}" method="POST"
+                class="mt-5 inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-emerald-600 to-green-600 text-white font-medium rounded-xl hover:from-emerald-700 hover:to-green-700 transition-all duration-200 shadow-md hover:shadow-lg">
+                @csrf
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                        </svg> 
-                      <button type="submit"> تكرار الباقة</button>
-             </form>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                </svg>
+                <button type="submit"> تكرار الباقة</button>
+            </form>
         </div>
     </div>
 

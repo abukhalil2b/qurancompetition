@@ -53,7 +53,8 @@
                     </button>
                 </form>
 
-                <a href="/" class="flex items-center justify-center gap-2 w-full px-4 py-3 bg-white text-purple-600 font-bold text-lg mt-2">
+                <a href="/"
+                    class="flex items-center justify-center gap-2 w-full px-4 py-3 bg-white text-purple-600 font-bold text-lg mt-2">
                     مؤسسة الشيخ مستهيل للقرآن الكريم وقراءاته
                 </a>
 
@@ -75,7 +76,6 @@
                                 class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-blue-100 text-blue-700 mb-2">
                                 {{ $currentStage->title }}
                             </div>
-
                         @endif
                         <div class="text-gray-500 text-xs flex items-center gap-1">
                             <span class="font-medium text-gray-400 italic">رقم المدني:</span>
@@ -163,38 +163,6 @@
                         </li>
 
                         <li class="menu-header text-xs uppercase text-gray-500 font-semibold px-2 py-2 mt-4">
-                            الأسئلة
-                        </li>
-
-                        <li class="menu-item">
-                            <a href="{{ route('questionset.index', 1) }}"
-                                class="flex items-center px-3 py-3 rounded-lg hover:bg-gray-100 text-gray-700 hover:text-blue-600 transition-colors">
-                                <svg class="w-5 h-5 ml-3" fill="currentColor" viewBox="0 0 24 24">
-                                    <path opacity="0.5"
-                                        d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"
-                                        fill="currentColor" />
-                                    <path d="M12 6h.01M12 12h.01M12 18h.01" stroke="currentColor" stroke-width="2"
-                                        stroke-linecap="round" stroke-linejoin="round" />
-                                </svg>
-                                <span>باقات الأسئلة - المستوى الأول</span>
-                            </a>
-                        </li>
-
-                        <li class="menu-item">
-                            <a href="{{ route('questionset.index', 2) }}"
-                                class="flex items-center px-3 py-3 rounded-lg hover:bg-gray-100 text-gray-700 hover:text-blue-600 transition-colors">
-                                <svg class="w-5 h-5 ml-3" fill="currentColor" viewBox="0 0 24 24">
-                                    <path opacity="0.5"
-                                        d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"
-                                        fill="currentColor" />
-                                    <path d="M12 6h.01M12 12h.01M12 18h.01" stroke="currentColor" stroke-width="2"
-                                        stroke-linecap="round" stroke-linejoin="round" />
-                                </svg>
-                                <span>باقات الأسئلة - المستوى الثاني</span>
-                            </a>
-                        </li>
-
-                        <li class="menu-header text-xs uppercase text-gray-500 font-semibold px-2 py-2 mt-4">
                             التقييم
                         </li>
 
@@ -227,7 +195,40 @@
                         </li>
                     @endif
 
-                    @if (auth()->user()->user_type == 'organizer' || auth()->user()->user_type == 'admin')
+                    @if (in_array(auth()->user()->user_type, ['question_admin', 'admin']))
+                        <li class="menu-header text-xs uppercase text-gray-500 font-semibold px-2 py-2 mt-4">
+                            الأسئلة
+                        </li>
+                        <li class="menu-item">
+                            <a href="{{ route('questionset.index', 1) }}"
+                                class="flex items-center px-3 py-3 rounded-lg hover:bg-gray-100 text-gray-700 hover:text-blue-600 transition-colors">
+                                <svg class="w-5 h-5 ml-3" fill="currentColor" viewBox="0 0 24 24">
+                                    <path opacity="0.5"
+                                        d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"
+                                        fill="currentColor" />
+                                    <path d="M12 6h.01M12 12h.01M12 18h.01" stroke="currentColor" stroke-width="2"
+                                        stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                                <span>باقات الأسئلة - المستوى الأول</span>
+                            </a>
+                        </li>
+
+                        <li class="menu-item">
+                            <a href="{{ route('questionset.index', 2) }}"
+                                class="flex items-center px-3 py-3 rounded-lg hover:bg-gray-100 text-gray-700 hover:text-blue-600 transition-colors">
+                                <svg class="w-5 h-5 ml-3" fill="currentColor" viewBox="0 0 24 24">
+                                    <path opacity="0.5"
+                                        d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"
+                                        fill="currentColor" />
+                                    <path d="M12 6h.01M12 12h.01M12 18h.01" stroke="currentColor" stroke-width="2"
+                                        stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                                <span>باقات الأسئلة - المستوى الثاني</span>
+                            </a>
+                        </li>
+                    @endif
+
+                    @if (auth()->user()->user_type == 'organizer')
                         <li class="menu-header text-xs uppercase text-gray-500 font-semibold px-2 py-2 mt-4">
                             المتسابقون
                         </li>
@@ -242,6 +243,25 @@
                                     <path d="M4 20c0-3.3137 3.5817-6 8-6s8 2.6863 8 6v1H4v-1z" fill="currentColor" />
                                 </svg>
                                 <span>المتسابقون - تسجيل الحضور</span>
+                            </a>
+                        </li>
+                    @endif
+
+                    @if (auth()->user()->user_type == 'admin')
+                        <li class="menu-header text-xs uppercase text-gray-500 font-semibold px-2 py-2 mt-4">
+                            المتسابقون
+                        </li>
+
+                        <li class="menu-item">
+                            <a href="{{ route('admin.student.female_attendance_index') }}"
+                                class="flex items-center px-3 py-3 rounded-lg hover:bg-gray-100 text-gray-700 hover:text-blue-600 transition-colors">
+                                <svg class="w-5 h-5 ml-3" fill="currentColor" viewBox="0 0 24 24">
+                                    <path opacity="0.5"
+                                        d="M12 12c2.2091 0 4-1.7909 4-4s-1.7909-4-4-4-4 1.7909-4 4 1.7909 4 4 4z"
+                                        fill="currentColor" />
+                                    <path d="M4 20c0-3.3137 3.5817-6 8-6s8 2.6863 8 6v1H4v-1z" fill="currentColor" />
+                                </svg>
+                                <span>المتسابقون - تسجيل الحضور (الاناث)</span>
                             </a>
                         </li>
                     @endif
@@ -279,21 +299,6 @@
                         </li>
                     @endif
 
-                    @if (in_array(auth()->user()->user_type, ['reviewer']))
-                        <li class="menu-item">
-                            <a href="{{ route('review.question.index') }}"
-                                class="flex items-center px-3 py-3 rounded-lg hover:bg-gray-100 text-gray-700 hover:text-blue-600 transition-colors">
-                                <svg class="w-5 h-5 ml-3" fill="currentColor" viewBox="0 0 24 24">
-                                    <path d="M5 19h14V5H5v14zm10-12h2v10h-2V7zm-4 4h2v6h-2v-6zm-4 3h2v3H7v-3z"
-                                        fill="currentColor" />
-                                    <path opacity="0.5" d="M3 21h18v2H3v-2z" fill="currentColor" />
-                                </svg>
-                                <span>مراجع الأسئلة</span>
-                            </a>
-                        </li>
-                    @endif
-
-                    
                 </ul>
             </div>
         </nav>

@@ -72,7 +72,7 @@
 
         User::create([
             'name' => 'مراجع الأسئلة',
-            'user_type' => 'reviewer',
+            'user_type' => 'question_admin',
             'gender' => 'male',
             'national_id' => '10000',
             'password' => Hash::make('10000@10000'),

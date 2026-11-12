@@ -14,17 +14,29 @@
                     @foreach ($questions as $question)
                         <tr class="hover:bg-gray-50">
                             <td class="px-4 py-2">{{ $loop->iteration }}</td>
-                            <td class="px-4 py-2">{{ $question->content }}</td>
-                            <td class="px-4 py-2 flex space-x-2 rtl:space-x-reverse justify-end">
-                                <a href="{{ route('question.edit', $question) }}"
-                                    class="px-2 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600">تعديل</a>
-                                <form action="{{ route('question.destroy', $question) }}" method="POST"
-                                    onsubmit="return confirm('هل أنت متأكد من حذف هذا السؤال؟');">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit"
-                                        class="px-2 py-1 bg-red-600 text-white rounded hover:bg-red-700">حذف</button>
-                                </form>
+
+                            <td class="px-4 py-2">
+                                {{ $question->content }}
+                            </td>
+
+                            <td class="px-4 py-2">
+                                <div class="flex items-center justify-end gap-2">
+                                    <a href="{{ route('question.edit', $question) }}"
+                                        class="px-3 py-1.5 text-xs font-medium bg-yellow-100 text-yellow-800 rounded-lg hover:bg-yellow-200 transition">
+                                        تعديل
+                                    </a>
+
+                                    <form action="{{ route('question.destroy', $question) }}" method="POST"
+                                        onsubmit="return confirm('هل أنت متأكد من حذف هذا السؤال؟');">
+                                        @csrf
+                                        @method('DELETE')
+
+                                        <button type="submit"
+                                            class="px-3 py-1.5 text-xs font-medium bg-red-100 text-red-800 rounded-lg hover:bg-red-200 transition">
+                                            حذف
+                                        </button>
+                                    </form>
+                                </div>
                             </td>
                         </tr>
                     @endforeach

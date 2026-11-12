@@ -200,7 +200,7 @@
                     <form
                         action="{{ route('questionset.destroy', $set) }}"
                         method="POST"
-                        onsubmit="return confirm('هل أنت متأكد من حذف هذه الباقة؟');"
+                        onsubmit="return confirm('هل أنت متأكد من حذف هذه الباقة؟ لايمكن حذف باقة قد تم اختيارها');"
                     >
                         @csrf
                         @method('DELETE')

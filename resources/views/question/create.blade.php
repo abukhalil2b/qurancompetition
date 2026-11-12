@@ -53,49 +53,48 @@
                     <div class="flex gap-1">
 
                         {{-- Riwaya --}}
-                        <div>
+<div class="w-full">
 
-                            <label for="riwaya" class="block text-gray-700 font-medium mb-2">
-                                الرواية
-                            </label>
+    <label class="block text-gray-700 font-medium mb-2">
+        الرواية
+    </label>
 
-                            <select name="riwaya" id="riwaya"
-                                class="w-full border border-gray-300 rounded-lg px-4 py-3
-                               focus:outline-none focus:border-green-500
-                               focus:ring-1 focus:ring-green-500"
-                                required>
+    <div class="inline-flex items-center bg-gray-100 rounded-xl p-1 gap-1">
 
-                                <option value="حفص" @selected(old('riwaya', 'حفص') === 'حفص')>
-                                    حفص
-                                </option>
+        <template x-for="option in [
+            { value: 'حفص', label: 'حفص' },
+            { value: 'شعبة', label: 'شعبة' }
+        ]" :key="option.value">
 
-                                <option value="شعبة" @selected(old('riwaya') === 'شعبة')>
-                                    شعبة
-                                </option>
+            <button type="button"
+                @click="riwaya = option.value"
+                :class="riwaya === option.value
+                    ? 'bg-white text-green-700 shadow-sm font-semibold'
+                    : 'text-gray-500 hover:text-gray-800'"
+                class="px-6 py-2.5 rounded-lg text-sm transition-all duration-200">
 
-                            </select>
+                <span x-text="option.label"></span>
 
-                        </div>
+                <i x-show="riwaya === option.value"
+                    class="fas fa-check-circle mr-1 text-green-600"></i>
+
+            </button>
+
+        </template>
+
+    </div>
+
+    <input type="hidden" name="riwaya" :value="riwaya">
+
+</div>
 
 
                         {{-- Juz --}}
                         <div>
                             <label for="juz" class="block text-gray-700 font-medium mb-2">الجزء </label>
-                            <select name="juz" id="juz"
+                            <input type="number" name="juz" id="juz"
                                 class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500"
                                 required>
-
-                                <option value="">
-                                    اختر الجزء
-                                </option>
-
-                                @foreach ($juzs as $juz)
-                                    <option value="{{ $juz }}" @selected(old('juz') == $juz)>
-                                        الجزء {{ $juz }}
-                                    </option>
-                                @endforeach
-
-                            </select>
 
                         </div>
 
@@ -289,17 +288,8 @@
     <script>
         function questionForm() {
             return {
-                surats: @js(
-    $surats
-        ->map(
-            fn($surat) => [
-                'id' => (string) $surat->id,
-                'number' => $surat->number,
-                'title' => $surat->title,
-            ],
-        )
-        ->values(),
-),
+            riwaya: @js(old('riwaya', 'حفص')),
+                surats: @js($surats->map(fn($surat)=> ['id' => (string) $surat->id,'number' => $surat->number,'title' => $surat->title,],)->values(),),
 
                 selectedSurat: @js(old('quran_surat_id', '')),
                 selectedSuratTo: @js(old('quran_surat_to_id', '')),
