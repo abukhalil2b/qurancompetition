@@ -75,7 +75,7 @@ class CenterController extends Controller
         }
         
         $center->load([
-            'committees' => fn ($q) => $q->with('stage')->orderByDesc('active')->latest('id'),
+            'committees' => fn ($q) => $q->with('stage')->orderByDesc('active')->where('stage_id',$stage->id)->latest('id'),
         ]);
 
         $committeeIds = $center->committees->pluck('id');

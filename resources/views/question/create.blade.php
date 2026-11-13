@@ -53,40 +53,41 @@
                     <div class="flex gap-1">
 
                         {{-- Riwaya --}}
-<div class="w-full">
+                        <div class="w-full">
 
-    <label class="block text-gray-700 font-medium mb-2">
-        الرواية
-    </label>
+                            <label class="block text-gray-700 font-medium mb-2">
+                                الرواية
+                            </label>
 
-    <div class="inline-flex items-center bg-gray-100 rounded-xl p-1 gap-1">
+                            <div class="inline-flex items-center bg-gray-100 rounded-xl p-1 gap-1">
 
-        <template x-for="option in [
+                                <template
+                                    x-for="option in [
             { value: 'حفص', label: 'حفص' },
             { value: 'شعبة', label: 'شعبة' }
-        ]" :key="option.value">
+        ]"
+                                    :key="option.value">
 
-            <button type="button"
-                @click="riwaya = option.value"
-                :class="riwaya === option.value
-                    ? 'bg-white text-green-700 shadow-sm font-semibold'
-                    : 'text-gray-500 hover:text-gray-800'"
-                class="px-6 py-2.5 rounded-lg text-sm transition-all duration-200">
+                                    <button type="button" @click="riwaya = option.value"
+                                        :class="riwaya === option.value ?
+                                            'bg-white text-green-700 shadow-sm font-semibold' :
+                                            'text-gray-500 hover:text-gray-800'"
+                                        class="px-6 py-2.5 rounded-lg text-sm transition-all duration-200">
 
-                <span x-text="option.label"></span>
+                                        <span x-text="option.label"></span>
 
-                <i x-show="riwaya === option.value"
-                    class="fas fa-check-circle mr-1 text-green-600"></i>
+                                        <i x-show="riwaya === option.value"
+                                            class="fas fa-check-circle mr-1 text-green-600"></i>
 
-            </button>
+                                    </button>
 
-        </template>
+                                </template>
 
-    </div>
+                            </div>
 
-    <input type="hidden" name="riwaya" :value="riwaya">
+                            <input type="hidden" name="riwaya" :value="riwaya">
 
-</div>
+                        </div>
 
 
                         {{-- Juz --}}
@@ -178,18 +179,14 @@
                                     من الآية
                                 </label>
 
-                                <select name="aya_from" id="aya_from" x-model="selectedAyaFrom"
-                                    @change="validateAyaRange()" :disabled="loadingFrom || !selectedSurat"
+                                <input type="number" name="aya_from" id="aya_from" x-model="selectedAyaFrom"
+                                    @input="validateAyaRange()" :min="1" :max="ayasFrom.length"
+                                    :disabled="loadingFrom || !selectedSurat || ayasFrom.length === 0"
+                                    placeholder="رقم الآية"
                                     class="w-full border border-gray-300 rounded-lg px-4 py-3
-                   disabled:bg-gray-100 disabled:text-gray-400"
+           focus:outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500
+           disabled:bg-gray-100 disabled:text-gray-400"
                                     required>
-                                    <option value="">اختر الآية</option>
-
-                                    <template x-for="aya in ayasFrom" :key="aya.id">
-                                        <option :value="String(aya.number)" x-text="'الآية ' + aya.number">
-                                        </option>
-                                    </template>
-                                </select>
 
                                 @error('aya_from')
                                     <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
@@ -201,19 +198,15 @@
                                 <label for="aya_to" class="block text-gray-700 font-medium mb-2">
                                     إلى الآية
                                 </label>
-
-                                <select name="aya_to" id="aya_to" x-model="selectedAyaTo"
-                                    :disabled="loadingTo || !selectedSuratTo || !selectedAyaFrom"
+                                <input type="number" name="aya_to" id="aya_to" x-model="selectedAyaTo"
+                                    :min="selectedSurat === selectedSuratTo ? (Number(selectedAyaFrom) || 1) : 1"
+                                    :max="ayasTo.length"
+                                    :disabled="loadingTo || !selectedSuratTo || !selectedAyaFrom || ayasTo.length === 0"
+                                    placeholder="رقم الآية"
                                     class="w-full border border-gray-300 rounded-lg px-4 py-3
-                   disabled:bg-gray-100 disabled:text-gray-400"
+           focus:outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500
+           disabled:bg-gray-100 disabled:text-gray-400"
                                     required>
-                                    <option value="">اختر الآية</option>
-
-                                    <template x-for="aya in availableToAyas" :key="aya.id">
-                                        <option :value="String(aya.number)" x-text="'الآية ' + aya.number">
-                                        </option>
-                                    </template>
-                                </select>
 
                                 @error('aya_to')
                                     <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
@@ -288,8 +281,8 @@
     <script>
         function questionForm() {
             return {
-            riwaya: @js(old('riwaya', 'حفص')),
-                surats: @js($surats->map(fn($surat)=> ['id' => (string) $surat->id,'number' => $surat->number,'title' => $surat->title,],)->values(),),
+                riwaya: @js(old('riwaya', 'حفص')),
+                surats: @js($surats->map(fn($surat) => ['id' => (string) $surat->id, 'number' => $surat->number, 'title' => $surat->title])->values()),
 
                 selectedSurat: @js(old('quran_surat_id', '')),
                 selectedSuratTo: @js(old('quran_surat_to_id', '')),
@@ -331,23 +324,7 @@
                         surat => surat.number >= start.number
                     );
                 },
-
-                get availableToAyas() {
-                    if (!this.selectedAyaFrom) {
-                        return [];
-                    }
-
-                    // Same Surah: ending Ayah cannot be before starting Ayah.
-                    if (this.selectedSurat === this.selectedSuratTo) {
-                        return this.ayasTo.filter(
-                            aya => Number(aya.number) >= Number(this.selectedAyaFrom)
-                        );
-                    }
-
-                    // Different Surahs: all Ayahs in ending Surah are available.
-                    return this.ayasTo;
-                },
-
+                
                 suratName(id) {
                     const surat = this.surats.find(
                         surat => surat.id === String(id)
