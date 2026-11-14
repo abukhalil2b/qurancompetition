@@ -98,6 +98,16 @@ class QuestionsetController extends Controller
 
     public function show(Questionset $questionset)
     {
+
+     $levels = [
+            1 => 'المستوى الأول',
+            2 => 'المستوى الثاني',
+        ];
+
+        $levelId = isset($levels[$questionset->level]) ? $questionset->level : 1;
+
+        $level = $levels[$levelId];
+
         $questions = $questionset->questions()
             ->with(['surat', 'suratTo'])
             ->join('quran_surats', 'questions.quran_surat_id', '=', 'quran_surats.id')
@@ -106,7 +116,7 @@ class QuestionsetController extends Controller
             ->select('questions.*')
             ->get();
 
-        return view('questionset.show', compact('questionset', 'questions'));
+        return view('questionset.show', compact('questionset', 'questions','level'));
     }
 
     public function edit(Questionset $questionset)

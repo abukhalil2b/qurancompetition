@@ -128,7 +128,7 @@
                                text-sm font-bold tabular-nums bg-blue-50 text-blue-700"
                     >
                         {{ $set->questions_count }}
-                        <span class="text-xs font-medium">/ 5</span>
+                        <span class="text-xs font-medium">عدد الأسئلة</span>
                     </span>
 
                 </div>

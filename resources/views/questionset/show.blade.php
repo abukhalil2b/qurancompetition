@@ -13,10 +13,17 @@
                         <p class="text-emerald-600">
                             عدد الأسئلة: {{ $questions->count() }}
                         </p>
-                    </div>
 
+                    </div>
+                    <div
+                        class="text-sm md:text-base font-semibold
+                           bg-green-100 text-green-700
+                           px-4 py-2 rounded-lg
+                           border border-green-200">
+                        {{ $level }}
+                    </div>
                     <a href="{{ route('question.create', $questionset) }}"
-                        class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-emerald-600 to-green-600 text-white font-medium rounded-xl hover:from-emerald-700 hover:to-green-700 transition-all duration-200 shadow-md hover:shadow-lg">
+                        class="inline-flex items-center gap-2 px-6 py-3 bg-green-800 text-white font-medium rounded-xl hover:from-emerald-700 hover:to-green-700 transition-all duration-200 shadow-md hover:shadow-lg">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                         </svg>
