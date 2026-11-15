@@ -18,6 +18,9 @@
                         <p class="text-sm text-gray-600">
                             المستوى: {{ $questionset->level }}
                         </p>
+                        <p class="text-sm text-gray-600">
+                           {{ $questionset->stage->title }}
+                        </p>
 
                         <p class="text-sm text-gray-600">
                             عدد الأسئلة: {{ $questionset->questions_count }}

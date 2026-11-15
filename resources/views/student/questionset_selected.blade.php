@@ -10,12 +10,8 @@
 
                 <div>
                     <h1 class="text-2xl font-extrabold text-gray-900">
-                        لوحة تقييم المتسابق
-                    </h1>
-
-                    <p class="text-indigo-700 font-semibold mt-1">
                         {{ $student->name }}
-                    </p>
+                    </h1>
                 </div>
 
                 @php
@@ -45,10 +41,13 @@
 
                 <p class="text-sm text-gray-600 mt-1">
                     المستوى: {{ $questionset->level }}
-                    —
-                    عدد الأسئلة: {{ $studentQuestionSelections->count() }}
                 </p>
-
+                <p class="text-sm text-gray-600 mt-1">
+                    عدد الأسئلة: {{ $questionset->questions->count() }}
+                </p>
+                <p class="text-sm text-gray-600 mt-1">
+                   {{ $questionset->stage->title }}
+                </p>
             </div>
 
 

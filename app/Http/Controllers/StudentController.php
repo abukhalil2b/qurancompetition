@@ -60,13 +60,13 @@ class StudentController extends Controller
             ->get();
 
         $stats = [
-            'total'          => $competitions->count(),
-            'withdrawn'      => $competitions->where('student_status', 'withdraw')->count(),
-            'active'         => $competitions->where('student_status', '!=', 'withdraw')->count(),
-            'registered'     => $competitions->where('student_status', 'registration')->count(),
-            'in_hall'        => $competitions->where('student_status', 'present')->count(), // بانتظار الدخول للجنة
+            'total' => $competitions->count(),
+            'withdrawn' => $competitions->where('student_status', 'withdraw')->count(),
+            'active' => $competitions->where('student_status', '!=', 'withdraw')->count(),
+            'registered' => $competitions->where('student_status', 'registration')->count(),
+            'in_hall' => $competitions->where('student_status', 'present')->count(), // بانتظار الدخول للجنة
             'with_committee' => $competitions->where('student_status', 'with_committee')->count(), // مع اللجنة حالياً
-            'finished'       => $competitions->whereIn('student_status', ['waiting_finalization', 'finish_competition'])->count(),
+            'finished' => $competitions->whereIn('student_status', ['waiting_finalization', 'finish_competition'])->count(),
         ];
 
         return view('student.attendance_index', compact(
@@ -174,6 +174,8 @@ class StudentController extends Controller
 
             $questionset = Questionset::findOrFail($competition->questionset_id);
 
+            $questionset->load('questions');
+
             $studentQuestionSelections = StudentQuestionSelection::with([
                 'question.surat',
                 'judgeEvaluations.element',
@@ -209,6 +211,7 @@ class StudentController extends Controller
 
         $questionsets = Questionset::where('level', $competition->level)
             ->whereNotIn('id', $usedQuestionsetIds)
+            ->where('stage_id', $competition->stage_id)
             ->where('selected', 0)
             ->withCount('questions')
             ->get();
@@ -228,7 +231,7 @@ class StudentController extends Controller
         // ---------------------------------------------------------------------
         // Authorization
         // ---------------------------------------------------------------------
-        abort_unless($user->user_type === 'admin'|| $user->isCommitteeLeader($competition->committee_id),403,'اختيار الباقة متاح لرئيس اللجنة فقط.');
+        abort_unless($user->user_type === 'admin' || $user->isCommitteeLeader($competition->committee_id), 403, 'اختيار الباقة متاح لرئيس اللجنة فقط.');
 
         // ---------------------------------------------------------------------
         // Basic guards

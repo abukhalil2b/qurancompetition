@@ -14,6 +14,11 @@ class Questionset extends Model
         return $this->hasMany(Question::class);
     }
 
+    public function stage()
+    {
+        return $this->belongsTo(Stage::class);
+    }
+
     public function students()
     {
         return $this->belongsToMany(Student::class, 'questionset_students');
