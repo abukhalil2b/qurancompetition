@@ -37,6 +37,11 @@ class HomeController extends Controller
         return view('welcome');
     }
 
+    public function guide()
+    {
+        return view('guide.index');
+    }
+
     public function dashboard()
     {
 

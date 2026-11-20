@@ -1,35 +1,43 @@
 <x-app-layout>
     <div class="container mx-auto py-8 px-4" dir="rtl">
 
-        <div class="text-center mb-6">
-            <h1 class="text-xl font-bold mb-2">
-                قائمة المتسابقين الذين أتموا المسابقة وتم اعتماد نتائجهم ({{ $stage->title }})
-            </h1>
-            <p class="text-gray-600">
-                التاريخ: {{ now()->format('Y/m/d') }}
-            </p>
+        <div class="page-header-brand bg-islamic-pattern-dark mb-6">
+            <div class="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div class="flex items-center gap-3">
+                    <div class="w-11 h-11 rounded-2xl bg-brand-gold-400/20 border border-brand-gold-400/40 flex items-center justify-center text-brand-gold-300 shrink-0">
+                        <x-svgicon.brand-icon name="results" class="w-6 h-6" />
+                    </div>
+                    <div>
+                        <h1 class="font-display text-xl sm:text-2xl font-bold text-white">
+                            قائمة المتسابقين الذين أتموا المسابقة وتم اعتماد نتائجهم ({{ $stage->title }})
+                        </h1>
+                        <p class="text-xs text-brand-gold-200 mt-0.5">
+                            التاريخ: {{ now()->format('Y/m/d') }}
+                        </p>
+                    </div>
+                </div>
+                <x-svgicon.rosette class="w-8 h-8 hidden sm:block shrink-0" />
+            </div>
         </div>
 
-        <div class="no-print mb-6 flex flex-wrap items-center justify-between gap-4">
-            <div class="flex items-center gap-3">
-                <button onclick="window.print()" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition">
-                    طباعة
+        <div class="no-print card-brand p-4 mb-6 flex flex-wrap items-center justify-between gap-4">
+            <div class="flex items-center gap-2.5">
+                <button onclick="window.print()" class="btn-brand-primary">
+                    <x-svgicon.brand-icon name="print" class="w-4 h-4" />
+                    <span>طباعة</span>
                 </button>
 
                 <a href="{{ route('finished_student_list', array_merge(request()->all(), ['export' => 'true'])) }}"
                     target="_blank"
-                    class="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700 flex items-center gap-2 transition">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
-                    تصدير إكسل
+                    class="btn-brand-gold">
+                    <x-svgicon.brand-icon name="excel" class="w-4 h-4" />
+                    <span>تصدير إكسل</span>
                 </a>
             </div>
 
-            <form method="GET" action="{{ route('finished_student_list') }}" class="flex gap-3">
+            <form method="GET" action="{{ route('finished_student_list') }}" class="flex flex-wrap gap-2.5">
     {{-- Center Filter --}}
-    <select name="center_id" class="border rounded px-3 py-2 bg-white text-sm">
+    <select name="center_id" class="border rounded-xl px-3 py-2 bg-brand-sand-50 text-sm">
         <option value="">-- كل المراكز --</option>
         @foreach($centers as $center)
             <option value="{{ $center->id }}" {{ request('center_id') == $center->id ? 'selected' : '' }}>
@@ -39,20 +47,20 @@
     </select>
 
     {{-- Gender Filter --}}
-    <select name="gender" class="border rounded px-3 py-2 bg-white text-sm">
+    <select name="gender" class="border rounded-xl px-3 py-2 bg-brand-sand-50 text-sm">
         <option value="">-- كل الأجناس --</option>
         <option value="male" {{ request('gender') === 'male' ? 'selected' : '' }}>ذكر</option>
         <option value="female" {{ request('gender') === 'female' ? 'selected' : '' }}>أنثى</option>
     </select>
 
     {{-- Level Filter --}}
-    <select name="level" class="border rounded px-3 py-2 bg-white text-sm">
+    <select name="level" class="border rounded-xl px-3 py-2 bg-brand-sand-50 text-sm">
         <option value="">-- كل المستويات --</option>
         <option value="1" {{ request('level') === '1' ? 'selected' : '' }}>المستوى الأول</option>
         <option value="2" {{ request('level') === '2' ? 'selected' : '' }}>المستوى الثاني</option>
     </select>
 
-    <button type="submit" class="bg-gray-700 text-white px-5 py-2 rounded hover:bg-gray-800 transition text-sm">
+    <button type="submit" class="btn-brand-outline text-sm">
         تصفية
     </button>
 </form>

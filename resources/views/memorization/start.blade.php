@@ -11,13 +11,13 @@
 
     <style>
         body {
-            background-color: #f3f4f6;
+            background-color: #FAF8F4;
         }
 
         .btn-plus-big,
         .btn-minus-big {
             padding: 12px 20px;
-            border-radius: 0.5rem;
+            border-radius: 0.75rem;
             color: #fff;
             font-size: 1.1rem;
             font-weight: bold;
@@ -30,27 +30,28 @@
         }
 
         .btn-plus-big {
-            background-color: #16a34a;
+            background: linear-gradient(135deg, #146E66 0%, #0B4440 100%);
+            border: 1px solid rgba(201, 166, 107, 0.4);
         }
 
         .btn-plus-big:hover {
-            background-color: #15803d;
-            transform: scale(1.05);
+            background: linear-gradient(135deg, #1E8A7F 0%, #0F5953 100%);
+            transform: scale(1.04);
         }
 
         .btn-minus-big {
-            background-color: #dc2626;
+            background: linear-gradient(135deg, #be123c 0%, #9f1239 100%);
         }
 
         .btn-minus-big:hover {
-            background-color: #b91c1c;
-            transform: scale(1.05);
+            background: linear-gradient(135deg, #e11d48 0%, #be123c 100%);
+            transform: scale(1.04);
         }
 
         .score-input-big {
             padding: 0.5rem;
-            background-color: #fdfdfd;
-            border: 2px solid #e5e7eb;
+            background-color: #FAF8F4;
+            border: 2px solid #E8DEC9;
             outline: none;
         }
 
@@ -60,11 +61,11 @@
         }
 
         .custom-scroll::-webkit-scrollbar-track {
-            background: #f1f1f1;
+            background: #F4EFE6;
         }
 
         .custom-scroll::-webkit-scrollbar-thumb {
-            background: #c7d2fe;
+            background: #9AC5BF;
             border-radius: 10px;
         }
     </style>
@@ -73,15 +74,15 @@
 <body class="antialiased overflow-hidden">
     <div class="h-screen flex flex-col md:flex-row" x-data="evaluationPage({{ $evaluationElements }}, {{ $oldScores->toJson() }})">
         {{-- LEFT SIDE: Question / Quran --}}
-        <div :class="isDarkTheme ? 'bg-[#161526] text-white' : 'bg-white text-gray-900'"
-            class="w-full md:w-2/5 p-4 md:p-6 flex flex-col overflow-y-auto justify-start items-center text-center shadow-2xl z-10 transition-colors duration-300">
+        <div :class="isDarkTheme ? 'bg-[#07312E] text-white' : 'bg-[#FAF8F4] text-brand-teal-950'"
+            class="w-full md:w-2/5 p-4 md:p-6 flex flex-col overflow-y-auto justify-start items-center text-center shadow-2xl z-10 transition-colors duration-300 border-l border-brand-gold-400/30">
 
             {{-- Background Toggle Button --}}
             <div class="w-full flex justify-end mb-2">
                 <button type="button" @click="toggleBackground()"
-                    class="px-3 py-1 text-xs font-bold rounded-lg border transition"
-                    :class="isDarkTheme ? 'border-indigo-400/40 text-indigo-200 hover:bg-white/10' :
-                        'border-gray-300 text-gray-700 hover:bg-gray-100'">
+                    class="px-3 py-1.5 text-xs font-bold rounded-xl border transition"
+                    :class="isDarkTheme ? 'border-brand-gold-400/50 text-brand-gold-200 hover:bg-white/10' :
+                        'border-brand-teal-200 bg-white text-brand-teal-800 hover:bg-brand-teal-50'">
                     تغيير لون الخلفية
                 </button>
             </div>
@@ -89,15 +90,15 @@
             {{-- Question Header --}}
             <div class="w-full mb-4">
                 <div class="border h-11 px-6 flex items-center justify-center rounded-xl font-black text-lg mx-auto mb-3 shadow-inner w-fit"
-                    :class="isDarkTheme ? 'bg-indigo-900/50 border-indigo-500 text-white' :
-                        'bg-indigo-50 border-indigo-200 text-indigo-900'">
+                    :class="isDarkTheme ? 'bg-brand-gold-400/20 border-brand-gold-400/50 text-brand-gold-200' :
+                        'bg-brand-teal-50 border-brand-teal-200 text-brand-teal-900'">
                     السؤال: {{ $studentQuestionSelection->position }}
                 </div>
                 <h2 class="text-xl md:text-2xl font-bold leading-relaxed">
                     سورة {{ $startSurat->title }}
                 </h2>
 
-                <div class="mt-2 text-sm leading-loose" :class="isDarkTheme ? 'text-indigo-200' : 'text-gray-600'">
+                <div class="mt-2 text-sm leading-loose" :class="isDarkTheme ? 'text-brand-teal-100' : 'text-brand-teal-700'">
 
                     من الآية
                     <span class="font-bold" :class="isDarkTheme ? 'text-white' : 'text-gray-900'">

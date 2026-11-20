@@ -3,57 +3,37 @@
     <div class="max-w-7xl mx-auto px-4 py-6">
 
         {{-- Header --}}
-        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
+        <div class="page-header-brand bg-islamic-pattern-dark">
+            <div class="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div class="flex items-center gap-3.5">
+                    <div class="w-11 h-11 rounded-2xl bg-brand-gold-400/20 border border-brand-gold-400/40 flex items-center justify-center text-brand-gold-300 shrink-0">
+                        <x-svgicon.brand-icon name="questions" class="w-6 h-6" />
+                    </div>
+                    <div>
+                        <div class="flex flex-wrap items-center gap-2.5">
+                            <h1 class="font-display text-xl md:text-2xl font-bold text-white">
+                                باقات الأسئلة — {{ $stage->title }}
+                            </h1>
+                            <span class="px-3 py-0.5 rounded-full text-xs font-bold bg-brand-gold-400/25 text-brand-gold-200 border border-brand-gold-400/45">
+                                {{ $level }}
+                            </span>
+                        </div>
+                        <p class="text-xs text-brand-teal-100/80 mt-0.5">إعداد وإدارة وطباعة باقات الأسئلة القرآنية</p>
+                    </div>
+                </div>
 
-            <div class="flex items-center gap-4">
-
-                <h1 class="text-xl md:text-3xl font-bold text-gray-800">
-                    باقات الأسئلة - {{ $stage->title }}
-                </h1>
-
-                <span
-                    class="text-sm md:text-base font-semibold
-                           bg-green-100 text-green-700
-                           px-4 py-2 rounded-lg
-                           border border-green-200"
-                >
-                    {{ $level }}
-                </span>
-
+                <div class="flex flex-wrap items-center gap-2.5">
+                    <a href="{{ route('questionset.create', $levelId) }}" class="btn-brand-gold">
+                        <x-svgicon.brand-icon name="plus" class="w-4 h-4" />
+                        <span>إنشاء باقة جديدة</span>
+                    </a>
+                    <a href="{{ route('questionset.print') }}"
+                        class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold bg-white/10 hover:bg-white/20 text-white border border-white/25 transition">
+                        <x-svgicon.brand-icon name="print" class="w-4 h-4 text-brand-gold-300" />
+                        <span>طباعة</span>
+                    </a>
+                </div>
             </div>
-
-            <div class="flex flex-wrap items-center gap-2">
-
-                {{-- Create --}}
-                <a
-                    href="{{ route('questionset.create', $levelId) }}"
-                    class="inline-flex items-center
-                           px-5 py-3
-                           bg-green-600 text-white
-                           rounded-lg
-                           hover:bg-green-700
-                           transition shadow-sm"
-                >
-                    <i class="fas fa-plus ml-2"></i>
-                    إنشاء باقة جديدة
-                </a>
-
-                {{-- Print --}}
-                <a
-                    href="{{ route('questionset.print') }}"
-                    class="inline-flex items-center
-                           px-4 py-3
-                           bg-yellow-500 text-white
-                           rounded-lg
-                           hover:bg-yellow-600
-                           transition"
-                >
-                    <i class="fas fa-print ml-2"></i>
-                    طباعة
-                </a>
-
-            </div>
-
         </div>
 
 

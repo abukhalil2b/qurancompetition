@@ -3,18 +3,25 @@
     <div class="p-6" x-data="{ open: false }" @keydown.escape.window="open = false">
 
         {{-- Header --}}
-        <div class="flex items-center justify-between mb-6">
+        <div class="page-header-brand bg-islamic-pattern-dark">
+            <div class="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-11 h-11 rounded-2xl bg-brand-gold-400/20 border border-brand-gold-400/40 flex items-center justify-center text-brand-gold-300">
+                        <x-svgicon.brand-icon name="evaluation" class="w-6 h-6" />
+                    </div>
+                    <div>
+                        <h2 class="font-display text-xl sm:text-2xl font-bold text-white">
+                            عناصر التقييم — {{ $level }}
+                        </h2>
+                        <p class="text-xs text-brand-teal-100/80 mt-0.5">إدارة معايير التحكيم والحد الأعلى للدرجات</p>
+                    </div>
+                </div>
 
-            <h2 class="text-xl font-bold text-gray-800">
-                عناصر التقييم - {{ $level }}
-            </h2>
-
-            <button type="button" @click="open = true"
-                class="px-4 py-2 bg-green-600 text-white rounded-lg
-                       hover:bg-green-700 transition">
-                إضافة عنصر جديد - {{ $level }}
-            </button>
-
+                <button type="button" @click="open = true" class="btn-brand-gold">
+                    <x-svgicon.brand-icon name="plus" class="w-4 h-4" />
+                    <span>إضافة عنصر جديد - {{ $level }}</span>
+                </button>
+            </div>
         </div>
 
 

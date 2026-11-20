@@ -17,23 +17,23 @@
 
     <style>
         :root {
-            --g-blue: #2563eb;
-            --g-blue-hover: #1d4ed8;
+            --g-blue: #0F5953;
+            --g-blue-hover: #0B4440;
             --g-surface: #ffffff;
-            --g-bg: #f3f4f6;
-            --g-outline: #e5e7eb;
-            --g-text: #1f2937;
-            --g-text-2: #4b5563;
+            --g-bg: #FAF8F4;
+            --g-outline: #E8DEC9;
+            --g-text: #07312E;
+            --g-text-2: #3A5A56;
         }
 
         body {
-            font-family: 'Cairo', system-ui, sans-serif;
+            font-family: 'Tajawal', 'Cairo', system-ui, sans-serif;
             background: var(--g-bg);
             color: var(--g-text);
         }
 
         .g-elev-1 {
-            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 10px -2px rgba(7, 49, 46, 0.08);
         }
 
         .g-btn {
@@ -45,25 +45,25 @@
         }
 
         .g-row:hover {
-            background: #f9fafb;
+            background: #F0FAF9;
         }
     </style>
 </head>
 
-<body class="antialiased">
+<body class="antialiased bg-islamic-pattern">
     <div class="min-h-screen flex flex-col">
 
         {{-- Top app bar --}}
-        <header class="bg-white border-b border-gray-200 sticky top-0 z-20 shadow-sm">
+        <header class="bg-islamic-pattern-dark text-white border-b-2 border-brand-gold-400 sticky top-0 z-20 shadow-md">
             <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
-                <a href="{{ route('student.attendance_index') }}" class="flex items-center gap-3 text-gray-800 hover:text-blue-600 transition-colors">
-                    <span class="w-10 h-10 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
-                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                            <path opacity="0.5" d="M12 12c2.2091 0 4-1.7909 4-4s-1.7909-4-4-4-4 1.7909-4 4 1.7909 4 4 4z" />
-                            <path d="M4 20c0-3.3137 3.5817-6 8-6s8 2.6863 8 6v1H4v-1z" />
-                        </svg>
+                <a href="{{ route('student.attendance_index') }}" class="flex items-center gap-3 text-white hover:text-brand-gold-200 transition-colors">
+                    <span class="w-10 h-10 rounded-xl bg-brand-gold-400/20 border border-brand-gold-400/40 text-brand-gold-300 flex items-center justify-center">
+                        <x-svgicon.brand-icon name="attendance" class="w-6 h-6" />
                     </span>
-               <span class="text-red-800">{{ auth()->user()?->name }}</span>
+                    <div class="leading-tight">
+                        <div class="font-bold text-sm text-white">{{ auth()->user()?->name }}</div>
+                        <div class="text-[11px] text-brand-gold-200">تسجيل حضور المتسابقين</div>
+                    </div>
                 </a>
 
                 <div class="flex items-center gap-3">

@@ -23,6 +23,7 @@ use Illuminate\Support\Facades\Route;
 // Route::get('test_login_to_user_account/{user}', [HomeController::class, 'testLoginToUserAccount'])->name('test_login_to_user_account')->where('user', '[0-9]+');
 
 Route::get('/', [HomeController::class, 'welcome'])->name('welcome');
+Route::get('/guide', [HomeController::class, 'guide'])->name('program.guide');
 
 Route::get('statistic_dashboard', [StatisticController::class, 'statisticDashboard'])->name('statistic_dashboard');
 

@@ -22,43 +22,44 @@
             ];
         @endphp
 
-        {{-- Committee info card (unchanged) --}}
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-            <div class="px-6 py-4 bg-gray-50 border-b border-gray-100 flex items-center justify-between">
-                <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2">
-                    <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
-                    معلومات اللجنة
+        {{-- Committee info card --}}
+        <div class="card-brand overflow-hidden">
+            <div class="px-6 py-4 bg-islamic-pattern-dark text-white border-b-2 border-brand-gold-400 flex items-center justify-between">
+                <h2 class="text-lg font-bold flex items-center gap-2.5">
+                    <x-svgicon.brand-icon name="committees" class="w-5 h-5 text-brand-gold-300" />
+                    <span>معلومات اللجنة</span>
                 </h2>
+                <x-svgicon.rosette class="w-6 h-6" />
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x md:divide-x-reverse divide-gray-100">
-                <div class="p-5 flex items-start gap-4 hover:bg-gray-50 transition">
-                    <div class="p-3 bg-blue-50 rounded-xl text-blue-600">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+            <div class="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x md:divide-x-reverse divide-brand-sand-200">
+                <div class="p-5 flex items-start gap-4 hover:bg-brand-teal-50/40 transition">
+                    <div class="p-3 bg-brand-teal-50 border border-brand-teal-200 rounded-xl text-brand-teal-700">
+                        <x-svgicon.brand-icon name="centers" class="w-6 h-6" />
                     </div>
                     <div>
-                        <p class="text-sm text-gray-500 font-medium">المركز</p>
-                        <p class="text-base font-bold text-gray-900 mt-0.5">{{ $center->title }}</p>
+                        <p class="text-xs text-brand-teal-700/80 font-semibold">المركز</p>
+                        <p class="text-base font-bold text-brand-teal-950 mt-0.5">{{ $center->title }}</p>
                     </div>
                 </div>
 
-                <div class="p-5 flex items-start gap-4 hover:bg-gray-50 transition">
-                    <div class="p-3 bg-indigo-50 rounded-xl text-indigo-600">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2z"></path></svg>
+                <div class="p-5 flex items-start gap-4 hover:bg-brand-teal-50/40 transition">
+                    <div class="p-3 bg-brand-gold-50 border border-brand-gold-200 rounded-xl text-brand-gold-700">
+                        <x-svgicon.brand-icon name="stages" class="w-6 h-6" />
                     </div>
                     <div>
-                        <p class="text-sm text-gray-500 font-medium">المرحلة</p>
-                        <p class="text-base font-bold text-gray-900 mt-0.5">{{ $stage->title }}</p>
+                        <p class="text-xs text-brand-teal-700/80 font-semibold">المرحلة</p>
+                        <p class="text-base font-bold text-brand-teal-950 mt-0.5">{{ $stage->title }}</p>
                     </div>
                 </div>
 
-                <div class="p-5 flex items-start gap-4 hover:bg-gray-50 transition">
-                    <div class="p-3 bg-purple-50 rounded-xl text-purple-600">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                <div class="p-5 flex items-start gap-4 hover:bg-brand-teal-50/40 transition">
+                    <div class="p-3 bg-brand-teal-50 border border-brand-teal-200 rounded-xl text-brand-teal-700">
+                        <x-svgicon.brand-icon name="committees" class="w-6 h-6" />
                     </div>
                     <div>
-                        <p class="text-sm text-gray-500 font-medium">اللجنة</p>
-                        <p class="text-base font-bold text-gray-900 mt-0.5">{{ $committee->title }}</p>
+                        <p class="text-xs text-brand-teal-700/80 font-semibold">اللجنة</p>
+                        <p class="text-base font-bold text-brand-teal-950 mt-0.5">{{ $committee->title }}</p>
                     </div>
                 </div>
             </div>

@@ -17,13 +17,23 @@
     }" class="p-4 md:p-6 max-w-7xl mx-auto" dir="rtl">
 
         {{-- Header --}}
-        <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-3 mb-6">
-            <h1 class="text-2xl font-bold text-gray-800">
-                إدارة اللجان . {{ $stage->title }}
-            </h1>
-            <p class="text-blue-700 bg-blue-100 p-2 rounded text-sm">
-                رئيس اللجنة هو من يختار باقة الأسئلة للمتسابق، هو من يحدد السؤال الملغي
-            </p>
+        <div class="page-header-brand bg-islamic-pattern-dark">
+            <div class="relative z-10 flex flex-col md:flex-row md:justify-between md:items-center gap-3">
+                <div class="flex items-center gap-3">
+                    <div class="w-11 h-11 rounded-2xl bg-brand-gold-400/20 border border-brand-gold-400/40 flex items-center justify-center text-brand-gold-300 shrink-0">
+                        <x-svgicon.brand-icon name="committees" class="w-6 h-6" />
+                    </div>
+                    <div>
+                        <h1 class="font-display text-2xl font-bold text-white">
+                            إدارة اللجان — {{ $stage->title }}
+                        </h1>
+                        <p class="text-xs text-brand-teal-100/80 mt-0.5">تنظيم لجان التحكيم وتحديد رؤساء اللجان في كل مركز</p>
+                    </div>
+                </div>
+                <p class="text-brand-gold-100 bg-brand-gold-400/15 border border-brand-gold-400/35 px-3.5 py-2 rounded-xl text-xs font-semibold">
+                    رئيس اللجنة هو من يختار باقة الأسئلة للمتسابق، وهو من يحدد السؤال الملغي
+                </p>
+            </div>
         </div>
 
         {{-- Committees List --}}

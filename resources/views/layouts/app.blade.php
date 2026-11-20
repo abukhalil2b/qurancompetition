@@ -1,326 +1,327 @@
 <!DOCTYPE html>
-<html lang="en-GB" dir="rtl">
+<html lang="ar" dir="rtl">
 
 <head>
-    <meta charset='utf-8' />
-    <meta http-equiv='X-UA-Compatible' content='IE=edge' />
-    <title>{{ $title ?? ' مؤسسة الشيخ مستهيل للقرآن الكريم وقراءاته' }}</title>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>{{ $title ?? 'مسابقة مؤسسة الشيخ مستهيل للقرآن الكريم وقراءاته' }}</title>
 
-    <meta name='viewport' content='width=device-width, initial-scale=1' />
-    <link rel="icon" type="image/svg" href="{{ asset('favicon.svg') }}" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/png" href="{{ asset('logo.png') }}" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-
 </head>
 
-<body class="bg-gray-100 font-Helvetica antialiased">
+<body class="brand-shell bg-islamic-pattern font-tajawal text-brand-teal-950 antialiased">
+    @php
+        $user = Auth::user();
+        $currentStage = \App\Models\Stage::whereActive(1)->latest('id')->first();
+        $navItemClass = function (bool $active): string {
+            return $active
+                ? 'group flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-bold bg-gradient-to-l from-brand-gold-400/25 to-brand-teal-500/20 text-white border border-brand-gold-400/45 shadow-sm transition-all'
+                : 'group flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-brand-teal-100/85 hover:text-white hover:bg-white/10 border border-transparent transition-all';
+        };
+        $navIconClass = function (bool $active): string {
+            return $active
+                ? 'w-5 h-5 shrink-0 text-brand-gold-300'
+                : 'w-5 h-5 shrink-0 text-brand-teal-300 group-hover:text-brand-gold-300 transition-colors';
+        };
+    @endphp
+
     <div x-data="{ sidebarOpen: false }" class="min-h-screen relative flex">
 
-        <div x-show="sidebarOpen" x-transition:enter="transition-opacity ease-linear duration-300"
-            x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
-            x-transition:leave="transition-opacity ease-linear duration-300" x-transition:leave-start="opacity-100"
-            x-transition:leave-end="opacity-0" @click="sidebarOpen = false"
-            class="fixed inset-0 bg-gray-900/80 z-40 lg:hidden" x-cloak>
+        {{-- Mobile Backdrop --}}
+        <div x-show="sidebarOpen"
+            x-transition:enter="transition-opacity ease-linear duration-300"
+            x-transition:enter-start="opacity-0"
+            x-transition:enter-end="opacity-100"
+            x-transition:leave="transition-opacity ease-linear duration-300"
+            x-transition:leave-start="opacity-100"
+            x-transition:leave-end="opacity-0"
+            @click="sidebarOpen = false"
+            class="fixed inset-0 bg-brand-teal-950/70 backdrop-blur-xs z-40 lg:hidden" x-cloak>
         </div>
 
+        {{-- Architectural Deep Teal Sidebar --}}
         <nav :class="sidebarOpen ? 'translate-x-0' : 'translate-x-full lg:translate-x-0'"
-            class="fixed top-0 right-0 z-50 h-screen w-72 bg-white shadow-xl transition-transform duration-300 ease-in-out lg:static lg:inset-auto lg:translate-x-0 print:hidden overflow-y-auto">
+            class="sidebar-scroll fixed top-0 right-0 z-50 h-screen w-72 bg-islamic-pattern-dark text-white shadow-2xl border-l border-brand-gold-400/25 transition-transform duration-300 ease-in-out lg:sticky lg:top-0 lg:translate-x-0 print:hidden overflow-y-auto shrink-0">
 
-            <div class="h-full p-4 flex flex-col">
+            <div class="min-h-full p-4 flex flex-col">
 
-                <div class="lg:hidden flex justify-end mb-4">
-                    <button @click="sidebarOpen = false" class="text-gray-500 hover:text-gray-700">
+                {{-- Mobile Close --}}
+                <div class="lg:hidden flex justify-end mb-2">
+                    <button @click="sidebarOpen = false"
+                        class="p-1.5 rounded-lg text-brand-teal-200 hover:text-white hover:bg-white/10 transition">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M6 18L18 6M6 6l12 12" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                         </svg>
                     </button>
                 </div>
 
-                <form method="POST" action="{{ route('logout') }}" class="mt-3">
-                    @csrf
-                    <button type="submit"
-                        class="w-full flex items-center justify-center gap-2 px-3 py-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg text-xs font-bold transition-all border border-red-100 active:scale-95">
-
-                        <svg class="w-4 h-4 rotate-90 shrink-0" fill="none" stroke="currentColor" stroke-width="2"
-                            viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1">
-                            </path>
-                        </svg>
-
-                        <span>تسجيل الخروج</span>
-                    </button>
-                </form>
-
+                {{-- Official Brand Logo --}}
                 <a href="/"
-                    class="flex items-center justify-center gap-2 w-full px-4 py-3 bg-white text-purple-600 font-bold text-lg mt-2">
-                    مؤسسة الشيخ مستهيل للقرآن الكريم وقراءاته
+                    class="block bg-white/95 rounded-2xl p-3 shadow-lg border border-brand-gold-400/50 hover:shadow-xl transition-all mb-4">
+                    <img src="{{ asset('logo.png') }}" alt="شعار المسابقة" class="h-12 w-auto mx-auto object-contain">
                 </a>
 
-                <div>
-                    <div class="bg-gray-50 rounded-xl p-4 mb-6 border border-gray-100 shadow-sm mt-4">
-                        <div class="text-gray-900 font-bold text-base mb-0.5">
-                            {{ Auth::user()->name }}
+                {{-- User Profile Card --}}
+                <div class="rounded-2xl p-3.5 mb-4 bg-white/[0.07] border border-brand-gold-400/25 backdrop-blur-sm">
+                    <div class="flex items-start gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-gold-300 to-brand-gold-500 text-brand-teal-950 font-extrabold text-sm flex items-center justify-center shrink-0 shadow-sm">
+                            {{ mb_substr($user->name, 0, 1) }}
                         </div>
-
-                        <div
-                            class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-blue-100 text-blue-700 mb-2">
-                            {{ __(Auth::user()->user_type) }}
-                        </div>
-                        @if (Auth::user()->user_type == 'judge')
-                            @php
-                                $currentStage = App\Models\Stage::whereActive(1)->latest('id')->first();
-                            @endphp
-                            <div
-                                class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-blue-100 text-blue-700 mb-2">
-                                {{ $currentStage->title }}
+                        <div class="min-w-0 flex-1">
+                            <div class="text-white font-bold text-sm truncate" title="{{ $user->name }}">
+                                {{ $user->name }}
                             </div>
-                        @endif
-                        <div class="text-gray-500 text-xs flex items-center gap-1">
-                            <span class="font-medium text-gray-400 italic">رقم المدني:</span>
-                            {{ Auth::user()->national_id }}
+                            <div class="flex flex-wrap items-center gap-1.5 mt-1.5">
+                                <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-bold bg-brand-gold-400/20 text-brand-gold-200 border border-brand-gold-400/35">
+                                    {{ __($user->user_type) }}
+                                </span>
+                                @if ($currentStage)
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-medium bg-brand-teal-500/30 text-brand-teal-100 border border-brand-teal-400/30 truncate max-w-[140px]">
+                                        {{ $currentStage->title }}
+                                    </span>
+                                @endif
+                            </div>
+                            @if ($user->national_id)
+                                <div class="text-brand-teal-200/80 text-[11px] mt-1.5 flex items-center gap-1">
+                                    <x-svgicon.brand-icon name="id-card" class="w-3.5 h-3.5 text-brand-gold-300/80" />
+                                    <span>{{ $user->national_id }}</span>
+                                </div>
+                            @endif
                         </div>
                     </div>
                 </div>
 
-                <div class="py-4 px-2 border-b mb-4">
+                {{-- Dashboard Primary Button --}}
+                <div class="pb-4 mb-3 border-b border-white/10">
                     <a href="{{ route('dashboard') }}"
-                        class="flex items-center justify-center gap-2 w-full px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-md shadow-blue-100 transition-all active:scale-95 font-bold mb-6">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                        </svg>
-                        الرئيسية
+                        class="flex items-center justify-center gap-2.5 w-full px-4 py-3 rounded-xl font-bold text-sm transition-all active:scale-[0.98] shadow-md
+                        {{ request()->routeIs('dashboard') ? 'bg-gradient-to-l from-brand-gold-300 to-brand-gold-500 text-brand-teal-950' : 'bg-brand-teal-600/80 hover:bg-brand-teal-500 text-white border border-brand-gold-400/30' }}">
+                        <x-svgicon.brand-icon name="home" class="w-5 h-5" />
+                        <span>الرئيسية</span>
                     </a>
                 </div>
 
-                <ul class="space-y-1 pb-10">
-                    @if (auth()->user()->user_type == 'admin')
-                        <li class="menu-header text-xs uppercase text-gray-500 font-semibold px-2 py-2">
-                            الإدارة
+                {{-- Navigation Links --}}
+                <ul class="space-y-1 flex-1 pb-6">
+                    @if ($user->user_type == 'admin')
+                        <li class="flex items-center gap-2 text-[11px] uppercase tracking-wider text-brand-gold-300/90 font-bold px-2.5 pt-2 pb-1">
+                            <span class="w-1.5 h-1.5 rounded-full bg-brand-gold-400"></span>
+                            <span>الإدارة</span>
                         </li>
-                        <li class="menu-item">
-                            <a href="{{ route('stage.index') }}"
-                                class="flex items-center px-3 py-3 rounded-lg hover:bg-gray-100 text-gray-700 hover:text-blue-600 transition-colors">
-                                <svg class="w-5 h-5 ml-3" fill="currentColor" viewBox="0 0 24 24">
-                                    <path d="M12 2L2 7l10 5 10-5-10-5z" fill="currentColor" opacity="0.9" />
-                                    <path d="M2 12l10 5 10-5" fill="currentColor" opacity="0.6" />
-                                    <path d="M2 17l10 5 10-5" fill="currentColor" opacity="0.4" />
-                                </svg>
+
+                        <li>
+                            <a href="{{ route('stage.index') }}" class="{{ $navItemClass(request()->routeIs('stage.*')) }}">
+                                <x-svgicon.brand-icon name="stages" class="{{ $navIconClass(request()->routeIs('stage.*')) }}" />
                                 <span>التصفيات</span>
                             </a>
                         </li>
-                        <li class="menu-item">
-                            <a href="{{ route('center.index') }}"
-                                class="flex items-center px-3 py-3 rounded-lg hover:bg-gray-100 text-gray-700 hover:text-blue-600 transition-colors">
-                                <svg class="w-5 h-5 ml-3" fill="currentColor" viewBox="0 0 24 24">
-                                    <path opacity="0.5"
-                                        d="M19.7165 20.3624C21.143 19.5846 22 18.5873 22 17.5C22 16.3475 21.0372 15.2961 19.4537 14.5C17.6226 13.5794 14.9617 13 12 13C9.03833 13 6.37738 13.5794 4.54631 14.5C2.96285 15.2961 2 16.3475 2 17.5C2 18.6525 2.96285 19.7039 4.54631 20.5C6.37738 21.4206 9.03833 22 12 22C15.1066 22 17.8823 21.3625 19.7165 20.3624Z">
-                                    </path>
-                                    <path fill-rule="evenodd" clip-rule="evenodd"
-                                        d="M5 8.51464C5 4.9167 8.13401 2 12 2C15.866 2 19 4.9167 19 8.51464C19 12.0844 16.7658 16.2499 13.2801 17.7396C12.4675 18.0868 11.5325 18.0868 10.7199 17.7396C7.23416 16.2499 5 12.0844 5 8.51464ZM12 11C13.1046 11 14 10.1046 14 9C14 7.89543 13.1046 7 12 7C10.8954 7 10 7.89543 10 9C10 10.1046 10.8954 11 12 11Z">
-                                    </path>
-                                </svg>
+
+                        <li>
+                            <a href="{{ route('center.index') }}" class="{{ $navItemClass(request()->routeIs('center.*')) }}">
+                                <x-svgicon.brand-icon name="centers" class="{{ $navIconClass(request()->routeIs('center.*')) }}" />
                                 <span>المراكز</span>
                             </a>
                         </li>
-                        <li class="menu-item">
-                            <a href="{{ route('committee.index') }}"
-                                class="flex items-center px-3 py-3 rounded-lg hover:bg-gray-100 text-gray-700 hover:text-blue-600 transition-colors">
-                                <svg class="w-5 h-5 ml-3" fill="currentColor" viewBox="0 0 24 24">
-                                    <path opacity="0.5" d="M3 20h18v-2H3v2z" fill="currentColor" />
-                                    <path d="M12 2l7 6h-4v6h-6V8H5l7-6z" fill="currentColor" />
-                                </svg>
+
+                        <li>
+                            <a href="{{ route('committee.index') }}" class="{{ $navItemClass(request()->routeIs('committee.*')) }}">
+                                <x-svgicon.brand-icon name="committees" class="{{ $navIconClass(request()->routeIs('committee.*')) }}" />
                                 <span>اللجان</span>
                             </a>
                         </li>
 
-                        <li class="menu-item">
-                            <a href="{{ route('user.index') }}"
-                                class="flex items-center px-3 py-3 rounded-lg hover:bg-gray-100 text-gray-700 hover:text-blue-600 transition-colors">
-                                <svg class="w-5 h-5 ml-3" fill="currentColor" viewBox="0 0 24 24">
-                                    <path opacity="0.5"
-                                        d="M12 12c2.2091 0 4-1.7909 4-4s-1.7909-4-4-4-4 1.7909-4 4 1.7909 4 4 4z"
-                                        fill="currentColor" />
-                                    <path d="M4 20c0-3.3137 3.5817-6 8-6s8 2.6863 8 6v1H4v-1z" fill="currentColor" />
-                                </svg>
-                                <span>مستخدم النظام</span>
+                        <li>
+                            <a href="{{ route('user.index') }}" class="{{ $navItemClass(request()->routeIs('user.*')) }}">
+                                <x-svgicon.brand-icon name="users" class="{{ $navIconClass(request()->routeIs('user.*')) }}" />
+                                <span>مستخدمو النظام</span>
                             </a>
                         </li>
 
-                        <li class="menu-item">
-                            <a href="{{ route('student.index') }}"
-                                class="flex items-center px-3 py-3 rounded-lg hover:bg-gray-100 text-gray-700 hover:text-blue-600 transition-colors">
-                                <svg class="w-5 h-5 ml-3" fill="currentColor" viewBox="0 0 24 24">
-                                    <path opacity="0.5"
-                                        d="M12 12c2.2091 0 4-1.7909 4-4s-1.7909-4-4-4-4 1.7909-4 4 1.7909 4 4 4z"
-                                        fill="currentColor" />
-                                    <path d="M4 20c0-3.3137 3.5817-6 8-6s8 2.6863 8 6v1H4v-1z" fill="currentColor" />
-                                </svg>
-                                <span> المتسابقون </span>
+                        <li>
+                            <a href="{{ route('student.index') }}" class="{{ $navItemClass(request()->routeIs('student.index', 'student.create', 'student.edit')) }}">
+                                <x-svgicon.brand-icon name="students" class="{{ $navIconClass(request()->routeIs('student.index', 'student.create', 'student.edit')) }}" />
+                                <span>المتسابقون</span>
                             </a>
                         </li>
 
-                        <li class="menu-header text-xs uppercase text-gray-500 font-semibold px-2 py-2 mt-4">
-                            التقييم
+                        <li class="flex items-center gap-2 text-[11px] uppercase tracking-wider text-brand-gold-300/90 font-bold px-2.5 pt-4 pb-1">
+                            <span class="w-1.5 h-1.5 rounded-full bg-brand-gold-400"></span>
+                            <span>معايير التقييم</span>
                         </li>
 
-                        <li class="menu-item">
-                            <a href="{{ route('evaluation_element.index', 1) }}"
-                                class="flex items-center px-3 py-3 rounded-lg hover:bg-gray-100 text-gray-700 hover:text-blue-600 transition-colors">
-                                <svg class="w-5 h-5 ml-3" fill="currentColor" viewBox="0 0 24 24">
-                                    <path opacity="0.5"
-                                        d="M14 2H6C4.89543 2 4 2.89543 4 4V20C4 21.1046 4.89543 22 6 22H18C19.1046 22 20 21.1046 20 20V8L14 2Z"
-                                        fill="currentColor" />
-                                    <path d="M14 2V8H20M8 13L12 17L16 11" stroke="currentColor" stroke-width="2"
-                                        stroke-linecap="round" stroke-linejoin="round" />
-                                </svg>
+                        <li>
+                            <a href="{{ route('evaluation_element.index', 1) }}" class="{{ $navItemClass(request()->is('evaluation_element/index/1')) }}">
+                                <x-svgicon.brand-icon name="evaluation" class="{{ $navIconClass(request()->is('evaluation_element/index/1')) }}" />
                                 <span>عناصر التقييم - المستوى الأول</span>
                             </a>
                         </li>
 
-                        <li class="menu-item">
-                            <a href="{{ route('evaluation_element.index', 2) }}"
-                                class="flex items-center px-3 py-3 rounded-lg hover:bg-gray-100 text-gray-700 hover:text-blue-600 transition-colors">
-                                <svg class="w-5 h-5 ml-3" fill="currentColor" viewBox="0 0 24 24">
-                                    <path opacity="0.5"
-                                        d="M14 2H6C4.89543 2 4 2.89543 4 4V20C4 21.1046 4.89543 22 6 22H18C19.1046 22 20 21.1046 20 20V8L14 2Z"
-                                        fill="currentColor" />
-                                    <path d="M14 2V8H20M8 13L12 17L16 11" stroke="currentColor" stroke-width="2"
-                                        stroke-linecap="round" stroke-linejoin="round" />
-                                </svg>
+                        <li>
+                            <a href="{{ route('evaluation_element.index', 2) }}" class="{{ $navItemClass(request()->is('evaluation_element/index/2')) }}">
+                                <x-svgicon.brand-icon name="evaluation" class="{{ $navIconClass(request()->is('evaluation_element/index/2')) }}" />
                                 <span>عناصر التقييم - المستوى الثاني</span>
                             </a>
                         </li>
                     @endif
 
-                    @if (in_array(auth()->user()->user_type, ['question_admin', 'admin']))
-                        <li class="menu-header text-xs uppercase text-gray-500 font-semibold px-2 py-2 mt-4">
-                            الأسئلة
+                    @if (in_array($user->user_type, ['question_admin', 'admin']))
+                        <li class="flex items-center gap-2 text-[11px] uppercase tracking-wider text-brand-gold-300/90 font-bold px-2.5 pt-4 pb-1">
+                            <span class="w-1.5 h-1.5 rounded-full bg-brand-gold-400"></span>
+                            <span>الأسئلة والباقات</span>
                         </li>
-                        <li class="menu-item">
-                            <a href="{{ route('questionset.index', 1) }}"
-                                class="flex items-center px-3 py-3 rounded-lg hover:bg-gray-100 text-gray-700 hover:text-blue-600 transition-colors">
-                                <svg class="w-5 h-5 ml-3" fill="currentColor" viewBox="0 0 24 24">
-                                    <path opacity="0.5"
-                                        d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"
-                                        fill="currentColor" />
-                                    <path d="M12 6h.01M12 12h.01M12 18h.01" stroke="currentColor" stroke-width="2"
-                                        stroke-linecap="round" stroke-linejoin="round" />
-                                </svg>
+
+                        <li>
+                            <a href="{{ route('questionset.index', 1) }}" class="{{ $navItemClass(request()->is('questionset/index/1')) }}">
+                                <x-svgicon.brand-icon name="questions" class="{{ $navIconClass(request()->is('questionset/index/1')) }}" />
                                 <span>باقات الأسئلة - المستوى الأول</span>
                             </a>
                         </li>
 
-                        <li class="menu-item">
-                            <a href="{{ route('questionset.index', 2) }}"
-                                class="flex items-center px-3 py-3 rounded-lg hover:bg-gray-100 text-gray-700 hover:text-blue-600 transition-colors">
-                                <svg class="w-5 h-5 ml-3" fill="currentColor" viewBox="0 0 24 24">
-                                    <path opacity="0.5"
-                                        d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"
-                                        fill="currentColor" />
-                                    <path d="M12 6h.01M12 12h.01M12 18h.01" stroke="currentColor" stroke-width="2"
-                                        stroke-linecap="round" stroke-linejoin="round" />
-                                </svg>
+                        <li>
+                            <a href="{{ route('questionset.index', 2) }}" class="{{ $navItemClass(request()->is('questionset/index/2')) }}">
+                                <x-svgicon.brand-icon name="questions" class="{{ $navIconClass(request()->is('questionset/index/2')) }}" />
                                 <span>باقات الأسئلة - المستوى الثاني</span>
                             </a>
                         </li>
                     @endif
 
-                    @if (auth()->user()->user_type == 'organizer')
-                        <li class="menu-header text-xs uppercase text-gray-500 font-semibold px-2 py-2 mt-4">
-                            المتسابقون
+                    @if ($user->user_type == 'organizer')
+                        <li class="flex items-center gap-2 text-[11px] uppercase tracking-wider text-brand-gold-300/90 font-bold px-2.5 pt-4 pb-1">
+                            <span class="w-1.5 h-1.5 rounded-full bg-brand-gold-400"></span>
+                            <span>المتسابقون</span>
                         </li>
 
-                        <li class="menu-item">
-                            <a href="{{ route('student.attendance_index') }}"
-                                class="flex items-center px-3 py-3 rounded-lg hover:bg-gray-100 text-gray-700 hover:text-blue-600 transition-colors">
-                                <svg class="w-5 h-5 ml-3" fill="currentColor" viewBox="0 0 24 24">
-                                    <path opacity="0.5"
-                                        d="M12 12c2.2091 0 4-1.7909 4-4s-1.7909-4-4-4-4 1.7909-4 4 1.7909 4 4 4z"
-                                        fill="currentColor" />
-                                    <path d="M4 20c0-3.3137 3.5817-6 8-6s8 2.6863 8 6v1H4v-1z" fill="currentColor" />
-                                </svg>
+                        <li>
+                            <a href="{{ route('student.attendance_index') }}" class="{{ $navItemClass(request()->routeIs('student.attendance_index')) }}">
+                                <x-svgicon.brand-icon name="attendance" class="{{ $navIconClass(request()->routeIs('student.attendance_index')) }}" />
                                 <span>المتسابقون - تسجيل الحضور</span>
                             </a>
                         </li>
                     @endif
 
-                    @if (auth()->user()->user_type == 'admin')
-                        <li class="menu-header text-xs uppercase text-gray-500 font-semibold px-2 py-2 mt-4">
-                            المتسابقون
+                    @if ($user->user_type == 'admin')
+                        <li class="flex items-center gap-2 text-[11px] uppercase tracking-wider text-brand-gold-300/90 font-bold px-2.5 pt-4 pb-1">
+                            <span class="w-1.5 h-1.5 rounded-full bg-brand-gold-400"></span>
+                            <span>الحضور</span>
                         </li>
 
-                        <li class="menu-item">
-                            <a href="{{ route('admin.student.female_attendance_index') }}"
-                                class="flex items-center px-3 py-3 rounded-lg hover:bg-gray-100 text-gray-700 hover:text-blue-600 transition-colors">
-                                <svg class="w-5 h-5 ml-3" fill="currentColor" viewBox="0 0 24 24">
-                                    <path opacity="0.5"
-                                        d="M12 12c2.2091 0 4-1.7909 4-4s-1.7909-4-4-4-4 1.7909-4 4 1.7909 4 4 4z"
-                                        fill="currentColor" />
-                                    <path d="M4 20c0-3.3137 3.5817-6 8-6s8 2.6863 8 6v1H4v-1z" fill="currentColor" />
-                                </svg>
-                                <span>المتسابقون - تسجيل الحضور (الاناث)</span>
+                        <li>
+                            <a href="{{ route('admin.student.female_attendance_index') }}" class="{{ $navItemClass(request()->routeIs('admin.student.female_attendance_index')) }}">
+                                <x-svgicon.brand-icon name="attendance" class="{{ $navIconClass(request()->routeIs('admin.student.female_attendance_index')) }}" />
+                                <span>تسجيل الحضور (الإناث)</span>
                             </a>
                         </li>
                     @endif
 
-                    @if (in_array(auth()->user()->user_type, ['judge', 'admin']))
-                        <li class="menu-header text-xs uppercase text-gray-500 font-semibold px-2 py-2 mt-4">
-                            التقييم
+                    @if (in_array($user->user_type, ['judge', 'admin']))
+                        <li class="flex items-center gap-2 text-[11px] uppercase tracking-wider text-brand-gold-300/90 font-bold px-2.5 pt-4 pb-1">
+                            <span class="w-1.5 h-1.5 rounded-full bg-brand-gold-400"></span>
+                            <span>التحكيم والنتائج</span>
                         </li>
 
-                        <li class="menu-item">
-                            <a href="{{ route('student.present_index') }}"
-                                class="flex items-center px-3 py-3 rounded-lg hover:bg-gray-100 text-gray-700 hover:text-blue-600 transition-colors">
-                                <svg class="w-5 h-5 ml-3" fill="currentColor" viewBox="0 0 24 24">
-                                    <path opacity="0.5"
-                                        d="M12 12c2.2091 0 4-1.7909 4-4s-1.7909-4-4-4-4 1.7909-4 4 1.7909 4 4 4z"
-                                        fill="currentColor" />
-                                    <path d="M4 20c0-3.3137 3.5817-6 8-6s8 2.6863 8 6v1H4v-1z" fill="currentColor" />
-                                </svg>
+                        <li>
+                            <a href="{{ route('student.present_index') }}" class="{{ $navItemClass(request()->routeIs('student.present_index')) }}">
+                                <x-svgicon.brand-icon name="present" class="{{ $navIconClass(request()->routeIs('student.present_index')) }}" />
                                 <span>المتسابقون الحاضرون</span>
                             </a>
                         </li>
                     @endif
 
-                    @if (in_array(auth()->user()->user_type, ['admin']))
-                        <li class="menu-item">
-                            <a href="{{ route('finished_student_list') }}"
-                                class="flex items-center px-3 py-3 rounded-lg hover:bg-gray-100 text-gray-700 hover:text-blue-600 transition-colors">
-                                <svg class="w-5 h-5 ml-3" fill="currentColor" viewBox="0 0 24 24">
-                                    <path d="M5 19h14V5H5v14zm10-12h2v10h-2V7zm-4 4h2v6h-2v-6zm-4 3h2v3H7v-3z"
-                                        fill="currentColor" />
-                                    <path opacity="0.5" d="M3 21h18v2H3v-2z" fill="currentColor" />
-                                </svg>
+                    @if (in_array($user->user_type, ['admin']))
+                        <li>
+                            <a href="{{ route('finished_student_list') }}" class="{{ $navItemClass(request()->routeIs('finished_student_list')) }}">
+                                <x-svgicon.brand-icon name="results" class="{{ $navIconClass(request()->routeIs('finished_student_list')) }}" />
                                 <span>النتائج النهائية</span>
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="{{ route('statistic_dashboard') }}" class="{{ $navItemClass(request()->routeIs('statistic_dashboard')) }}">
+                                <x-svgicon.brand-icon name="statistics" class="{{ $navIconClass(request()->routeIs('statistic_dashboard')) }}" />
+                                <span>الإحصائيات العامة</span>
                             </a>
                         </li>
                     @endif
 
+                    {{-- Program Guide (PDF) Link --}}
+                    <li class="flex items-center gap-2 text-[11px] uppercase tracking-wider text-brand-gold-300/90 font-bold px-2.5 pt-4 pb-1">
+                        <span class="w-1.5 h-1.5 rounded-full bg-brand-gold-400"></span>
+                        <span>المساعدة والتوثيق</span>
+                    </li>
+                    <li>
+                        <a href="{{ route('program.guide') }}" target="_blank"
+                            class="group flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-bold text-brand-gold-200 hover:text-white bg-brand-gold-400/10 hover:bg-brand-gold-400/20 border border-brand-gold-400/30 transition-all">
+                            <x-svgicon.brand-icon name="guide" class="w-5 h-5 shrink-0 text-brand-gold-300" />
+                            <span>دليل البرنامج (PDF)</span>
+                        </a>
+                    </li>
                 </ul>
+
+                {{-- Logout Button --}}
+                <div class="pt-3 border-t border-white/10 mt-auto">
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button type="submit"
+                            class="w-full flex items-center justify-center gap-2 px-3.5 py-2.5 bg-rose-500/15 hover:bg-rose-500/25 text-rose-200 hover:text-white rounded-xl text-xs font-bold transition-all border border-rose-400/25 active:scale-95">
+                            <x-svgicon.brand-icon name="logout" class="w-4 h-4 shrink-0" />
+                            <span>تسجيل الخروج</span>
+                        </button>
+                    </form>
+                </div>
             </div>
         </nav>
 
-        <div class="flex-1 flex flex-col overflow-hidden">
+        {{-- Main Area --}}
+        <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
 
-            <div class="lg:hidden bg-white shadow-sm p-4 flex items-center justify-between border-b">
-                <span class="font-bold text-gray-700">{{ $title ?? 'مسابقة مؤسسة الشيخ مستهيل' }}</span>
-                <button @click="sidebarOpen = true"
-                    class="text-gray-500 hover:text-gray-700 focus:outline-none bg-gray-50 p-2 rounded-lg">
-                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M4 6h16M4 12h16M4 18h16"></path>
-                    </svg>
-                </button>
-            </div>
+            {{-- Top Institutional Bar --}}
+            <header class="print:hidden bg-white/90 backdrop-blur-md border-b border-brand-sand-200 sticky top-0 z-30 shadow-xs">
+                <div class="px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
+                    <div class="flex items-center gap-3 min-w-0">
+                        <button @click="sidebarOpen = true"
+                            class="lg:hidden p-2 rounded-xl text-brand-teal-800 bg-brand-teal-50 hover:bg-brand-teal-100 border border-brand-teal-200 transition">
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                            </svg>
+                        </button>
+                        <div class="flex items-center gap-2.5 min-w-0">
+                            <x-svgicon.rosette class="w-6 h-6 shrink-0 hidden sm:block" />
+                            <div class="min-w-0">
+                                <div class="font-bold text-sm sm:text-base text-brand-teal-900 truncate">
+                                    {{ $title ?? 'مسابقة مؤسسة الشيخ مستهيل للقرآن الكريم وقراءاته' }}
+                                </div>
+                                @if ($currentStage)
+                                    <div class="text-[11px] text-brand-gold-700 font-medium truncate">
+                                        المرحلة النشطة: {{ $currentStage->title }}
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
 
-            <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-2">
-                <div class="mb-4">
-                    @include('layouts._message')
+                    <div class="flex items-center gap-2 shrink-0">
+                        <a href="{{ route('program.guide') }}" target="_blank"
+                            class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-brand-gold-50 text-brand-gold-800 border border-brand-gold-200 hover:bg-brand-gold-100 transition">
+                            <x-svgicon.brand-icon name="guide" class="w-4 h-4 text-brand-gold-600" />
+                            <span>دليل الاستخدام</span>
+                        </a>
+                    </div>
                 </div>
-                {{ $slot }}
+            </header>
+
+            {{-- Page Content --}}
+            <main class="flex-1 overflow-x-hidden overflow-y-auto p-3 sm:p-5 lg:p-6">
+                <div class="max-w-7xl mx-auto">
+                    @include('layouts._message')
+                    {{ $slot }}
+                </div>
             </main>
         </div>
 

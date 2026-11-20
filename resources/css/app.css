@@ -15,19 +15,203 @@
     font-display: swap;
 }
 
-body {
-    font-family: "Helvetica";
+:root {
+    --brand-teal-950: #041F1D;
+    --brand-teal-900: #07312E;
+    --brand-teal-800: #0B4440;
+    --brand-teal-700: #0F5953;
+    --brand-teal-600: #146E66;
+    --brand-teal-500: #1E8A7F;
+    --brand-teal-100: #D6F0ED;
+    --brand-teal-50: #F0FAF9;
+
+    --brand-gold-600: #9A7237;
+    --brand-gold-500: #B68D4C;
+    --brand-gold-400: #C9A66B;
+    --brand-gold-200: #E8D7B0;
+    --brand-gold-100: #F4ECD8;
+    --brand-gold-50: #FBF8F0;
+
+    --brand-sand-50: #FAF8F4;
+    --brand-sand-100: #F4EFE6;
+    --brand-sand-200: #E8DEC9;
+}
+
+@layer base {
+    body {
+        font-family: "Tajawal", "Helvetica", system-ui, -apple-system, sans-serif;
+        color: #0D2D2A;
+        background-color: var(--brand-sand-50);
+    }
+
+    input[type="text"],
+    input[type="password"],
+    input[type="email"],
+    input[type="number"],
+    input[type="search"],
+    input[type="tel"],
+    input[type="date"],
+    select,
+    textarea {
+        @apply border-brand-sand-200 rounded-xl transition-all duration-200;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+        border-color: var(--brand-teal-600) !important;
+        box-shadow: 0 0 0 3px rgba(20, 110, 102, 0.14) !important;
+        outline: none !important;
+    }
 }
 
 .font-quran {
-    font-family: "MeQuran", serif;
+    font-family: "MeQuran", "Amiri", serif;
     direction: rtl;
     text-align: right;
     line-height: 2.4;
 }
 
-[x-cloak] {
-            display: none !important;
-        }
+.font-display {
+    font-family: "Amiri", serif;
+}
 
-    
+[x-cloak] {
+    display: none !important;
+}
+
+/* ==========================================================================
+   Islamic Architectural Geometric SVG Patterns
+   Inspired by Omani Mosque Domes & Sheikh Mustahil Competition Visual Identity
+   ========================================================================== */
+
+/* Light sandstone geometric 8-pointed star lattice (for main content areas) */
+.bg-islamic-pattern {
+    background-color: #FAF8F4;
+    background-image: url("data:image/svg+xml,%3Csvg width='72' height='72' viewBox='0 0 72 72' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%230F5953' stroke-opacity='0.045' stroke-width='1'%3E%3Cpath d='M36 6L43.5 28.5L66 36L43.5 43.5L36 66L28.5 43.5L6 36L28.5 28.5Z'/%3E%3Crect x='18' y='18' width='36' height='36' transform='rotate(45 36 36)'/%3E%3Ccircle cx='36' cy='36' r='5' stroke='%23C9A66B' stroke-opacity='0.14'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* Deep teal geometric pattern (for sidebar, banners, and hero headers) */
+.bg-islamic-pattern-dark {
+    background-color: #07312E;
+    background-image:
+        radial-gradient(circle at 20% 0%, rgba(30, 138, 127, 0.35), transparent 55%),
+        radial-gradient(circle at 80% 100%, rgba(201, 166, 107, 0.14), transparent 50%),
+        url("data:image/svg+xml,%3Csvg width='64' height='64' viewBox='0 0 64 64' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%23C9A66B' stroke-opacity='0.09' stroke-width='0.9'%3E%3Cpath d='M32 4L39 25L60 32L39 39L32 60L25 39L4 32L25 25Z'/%3E%3Crect x='16' y='16' width='32' height='32' transform='rotate(45 32 32)'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* Gold banner plaque matching the uploaded image's title bar */
+.brand-gold-plaque {
+    background: linear-gradient(135deg, #D5B577 0%, #C9A66B 55%, #B8904F 100%);
+    box-shadow: 0 10px 28px -6px rgba(7, 49, 46, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.45);
+    border-bottom: 3px solid #F6E9CE;
+}
+
+/* ==========================================================================
+   Brand Components
+   ========================================================================== */
+@layer components {
+    .btn-brand-primary {
+        @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm text-white transition-all duration-200 active:scale-[0.98] shadow-sm;
+        background: linear-gradient(135deg, #146E66 0%, #0B4440 100%);
+        border: 1px solid rgba(201, 166, 107, 0.35);
+    }
+
+    .btn-brand-primary:hover {
+        background: linear-gradient(135deg, #1E8A7F 0%, #0F5953 100%);
+        box-shadow: 0 8px 20px -6px rgba(11, 68, 64, 0.45);
+        transform: translateY(-1px);
+    }
+
+    .btn-brand-gold {
+        @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm text-[#07312E] transition-all duration-200 active:scale-[0.98] shadow-sm;
+        background: linear-gradient(135deg, #DEC28A 0%, #C9A66B 100%);
+        border: 1px solid rgba(154, 114, 55, 0.35);
+    }
+
+    .btn-brand-gold:hover {
+        background: linear-gradient(135deg, #E8D2A4 0%, #D4B275 100%);
+        box-shadow: 0 8px 20px -6px rgba(182, 141, 76, 0.45);
+        transform: translateY(-1px);
+    }
+
+    .btn-brand-outline {
+        @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl font-bold text-sm text-brand-teal-800 bg-white border border-brand-teal-200 hover:bg-brand-teal-50 hover:border-brand-teal-400 transition-all duration-200 active:scale-[0.98];
+    }
+
+    .btn-brand-danger {
+        @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl font-bold text-sm text-white bg-rose-700 hover:bg-rose-800 border border-rose-800/30 shadow-sm transition-all duration-200 active:scale-[0.98];
+    }
+
+    .card-brand {
+        @apply bg-white/95 backdrop-blur-sm rounded-2xl border border-brand-sand-200/90 shadow-sm;
+    }
+
+    .page-header-brand {
+        @apply relative overflow-hidden rounded-2xl p-5 sm:p-6 text-white shadow-md mb-6;
+        background: linear-gradient(135deg, #07312E 0%, #0F5953 60%, #146E66 100%);
+        border-bottom: 3px solid #C9A66B;
+    }
+
+    .badge-teal {
+        @apply inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-brand-teal-50 text-brand-teal-800 border border-brand-teal-200;
+    }
+
+    .badge-gold {
+        @apply inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-brand-gold-50 text-brand-gold-800 border border-brand-gold-200;
+    }
+}
+
+/* ==========================================================================
+   Global Visual Harmonization Inside App Layout
+   Elevates all existing inner pages seamlessly to the new identity
+   ========================================================================== */
+.brand-shell main table {
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.brand-shell main table thead tr {
+    background: linear-gradient(180deg, #F0FAF9 0%, #E5F4F2 100%);
+    color: #0B4440;
+}
+
+.brand-shell main table thead th {
+    font-weight: 700;
+    border-bottom: 2px solid #D8C7A8;
+}
+
+.brand-shell main table tbody tr:hover {
+    background-color: rgba(240, 250, 249, 0.65);
+}
+
+/* Custom subtle scrollbars */
+::-webkit-scrollbar {
+    width: 7px;
+    height: 7px;
+}
+
+::-webkit-scrollbar-track {
+    background: #F4EFE6;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #9AC5BF;
+    border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #146E66;
+}
+
+.sidebar-scroll::-webkit-scrollbar-track {
+    background: rgba(4, 31, 29, 0.35);
+}
+
+.sidebar-scroll::-webkit-scrollbar-thumb {
+    background: rgba(201, 166, 107, 0.35);
+}
+
+.sidebar-scroll::-webkit-scrollbar-thumb:hover {
+    background: rgba(201, 166, 107, 0.65);
+}
