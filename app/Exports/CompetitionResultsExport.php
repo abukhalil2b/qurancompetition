@@ -2,6 +2,7 @@
 namespace App\Exports;
 
 use App\Models\Competition;
+use App\Models\Stage;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -24,6 +25,8 @@ class CompetitionResultsExport implements FromView, WithColumnWidths, WithStyles
 
     public function view(): View
     {
+        $stage = Stage::whereActive(1)->latest('id')->first();
+
         $competitions = Competition::with([
             'student',
             'questionset',
@@ -43,6 +46,7 @@ class CompetitionResultsExport implements FromView, WithColumnWidths, WithStyles
             ->when($this->request->filled('level'), function ($query) {
                 $query->where('level', $this->request->level);
             })
+            ->where('stage_id',$stage->id)
             ->whereNotNull('final_score')
             ->orderByDesc('final_score')
             ->get();
